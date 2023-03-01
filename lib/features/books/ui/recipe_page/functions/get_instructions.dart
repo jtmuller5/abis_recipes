@@ -1,9 +1,8 @@
 import 'dart:developer';
 
 import 'package:abis_recipes/features/books/models/instruction.dart';
-import 'package:abis_recipes/features/books/ui/recipe_page/recipe_page.dart';
 import 'package:abis_recipes/features/books/ui/recipe_page/services/html_processor.dart';
-import 'package:abis_recipes/features/home/providers/instructions_provider.dart';
+import 'package:abis_recipes/features/home/providers/recipe_provider.dart';
 import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'package:flutter/foundation.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -63,6 +62,6 @@ void getInstructions(BeautifulSoup bs, WidgetRef ref, {bool print = false}) {
 
     if (print) debugPrint('Instructions: ' + instruction);
 
-    ref.read(instructionsProvider.notifier).addInstruction(Instruction(text: ReCase(instruction.trim()).sentenceCase + '.'));
+    ref.read(recipeProvider.notifier).addInstruction(Instruction(text: ReCase(instruction.trim()).sentenceCase + '.'));
   });
 }

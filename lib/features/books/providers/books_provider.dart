@@ -35,13 +35,8 @@ final booksProvider = StateNotifierProvider<BooksNotifier, List<Book>>((ref) {
 });
 
 class BookNotifier extends StateNotifier<Book?> {
-  BookNotifier(this.bookId, this.ref) : super(isar.books.getSync(bookId)) {
-    ref.onDispose(() {
-      debugPrint('disposing book notifier');
-    });
-  }
+  BookNotifier(this.bookId) : super(isar.books.getSync(bookId));
 
-  final Ref ref;
   final int bookId;
 
   void updateBook(Book book) {
@@ -54,7 +49,7 @@ class BookNotifier extends StateNotifier<Book?> {
 }
 
 final bookProvider = StateNotifierProvider.family<BookNotifier, Book?, int>((ref, bookId) {
-  return BookNotifier(bookId, ref);
+  return BookNotifier(bookId);
 });
 
 final bookRecipesProvider = StateProvider.family<List<Recipe>, int>((ref, bookId) {

@@ -73,15 +73,15 @@ class BookPage extends ConsumerWidget {
 
                                     debugPrint('updatedBook: ' + updatedBook.title.toString());
                                     debugPrint('bookId: ' + bookId.toString());
+                                    debugPrint('updatedBook.id: ' + updatedBook.id.toString());
 
                                     Book newBook = Book(
+                                      id: updatedBook.id,
                                       title: bookTitleController.text,
                                       dateCreated: updatedBook.dateCreated,
-                                      id: updatedBook.id,
+                                      url: updatedBook.url,
                                     );
-
-                                    updatedBook..title = bookTitleController.text;
-                                    ref.read(bookProvider(bookId).notifier).updateBook(newBook);
+                                    ref.read(bookProvider(updatedBook.id).notifier).updateBook(newBook);
                                     await ref.read(booksProvider.notifier).updateBook(newBook);
 
                                     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Book renamed')));

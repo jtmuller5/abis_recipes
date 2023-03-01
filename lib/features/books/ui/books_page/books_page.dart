@@ -28,17 +28,20 @@ class BooksPage extends HookConsumerWidget {
                 Book book = ref.watch(booksProvider)[index];
                 return ListTile(
                   leading: Hero(
-                  tag: 'recipe-${isar.recipes.filter().bookIdsElementEqualTo(book.id).findFirstSync()?.id ?? book.title}',
+                    tag: 'recipe-${isar.recipes.filter().bookIdsElementEqualTo(book.id).findFirstSync()?.id ?? book.title}',
                     child: SizedBox(
                         height: 64,
                         width: 64,
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(8),
                           child: isar.recipes.filter().bookIdsElementEqualTo(book.id).findFirstSync()?.images?.firstOrNull != null
-                              ? Image.network(
-                                isar.recipes.filter().bookIdsElementEqualTo(book.id).findFirstSync()?.images?.first ?? '',
-                                fit: BoxFit.cover,
-                              )
+                              ? FadeInImage(
+                                  placeholder: AssetImage('assets/transparent.png'),
+                                  image: NetworkImage(
+                                    isar.recipes.filter().bookIdsElementEqualTo(book.id).findFirstSync()?.images?.first ?? '',
+                                  ),
+                                  fit: BoxFit.cover,
+                                )
                               : ColoredBox(color: Theme.of(context).colorScheme.secondary, child: Icon(Icons.book)),
                         )),
                   ),

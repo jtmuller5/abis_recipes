@@ -95,10 +95,10 @@ Book _bookDeserialize(
   final object = Book(
     dateCreated: reader.readDateTimeOrNull(offsets[0]),
     description: reader.readStringOrNull(offsets[1]),
+    id: id,
     title: reader.readString(offsets[2]),
     url: reader.readStringOrNull(offsets[3]),
   );
-  object.id = id;
   return object;
 }
 
@@ -933,12 +933,13 @@ extension BookQueryProperty on QueryBuilder<Book, Book, QQueryProperty> {
 
 Book _$BookFromJson(Map<String, dynamic> json) => Book(
       title: json['title'] as String,
+      id: json['id'] as int? ?? Isar.autoIncrement,
       url: json['url'] as String?,
       description: json['description'] as String?,
       dateCreated: json['dateCreated'] == null
           ? null
           : DateTime.parse(json['dateCreated'] as String),
-    )..id = json['id'] as int;
+    );
 
 Map<String, dynamic> _$BookToJson(Book instance) => <String, dynamic>{
       'url': instance.url,

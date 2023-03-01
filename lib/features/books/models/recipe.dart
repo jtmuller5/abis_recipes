@@ -35,6 +35,27 @@ class Recipe {
     this.bookIds = const [],
   });
 
+  // Copy with
+  Recipe copyWith({
+    String? url,
+    String? title,
+    String? description,
+    List<String>? images,
+    List<Ingredient>? ingredients,
+    List<Instruction>? instructions,
+    List<int>? bookIds,
+  }) {
+    return Recipe(
+      url: url ?? this.url,
+      title: title ?? this.title,
+      description: description ?? this.description,
+      images: images ?? this.images,
+      ingredients: ingredients ?? this.ingredients,
+      instructions: instructions ?? this.instructions,
+      bookIds: bookIds ?? this.bookIds,
+    );
+  }
+
   factory Recipe.fromJson(Map<String, dynamic> json) => _$RecipeFromJson(json);
 
   Map<String, dynamic> toJson() => _$RecipeToJson(this);

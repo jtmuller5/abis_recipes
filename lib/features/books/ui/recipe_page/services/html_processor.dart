@@ -18,8 +18,9 @@ class HtmlProcessor{
 
   static String removeTabs(String text){
     RegExp tabs = RegExp('[\t]');
+    RegExp extraSpaces = RegExp('  +',multiLine: true);
 
-    return text.replaceAll(tabs, ' ');
+    return text.replaceAll(tabs, ' ').replaceAll(extraSpaces, ' ');
   }
 
   // Capitalize the first letter
