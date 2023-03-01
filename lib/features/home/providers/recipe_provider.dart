@@ -1,11 +1,21 @@
 import 'package:abis_recipes/features/books/models/ingredient.dart';
 import 'package:abis_recipes/features/books/models/instruction.dart';
 import 'package:abis_recipes/features/books/models/recipe.dart';
+import 'package:abis_recipes/features/books/providers/books_provider.dart';
+import 'package:abis_recipes/features/books/ui/recipe_page/recipe_page.dart';
 import 'package:abis_recipes/main.dart';
+import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:isar/isar.dart';
 
 class RecipeNotifier extends StateNotifier<Recipe?> {
   RecipeNotifier() : super(null);
+
+  static void navigateToRecipe(Recipe recipe, WidgetRef ref, BuildContext context) {
+    setRecipe(ref, recipe);
+    ref.watch(checkedBooksProvider.notifier).state = recipe.bookIds;
+    Navigator.of(context).push(MaterialPageRoute(builder: (context) => RecipePage()));
+  }
 
   void createRecipe(String? url) => state = Recipe(
         ingredients: [],
@@ -56,4 +66,46 @@ class RecipeNotifier extends StateNotifier<Recipe?> {
 
 final recipeProvider = StateNotifierProvider<RecipeNotifier, Recipe?>((ref) {
   return RecipeNotifier();
+});
+
+class RecipesNotifier extends StateNotifier<List<Recipe>> {
+  RecipesNotifier(this.ref) : super(isar.recipes.buildQuery<Recipe>().findAllSync()) {
+    ref.listen(searchProvider, (previous, next) {
+      if (next != null) {
+        state = isar.recipes.filter().titleContains(next, caseSensitive: false).findAllSync();
+      } else {
+        state = isar.recipes.buildQuery<Recipe>().findAllSync();
+      }
+    });
+
+    ref.listen(recipeProvider, (previous, next) {
+      state= isar.recipes.buildQuery<Recipe>().findAllSync();
+    });
+  }
+
+  final Ref ref;
+
+  Future<void> deleteRecipes(List<int> ids) async {
+    await isar.writeTxn(() async {
+      final success = await isar.recipes.deleteAll(ids);
+      print('Recipe deleted: $success');
+    });
+    state = isar.recipes.buildQuery<Recipe>().findAllSync();
+  }
+
+  void updateRecipes(List<Recipe> recipes) {
+    state = recipes;
+  }
+
+  void addRecipe(Recipe recipe) {
+    state = [...state, recipe];
+  }
+}
+
+final recipesProvider = StateNotifierProvider<RecipesNotifier, List<Recipe>>((ref) {
+  return RecipesNotifier(ref);
+});
+
+final searchProvider = StateProvider<String?>((ref) {
+  return null;
 });

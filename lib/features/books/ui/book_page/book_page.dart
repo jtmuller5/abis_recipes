@@ -157,9 +157,7 @@ class BookPage extends ConsumerWidget {
                       title: Text(recipe.title ?? 'No title'),
                       subtitle: Text(recipe.description ?? ''),
                       onTap: () {
-                        setRecipe(ref, recipe);
-                        ref.watch(checkedBooksProvider.notifier).state = recipe.bookIds;
-                        Navigator.of(context).push(MaterialPageRoute(builder: (context) => RecipePage()));
+                        RecipeNotifier.navigateToRecipe(recipe, ref, context);
                       },
                       onLongPress: () async {
 

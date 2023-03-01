@@ -1,7 +1,9 @@
 import 'package:abis_recipes/app/constants.dart';
 import 'package:abis_recipes/features/books/ui/books_page/books_page.dart';
 import 'package:abis_recipes/features/books/ui/recipe_page/recipe_page.dart';
+import 'package:abis_recipes/features/books/ui/search/ui/search_view.dart';
 import 'package:abis_recipes/features/home/providers/loading_provider.dart';
+import 'package:abis_recipes/features/home/providers/recipe_provider.dart';
 import 'package:abis_recipes/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -120,6 +122,19 @@ class HomeView extends HookConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
+                      Animate(
+                        effects: [ ShimmerEffect()],
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                          child: ElevatedButton(
+                            onPressed: () async {
+                              ref.watch(searchProvider.notifier).state = '';
+                              Navigator.of(context).push(MaterialPageRoute(builder: (context) => SearchView()));
+                            },
+                            child: Text('All Recipes'),
+                          ),
+                        ),
+                      ),
                       Animate(
                         effects: [ ShimmerEffect()],
                         child: Padding(
