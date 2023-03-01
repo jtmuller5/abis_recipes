@@ -86,7 +86,7 @@ class HomeView extends HookConsumerWidget {
                             ref.watch(urlProvider.notifier).state = url;
                             ref.watch(errorProvider.notifier).state = false;
                             Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) => RecipePage(url: url),
+                              builder: (context) => RecipePage(),
                             ));
                           },
                         )),

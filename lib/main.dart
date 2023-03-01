@@ -18,9 +18,6 @@ Future<void> main() async {
     BookSchema,
   ]);
 
-  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.dark));
 
   runApp(ProviderScope(child: const MyApp()));
 }
@@ -38,6 +35,11 @@ class _MyAppState extends ConsumerState<MyApp> {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.dark));
+
     return MaterialApp(
       title: 'Abi\'s Recipes',
       navigatorKey: navigatorKey,
@@ -89,7 +91,7 @@ class _MyAppState extends ConsumerState<MyApp> {
       debugPrint('value.first.value: ' + value.first.value.toString());
       if (value.isNotEmpty && checkValidUrl(value.first.value ?? "")) {
         loadRecipe(ref, value.first.value!);
-        Navigator.of(navigatorKey.currentContext!).push(MaterialPageRoute(builder: (context) => RecipePage(url: value.first.value!)));
+        Navigator.of(navigatorKey.currentContext!).push(MaterialPageRoute(builder: (context) => RecipePage()));
       }
     }, onError: (err) {
       print("getIntentDataStream error: $err");
@@ -100,7 +102,7 @@ class _MyAppState extends ConsumerState<MyApp> {
 
       if (value.isNotEmpty && checkValidUrl(value.first.value ?? "")) {
         loadRecipe(ref, value.first.value!);
-        Navigator.of(navigatorKey.currentContext!).push(MaterialPageRoute(builder: (context) => RecipePage(url: value.first.value!)));
+        Navigator.of(navigatorKey.currentContext!).push(MaterialPageRoute(builder: (context) => RecipePage()));
       }
     });
   }

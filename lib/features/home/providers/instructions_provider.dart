@@ -9,6 +9,8 @@ class InstructionsNotifier extends StateNotifier<List<Instruction>> {
   void removeInstruction(Instruction instruction) => state = [...state]..remove(instruction);
 
   void clearInstructions() => state = [];
+
+  void setInstructions(List<Instruction> instructions) => state = instructions;
 }
 
 final instructionsProvider = StateNotifierProvider<InstructionsNotifier, List<Instruction>>((ref) {

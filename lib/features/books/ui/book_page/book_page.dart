@@ -1,7 +1,11 @@
+import 'package:abis_recipes/features/books/models/book.dart';
 import 'package:abis_recipes/features/books/models/recipe.dart';
 import 'package:abis_recipes/features/books/providers/books_provider.dart';
+import 'package:abis_recipes/features/books/ui/recipe_page/recipe_page.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:collection/collection.dart';
+import 'package:recase/recase.dart';
 
 class BookPage extends ConsumerWidget {
   const BookPage({Key? key, required this.bookId}) : super(key: key);
@@ -16,40 +20,112 @@ class BookPage extends ConsumerWidget {
         SliverAppBar(
           title: Text(ref.watch(bookProvider(bookId))?.title ?? 'No title'),
           actions: [
-            Builder(
-              builder: (context) {
-                return IconButton(
-                  icon: Icon(Icons.more_vert),
-                  onPressed: () async {
-                    Rect? rect;
-                    RenderBox? overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
-                    final renderObject = context.findRenderObject();
-                    final translation = renderObject?.getTransformTo(null).getTranslation();
-                    if (translation != null && renderObject?.paintBounds != null) {
-                      final offset = Offset(translation.x, translation.y);
-                      rect = renderObject!.paintBounds.shift(offset);
-                    }
-                    if (rect != null) {
-                      var value = await showMenu<String>(
-                        context: context,
-                        position: RelativeRect.fromRect(
-                          rect,
-                          Offset.zero & overlay.size,
-                        ),
-                        items: [
-                          const PopupMenuItem(value: 'rename', child: Text('Rename Book')),
+            Builder(builder: (context) {
+              return IconButton(
+                icon: Icon(Icons.more_vert),
+                onPressed: () async {
+                  Rect? rect;
+                  RenderBox? overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
+                  final renderObject = context.findRenderObject();
+                  final translation = renderObject?.getTransformTo(null).getTranslation();
+                  if (translation != null && renderObject?.paintBounds != null) {
+                    final offset = Offset(translation.x, translation.y);
+                    rect = renderObject!.paintBounds.shift(offset);
+                  }
+                  if (rect != null) {
+                    var value = await showMenu<String>(
+                      context: context,
+                      position: RelativeRect.fromRect(
+                        rect,
+                        Offset.zero & overlay.size,
+                      ),
+                      items: [
+                        const PopupMenuItem(value: 'rename', child: Text('Rename Book')),
+                        const PopupMenuItem(value: 'delete', child: Text('Delete Book')),
+                      ],
+                    );
+                    if (value != null) {
+                      debugPrint(value);
+                      if (value == 'rename') {
+                        await showDialog(
+                          context: context,
+                          builder: (context) {
+                            TextEditingController bookTitleController = TextEditingController(text: ref.watch(bookProvider(bookId))?.title);
+                            return AlertDialog(
+                              title: Text('Rename Book'),
+                              content: TextField(
+                                controller: bookTitleController,
+                                decoration: InputDecoration(
+                                  labelText: 'Book Title',
+                                ),
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop(false);
+                                  },
+                                  child: Text('Cancel'),
+                                ),
+                                TextButton(
+                                  onPressed: () async {
+                                    Book? updatedBook = ref.read(bookProvider(bookId));
+                                    if (updatedBook == null) return;
 
-                          const PopupMenuItem(value: 'delete', child: Text('Delete Book')),
-                        ],
-                      );
-                      if (value != null) {
-                        debugPrint(value);
+                                    debugPrint('updatedBook: ' + updatedBook.title.toString());
+                                    debugPrint('bookId: ' + bookId.toString());
+
+                                    Book newBook = Book(
+                                      title: bookTitleController.text,
+                                      dateCreated: updatedBook.dateCreated,
+                                      id: updatedBook.id,
+                                    );
+
+                                    updatedBook..title = bookTitleController.text;
+                                    ref.read(bookProvider(bookId).notifier).updateBook(newBook);
+                                    await ref.read(booksProvider.notifier).updateBook(newBook);
+
+                                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Book renamed')));
+                                    Navigator.of(context).pop(true);
+                                  },
+                                  child: Text('Rename'),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      } else if (value == 'delete') {
+                        showDialog(
+                          context: context,
+                          builder: (context) {
+                            return AlertDialog(
+                              title: Text('Delete Book'),
+                              content: Text('Are you sure you want to delete this book?'),
+                              actions: [
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: Text('Cancel'),
+                                ),
+                                TextButton(
+                                  onPressed: () async {
+                                    await ref.read(booksProvider.notifier).deleteBook(bookId);
+                                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Book deleted')));
+                                    Navigator.of(context).pop();
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: Text('Delete'),
+                                ),
+                              ],
+                            );
+                          },
+                        );
                       }
                     }
-                  },
-                );
-              }
-            )
+                  }
+                },
+              );
+            })
           ],
         ),
         SliverList(
@@ -57,7 +133,27 @@ class BookPage extends ConsumerWidget {
             (BuildContext context, int index) {
               Recipe recipe = ref.watch(bookRecipesProvider(bookId))[index];
               return ListTile(
+                leading: Hero(
+                  tag: 'recipe-${recipe.id}',
+                  child: SizedBox(
+                      height: 64,
+                      width: 64,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: recipe.images?.firstOrNull != null
+                            ? Image.network(
+                                recipe.images?.first ?? '',
+                                fit: BoxFit.cover,
+                              )
+                            : ColoredBox(color: Theme.of(context).colorScheme.secondary, child: Icon(Icons.book)),
+                      )),
+                ),
                 title: Text(recipe.title ?? 'No title'),
+                subtitle: Text(recipe.description ?? ''),
+                onTap: () {
+                  setRecipe(ref, recipe);
+                  Navigator.of(context).push(MaterialPageRoute(builder: (context) => RecipePage()));
+                },
               );
             },
             childCount: ref.watch(bookRecipesProvider(bookId)).length,

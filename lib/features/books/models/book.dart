@@ -17,6 +17,7 @@ class Book {
 
   Book({
     required this.title,
+    this.id = Isar.autoIncrement,
     this.url,
     this.description,
     this.dateCreated,

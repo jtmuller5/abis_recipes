@@ -14,6 +14,8 @@ class IngredientsNotifier extends StateNotifier<List<Ingredient>> {
   void removeIngredient(Ingredient ingredient) => state = [...state]..remove(ingredient);
 
   void clearIngredients() => state = [];
+
+  void setIngredients(List<Ingredient> ingredients) => state = ingredients;
 }
 
 final ingredientsProvider = StateNotifierProvider<IngredientsNotifier, List<Ingredient>>((ref) {
