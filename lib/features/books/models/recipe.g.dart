@@ -22,35 +22,40 @@ const RecipeSchema = CollectionSchema(
       name: r'bookIds',
       type: IsarType.longList,
     ),
-    r'description': PropertySchema(
+    r'coverImage': PropertySchema(
       id: 1,
+      name: r'coverImage',
+      type: IsarType.string,
+    ),
+    r'description': PropertySchema(
+      id: 2,
       name: r'description',
       type: IsarType.string,
     ),
     r'images': PropertySchema(
-      id: 2,
+      id: 3,
       name: r'images',
       type: IsarType.stringList,
     ),
     r'ingredients': PropertySchema(
-      id: 3,
+      id: 4,
       name: r'ingredients',
       type: IsarType.objectList,
       target: r'Ingredient',
     ),
     r'instructions': PropertySchema(
-      id: 4,
+      id: 5,
       name: r'instructions',
       type: IsarType.objectList,
       target: r'Instruction',
     ),
     r'title': PropertySchema(
-      id: 5,
+      id: 6,
       name: r'title',
       type: IsarType.string,
     ),
     r'url': PropertySchema(
-      id: 6,
+      id: 7,
       name: r'url',
       type: IsarType.string,
     )
@@ -79,6 +84,12 @@ int _recipeEstimateSize(
 ) {
   var bytesCount = offsets.last;
   bytesCount += 3 + object.bookIds.length * 8;
+  {
+    final value = object.coverImage;
+    if (value != null) {
+      bytesCount += 3 + value.length * 3;
+    }
+  }
   {
     final value = object.description;
     if (value != null) {
@@ -147,22 +158,23 @@ void _recipeSerialize(
   Map<Type, List<int>> allOffsets,
 ) {
   writer.writeLongList(offsets[0], object.bookIds);
-  writer.writeString(offsets[1], object.description);
-  writer.writeStringList(offsets[2], object.images);
+  writer.writeString(offsets[1], object.coverImage);
+  writer.writeString(offsets[2], object.description);
+  writer.writeStringList(offsets[3], object.images);
   writer.writeObjectList<Ingredient>(
-    offsets[3],
+    offsets[4],
     allOffsets,
     IngredientSchema.serialize,
     object.ingredients,
   );
   writer.writeObjectList<Instruction>(
-    offsets[4],
+    offsets[5],
     allOffsets,
     InstructionSchema.serialize,
     object.instructions,
   );
-  writer.writeString(offsets[5], object.title);
-  writer.writeString(offsets[6], object.url);
+  writer.writeString(offsets[6], object.title);
+  writer.writeString(offsets[7], object.url);
 }
 
 Recipe _recipeDeserialize(
@@ -173,22 +185,23 @@ Recipe _recipeDeserialize(
 ) {
   final object = Recipe(
     bookIds: reader.readLongList(offsets[0]) ?? const [],
-    description: reader.readStringOrNull(offsets[1]),
-    images: reader.readStringList(offsets[2]),
+    coverImage: reader.readStringOrNull(offsets[1]),
+    description: reader.readStringOrNull(offsets[2]),
+    images: reader.readStringList(offsets[3]),
     ingredients: reader.readObjectList<Ingredient>(
-      offsets[3],
+      offsets[4],
       IngredientSchema.deserialize,
       allOffsets,
       Ingredient(),
     ),
     instructions: reader.readObjectList<Instruction>(
-      offsets[4],
+      offsets[5],
       InstructionSchema.deserialize,
       allOffsets,
       Instruction(),
     ),
-    title: reader.readStringOrNull(offsets[5]),
-    url: reader.readStringOrNull(offsets[6]),
+    title: reader.readStringOrNull(offsets[6]),
+    url: reader.readStringOrNull(offsets[7]),
   );
   object.id = id;
   return object;
@@ -206,24 +219,26 @@ P _recipeDeserializeProp<P>(
     case 1:
       return (reader.readStringOrNull(offset)) as P;
     case 2:
-      return (reader.readStringList(offset)) as P;
+      return (reader.readStringOrNull(offset)) as P;
     case 3:
+      return (reader.readStringList(offset)) as P;
+    case 4:
       return (reader.readObjectList<Ingredient>(
         offset,
         IngredientSchema.deserialize,
         allOffsets,
         Ingredient(),
       )) as P;
-    case 4:
+    case 5:
       return (reader.readObjectList<Instruction>(
         offset,
         InstructionSchema.deserialize,
         allOffsets,
         Instruction(),
       )) as P;
-    case 5:
-      return (reader.readStringOrNull(offset)) as P;
     case 6:
+      return (reader.readStringOrNull(offset)) as P;
+    case 7:
       return (reader.readStringOrNull(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -452,6 +467,152 @@ extension RecipeQueryFilter on QueryBuilder<Recipe, Recipe, QFilterCondition> {
         upper,
         includeUpper,
       );
+    });
+  }
+
+  QueryBuilder<Recipe, Recipe, QAfterFilterCondition> coverImageIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'coverImage',
+      ));
+    });
+  }
+
+  QueryBuilder<Recipe, Recipe, QAfterFilterCondition> coverImageIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'coverImage',
+      ));
+    });
+  }
+
+  QueryBuilder<Recipe, Recipe, QAfterFilterCondition> coverImageEqualTo(
+    String? value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'coverImage',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Recipe, Recipe, QAfterFilterCondition> coverImageGreaterThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'coverImage',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Recipe, Recipe, QAfterFilterCondition> coverImageLessThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'coverImage',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Recipe, Recipe, QAfterFilterCondition> coverImageBetween(
+    String? lower,
+    String? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'coverImage',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Recipe, Recipe, QAfterFilterCondition> coverImageStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'coverImage',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Recipe, Recipe, QAfterFilterCondition> coverImageEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'coverImage',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Recipe, Recipe, QAfterFilterCondition> coverImageContains(
+      String value,
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'coverImage',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Recipe, Recipe, QAfterFilterCondition> coverImageMatches(
+      String pattern,
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'coverImage',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Recipe, Recipe, QAfterFilterCondition> coverImageIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'coverImage',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<Recipe, Recipe, QAfterFilterCondition> coverImageIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'coverImage',
+        value: '',
+      ));
     });
   }
 
@@ -1397,6 +1558,18 @@ extension RecipeQueryObject on QueryBuilder<Recipe, Recipe, QFilterCondition> {
 extension RecipeQueryLinks on QueryBuilder<Recipe, Recipe, QFilterCondition> {}
 
 extension RecipeQuerySortBy on QueryBuilder<Recipe, Recipe, QSortBy> {
+  QueryBuilder<Recipe, Recipe, QAfterSortBy> sortByCoverImage() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'coverImage', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Recipe, Recipe, QAfterSortBy> sortByCoverImageDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'coverImage', Sort.desc);
+    });
+  }
+
   QueryBuilder<Recipe, Recipe, QAfterSortBy> sortByDescription() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'description', Sort.asc);
@@ -1435,6 +1608,18 @@ extension RecipeQuerySortBy on QueryBuilder<Recipe, Recipe, QSortBy> {
 }
 
 extension RecipeQuerySortThenBy on QueryBuilder<Recipe, Recipe, QSortThenBy> {
+  QueryBuilder<Recipe, Recipe, QAfterSortBy> thenByCoverImage() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'coverImage', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Recipe, Recipe, QAfterSortBy> thenByCoverImageDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'coverImage', Sort.desc);
+    });
+  }
+
   QueryBuilder<Recipe, Recipe, QAfterSortBy> thenByDescription() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'description', Sort.asc);
@@ -1491,6 +1676,13 @@ extension RecipeQueryWhereDistinct on QueryBuilder<Recipe, Recipe, QDistinct> {
     });
   }
 
+  QueryBuilder<Recipe, Recipe, QDistinct> distinctByCoverImage(
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'coverImage', caseSensitive: caseSensitive);
+    });
+  }
+
   QueryBuilder<Recipe, Recipe, QDistinct> distinctByDescription(
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
@@ -1529,6 +1721,12 @@ extension RecipeQueryProperty on QueryBuilder<Recipe, Recipe, QQueryProperty> {
   QueryBuilder<Recipe, List<int>, QQueryOperations> bookIdsProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'bookIds');
+    });
+  }
+
+  QueryBuilder<Recipe, String?, QQueryOperations> coverImageProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'coverImage');
     });
   }
 
@@ -1578,6 +1776,7 @@ extension RecipeQueryProperty on QueryBuilder<Recipe, Recipe, QQueryProperty> {
 Recipe _$RecipeFromJson(Map<String, dynamic> json) => Recipe(
       url: json['url'] as String?,
       title: json['title'] as String?,
+      coverImage: json['coverImage'] as String?,
       description: json['description'] as String?,
       images:
           (json['images'] as List<dynamic>?)?.map((e) => e as String).toList(),
@@ -1596,6 +1795,7 @@ Map<String, dynamic> _$RecipeToJson(Recipe instance) => <String, dynamic>{
       'url': instance.url,
       'title': instance.title,
       'description': instance.description,
+      'coverImage': instance.coverImage,
       'images': instance.images,
       'id': instance.id,
       'ingredients': instance.ingredients?.map((e) => e.toJson()).toList(),

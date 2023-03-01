@@ -15,6 +15,8 @@ class Recipe {
 
   String? description;
 
+  String? coverImage;
+
   List<String>? images;
 
   Id id = Isar.autoIncrement;
@@ -28,6 +30,7 @@ class Recipe {
   Recipe({
     this.url,
     this.title,
+    this.coverImage,
     this.description,
     this.images,
     this.ingredients,
@@ -40,6 +43,7 @@ class Recipe {
     String? url,
     String? title,
     String? description,
+    String? coverImage,
     List<String>? images,
     List<Ingredient>? ingredients,
     List<Instruction>? instructions,
@@ -48,6 +52,7 @@ class Recipe {
     return Recipe(
       url: url ?? this.url,
       title: title ?? this.title,
+      coverImage: coverImage ?? this.coverImage,
       description: description ?? this.description,
       images: images ?? this.images,
       ingredients: ingredients ?? this.ingredients,

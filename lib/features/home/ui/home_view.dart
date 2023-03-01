@@ -4,6 +4,7 @@ import 'package:abis_recipes/features/books/ui/recipe_page/recipe_page.dart';
 import 'package:abis_recipes/features/home/providers/loading_provider.dart';
 import 'package:abis_recipes/main.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:flutter/services.dart';
@@ -44,7 +45,7 @@ class HomeView extends HookConsumerWidget {
                         .textTheme
                         .headlineMedium!
                         .copyWith(fontSize: 32, fontWeight: FontWeight.w600, color: Theme.of(context).colorScheme.primary),
-                  ),
+                  ).animate(onPlay: (controller) => controller.repeat()).shimmer(delay: Duration(seconds: 5)),
                 ),
                 gap32,
                 Padding(
@@ -63,12 +64,12 @@ class HomeView extends HookConsumerWidget {
                             child: Icon(Icons.download_outlined),
                           ),
                           onPressed: () {
-                            if(urlController.text.isEmpty) {
+                            if (urlController.text.isEmpty) {
                               ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Please enter a url')));
                               return;
                             }
 
-                            if(!checkValidUrl(urlController.text) || !urlController.text.startsWith('https')) {
+                            if (!checkValidUrl(urlController.text) || !urlController.text.startsWith('https')) {
                               ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Please enter a valid url')));
                               return;
                             }
@@ -111,20 +112,24 @@ class HomeView extends HookConsumerWidget {
                     'Paste from Clipboard',
                     style: Theme.of(context).textTheme.bodySmall!,
                   ),
-                )),
+                ).animate(/*onPlay: (controller) => controller.repeat()*/).shake(delay: Duration(seconds: 1),duration: Duration(milliseconds: 1000),
+                        offset: Offset(0, .1),hz: 2)),
                 gap32,
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                        child: ElevatedButton(
-                          onPressed: () async {
-                            Navigator.of(context).push(MaterialPageRoute(builder: (context) => BooksPage()));
-                          },
-                          child: Text('Recipe Books'),
+                      Animate(
+                        effects: [ ShimmerEffect()],
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                          child: ElevatedButton(
+                            onPressed: () async {
+                              Navigator.of(context).push(MaterialPageRoute(builder: (context) => BooksPage()));
+                            },
+                            child: Text('Recipe Books'),
+                          ),
                         ),
                       ),
                     ],

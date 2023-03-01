@@ -167,8 +167,7 @@ class RecipePage extends ConsumerWidget {
                                             }
                                           } else if (value == 'delete') {
                                             if (ref.watch(recipeProvider)?.url != null) {
-
-                                              List<int> deleteIds= isar.recipes
+                                              List<int> deleteIds = isar.recipes
                                                   .filter()
                                                   .urlContains(ref.watch(recipeProvider)!.url!)
                                                   .findAllSync()
@@ -209,21 +208,27 @@ class RecipePage extends ConsumerWidget {
                             delegate: SliverChildBuilderDelegate(
                               (BuildContext context, int index) {
                                 Ingredient? ingredient = ref.watch(recipeProvider)?.ingredients?[index];
-                                return Column(
-                                  children: [
-                                    ListTile(
-                                      title: Text(
-                                        ingredient?.name ?? '',
-                                        style: Theme.of(context).textTheme.bodyLarge!.copyWith(fontSize: 18),
-                                      ),
-                                    ),
-                                    // Divider
-                                    if (index != (ref.watch(recipeProvider)?.ingredients ?? []).length - 1)
-                                      Divider(
-                                        height: 4,
-                                        color: Theme.of(context).colorScheme.secondaryContainer,
-                                      ),
+                                return Animate(
+                                  effects: [
+                                    ScaleEffect(delay: Duration(milliseconds: 50 * index)),
+                                    FadeEffect(delay: Duration(milliseconds: 10 * index)),
                                   ],
+                                  child: Column(
+                                    children: [
+                                      ListTile(
+                                        title: Text(
+                                          ingredient?.name ?? '',
+                                          style: Theme.of(context).textTheme.bodyLarge!.copyWith(fontSize: 18),
+                                        ),
+                                      ),
+                                      // Divider
+                                      if (index != (ref.watch(recipeProvider)?.ingredients ?? []).length - 1)
+                                        Divider(
+                                          height: 4,
+                                          color: Theme.of(context).colorScheme.secondaryContainer,
+                                        ),
+                                    ],
+                                  ),
                                 );
                               },
                               childCount: (ref.watch(recipeProvider)?.ingredients ?? []).length,
@@ -244,19 +249,25 @@ class RecipePage extends ConsumerWidget {
                             delegate: SliverChildBuilderDelegate(
                               (BuildContext context, int index) {
                                 Instruction instruction = (ref.watch(recipeProvider)?.instructions ?? [])[index];
-                                return ListTile(
-                                  contentPadding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8),
-                                  minLeadingWidth: 0,
-                                  leading: CircleAvatar(
-                                    backgroundColor: Theme.of(context).colorScheme.primary,
-                                    child: Center(
-                                      child: Text('${index + 1}',
-                                          style: Theme.of(context).textTheme.titleMedium!.copyWith(color: Theme.of(context).colorScheme.onPrimary)),
+                                return Animate(
+                                  effects: [
+                                    ScaleEffect(delay: Duration(milliseconds: 50 * index)),
+                                    FadeEffect(delay: Duration(milliseconds: 10 * index)),
+                                  ],
+                                  child: ListTile(
+                                    contentPadding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8),
+                                    minLeadingWidth: 0,
+                                    leading: CircleAvatar(
+                                      backgroundColor: Theme.of(context).colorScheme.primary,
+                                      child: Center(
+                                        child: Text('${index + 1}',
+                                            style: Theme.of(context).textTheme.titleMedium!.copyWith(color: Theme.of(context).colorScheme.onPrimary)),
+                                      ),
                                     ),
-                                  ),
-                                  title: Text(
-                                    instruction.text ?? '',
-                                    style: Theme.of(context).textTheme.bodyLarge!.copyWith(fontSize: 18),
+                                    title: Text(
+                                      instruction.text ?? '',
+                                      style: Theme.of(context).textTheme.bodyLarge!.copyWith(fontSize: 18),
+                                    ),
                                   ),
                                 );
                               },
