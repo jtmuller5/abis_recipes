@@ -28,17 +28,17 @@ class BooksPage extends HookConsumerWidget {
                 Book book = ref.watch(booksProvider)[index];
                 return ListTile(
                   leading: Hero(
-                    tag: 'recipe-${isar.recipes.filter().bookIdsElementEqualTo(book.id).findFirstSync()?.id ?? book.title}',
+                    tag: 'recipe-${ref.watch(bookRecipesProvider(book.id)).firstOrNull?.id ?? book.title}',
                     child: SizedBox(
                         height: 64,
                         width: 64,
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(8),
-                          child: isar.recipes.filter().bookIdsElementEqualTo(book.id).findFirstSync()?.images?.firstOrNull != null
+                          child: ref.watch(bookRecipesProvider(book.id)).firstOrNull?.images?.firstOrNull != null
                               ? FadeInImage(
                                   placeholder: AssetImage('assets/transparent.png'),
                                   image: NetworkImage(
-                                    isar.recipes.filter().bookIdsElementEqualTo(book.id).findFirstSync()?.images?.first ?? '',
+                                    ref.watch(bookRecipesProvider(book.id)).firstOrNull?.images?.first ?? '',
                                   ),
                                   fit: BoxFit.cover,
                                 )
@@ -46,7 +46,7 @@ class BooksPage extends HookConsumerWidget {
                         )),
                   ),
                   title: Text(book.title),
-                  subtitle: Text('${isar.recipes.filter().bookIdsElementEqualTo(book.id).findAllSync().length} recipes'),
+                  subtitle: Text('${ref.watch(bookRecipesProvider(book.id)).length} recipes'),
                   onTap: () {
                     Navigator.of(context).push(MaterialPageRoute(builder: (context) => BookPage(bookId: book.id)));
                   },

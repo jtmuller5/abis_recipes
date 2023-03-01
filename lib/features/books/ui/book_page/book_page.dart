@@ -1,8 +1,10 @@
+import 'package:abis_recipes/app/constants.dart';
 import 'package:abis_recipes/features/books/models/book.dart';
 import 'package:abis_recipes/features/books/models/recipe.dart';
 import 'package:abis_recipes/features/books/providers/books_provider.dart';
 import 'package:abis_recipes/features/books/ui/recipe_page/recipe_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:collection/collection.dart';
 import 'package:recase/recase.dart';
@@ -128,7 +130,7 @@ class BookPage extends ConsumerWidget {
             })
           ],
         ),
-        SliverList(
+        if( ref.watch(bookRecipesProvider(bookId)).length > 0)SliverList(
           delegate: SliverChildBuilderDelegate(
             (BuildContext context, int index) {
               Recipe recipe = ref.watch(bookRecipesProvider(bookId))[index];
@@ -158,7 +160,25 @@ class BookPage extends ConsumerWidget {
             },
             childCount: ref.watch(bookRecipesProvider(bookId)).length,
           ),
-        ),
+        ) else SliverFillRemaining(
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Animate(
+                    effects: [ScaleEffect()],
+                    child: Image.asset('assets/splash.png', height: 300)),
+                Animate(
+                    effects: [SlideEffect(
+                      begin: Offset(0, 0.5),
+                      end: Offset(0, 0),
+                    ),FadeEffect()],
+                    child: Text('No recipes in this book', style: Theme.of(context).textTheme.headlineSmall!.copyWith(color: Theme.of(context).colorScheme.primary),)),
+                gap64,
+              ],
+            ),
+          ),
+        )
       ],
     ));
   }

@@ -24,6 +24,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:html/dom.dart' as dom;
 import 'package:html/parser.dart' as parser;
 import 'package:http/http.dart' as http;
+import 'package:isar/isar.dart';
 
 class RecipePage extends ConsumerWidget {
   const RecipePage({Key? key}) : super(key: key);
@@ -143,19 +144,39 @@ class RecipePage extends ConsumerWidget {
                                           ),
                                           items: [
                                             const PopupMenuItem(value: 'reload', child: Text('Reload Recipe')),
-                                            const PopupMenuItem(value: 'delete', child: Text('Delete Recipe')),
+                                            if (ref.watch(recipeProvider)?.url != null &&
+                                                isar.recipes.filter().urlContains(ref.watch(recipeProvider)!.url!).findAllSync().isNotEmpty)
+                                              const PopupMenuItem(
+                                                  value: 'delete',
+                                                  child: Text('Delete '
+                                                      'Recipe')),
                                           ],
                                         );
                                         if (value != null) {
                                           debugPrint(value);
                                           if (value == 'reload') {
-                                            ref.watch(urlProvider.notifier).state = '';
-                                            loadRecipe(ref, ref.watch(urlProvider));
+                                            ref.watch(urlProvider.notifier).state = ref.watch(recipeProvider)?.url;
+                                            try {
+                                              loadRecipe(ref, ref.watch(urlProvider));
+                                            } catch (e) {
+                                              debugPrint(e.toString());
+                                              ref.read(loadingRecipeProvider.notifier).state = false;
+                                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                                content: Text('Error loading recipe'),
+                                              ));
+                                            }
                                           } else if (value == 'delete') {
-                                            await isar.writeTxn(() async {
-                                              final success = await isar.recipes.delete(123);
-                                              print('Recipe deleted: $success');
-                                            });
+                                            if (ref.watch(recipeProvider)?.url != null) {
+
+                                              List<int> deleteIds= isar.recipes
+                                                  .filter()
+                                                  .urlContains(ref.watch(recipeProvider)!.url!)
+                                                  .findAllSync()
+                                                  .map((e) => e.id)
+                                                  .toList();
+
+                                              await ref.read(recipeProvider.notifier).deleteRecipes(deleteIds);
+                                            }
                                             Navigator.of(context).pop();
                                           }
                                         }
@@ -307,6 +328,7 @@ class RecipePage extends ConsumerWidget {
                                               instructions: ref.watch(recipeProvider)?.instructions?.map((e) => Instruction(text: e.text)).toList(),
                                               url: ref.watch(urlProvider),
                                             );
+                                            ref.watch(bookRecipesProvider(ref.watch(saveToBookProvider) ?? 0).notifier).addRecipe(newRecipe);
                                             await isar.recipes.put(newRecipe);
                                           });
                                           Navigator.of(context).pop();
@@ -331,10 +353,7 @@ class RecipePage extends ConsumerWidget {
 }
 
 void setRecipe(WidgetRef ref, Recipe recipe) {
-  ref.read(recipeProvider.notifier).updateRecipeTitle(recipe.title ?? '');
-  ref.read(recipeProvider.notifier).updateRecipeImage(recipe.images?[0]);
-  ref.read(recipeProvider.notifier).updateRecipeIngredients(recipe.ingredients ?? []);
-  ref.read(recipeProvider.notifier).updateRecipeInstructions(recipe.instructions ?? []);
+  ref.read(recipeProvider.notifier).updateRecipe(recipe);
 }
 
 Future<void> loadRecipe(WidgetRef ref, url) async {
@@ -348,7 +367,7 @@ Future<void> loadRecipe(WidgetRef ref, url) async {
     try {
       BeautifulSoup bs = BeautifulSoup(document.outerHtml);
 
-      ref.watch(recipeProvider.notifier).createRecipe();
+      ref.watch(recipeProvider.notifier).createRecipe(url);
       getTitle(bs, ref);
       getImage(bs, ref);
       getIngredients(bs, ref);

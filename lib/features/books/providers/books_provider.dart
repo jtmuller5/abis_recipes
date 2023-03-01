@@ -1,9 +1,11 @@
 import 'package:abis_recipes/features/books/models/book.dart';
 import 'package:abis_recipes/features/books/models/recipe.dart';
+import 'package:abis_recipes/features/home/providers/recipe_provider.dart';
 import 'package:abis_recipes/main.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:isar/isar.dart';
+import 'package:recase/recase.dart';
 
 class BooksNotifier extends StateNotifier<List<Book>> {
   BooksNotifier() : super(isar.books.buildQuery<Book>().findAllSync());
@@ -40,7 +42,6 @@ class BookNotifier extends StateNotifier<Book?> {
   final int bookId;
 
   void updateBook(Book book) {
-
     debugPrint('state: ' + state!.title.toString());
     debugPrint('book: ' + book.title.toString());
     debugPrint((state == book).toString());
@@ -52,8 +53,25 @@ final bookProvider = StateNotifierProvider.family<BookNotifier, Book?, int>((ref
   return BookNotifier(bookId);
 });
 
-final bookRecipesProvider = StateProvider.family<List<Recipe>, int>((ref, bookId) {
-  return isar.recipes.filter().anyOf([bookId], (q, element) => q.bookIdsElementEqualTo(element)).findAllSync();
+class BookRecipesNotifier extends StateNotifier<List<Recipe>> {
+  BookRecipesNotifier(this.bookId, this.ref)
+      : super(isar.recipes.filter().anyOf([bookId], (q, element) => q.bookIdsElementEqualTo(element)).findAllSync()) {
+    ref.listen(recipeProvider, (previous, next) {
+      state = isar.recipes.filter().anyOf([bookId], (q, element) =>q.bookIdsElementEqualTo(bookId)).findAllSync();
+      debugPrint('state: ' + state.toString());
+    });
+  }
+
+  final int bookId;
+  final Ref ref;
+
+  void addRecipe(Recipe recipe) {
+    state = [...state, recipe];
+  }
+}
+
+final bookRecipesProvider = StateNotifierProvider.family<BookRecipesNotifier, List<Recipe>, int>((ref, bookId) {
+  return BookRecipesNotifier(bookId, ref);
 });
 
 final saveToBookProvider = StateProvider<int?>((ref) {

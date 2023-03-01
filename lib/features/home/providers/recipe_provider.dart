@@ -7,9 +7,10 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 class RecipeNotifier extends StateNotifier<Recipe?> {
   RecipeNotifier() : super(null);
 
-  void createRecipe() => state = Recipe(
+  void createRecipe(String? url) => state = Recipe(
     ingredients: [],
     instructions: [],
+    url: url,
   );
 
   void updateRecipe(Recipe recipe) => state = recipe;
@@ -41,12 +42,13 @@ class RecipeNotifier extends StateNotifier<Recipe?> {
 
   void removeIngredient(Ingredient ingredient) => state = state!.copyWith(ingredients: [...state!.ingredients!]..remove(ingredient));
 
-  Future<void> deleteRecipe() async {
-    if (state?.id == null) return;
+  Future<void> deleteRecipes(List<int> ids) async {
     await isar.writeTxn(() async {
-      final success = await isar.recipes.delete(state!.id);
+      final success = await isar.recipes.deleteAll(ids);
       print('Recipe deleted: $success');
     });
+
+    clearRecipe();
   }
 }
 
