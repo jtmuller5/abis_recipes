@@ -39,6 +39,7 @@ class RecipeHeader extends ConsumerWidget {
           gap16,
           Expanded(
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 title,

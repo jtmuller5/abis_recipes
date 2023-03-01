@@ -8,14 +8,16 @@ class RecipeNotifier extends StateNotifier<Recipe?> {
   RecipeNotifier() : super(null);
 
   void createRecipe(String? url) => state = Recipe(
-    ingredients: [],
-    instructions: [],
-    url: url,
-  );
+        ingredients: [],
+        instructions: [],
+        url: url,
+      );
 
   void updateRecipe(Recipe recipe) => state = recipe;
 
-  void clearRecipe() => state = null;
+  void clearRecipe() {
+    state = null;
+  }
 
   void updateRecipeTitle(String title) => state = state!.copyWith(title: title);
 

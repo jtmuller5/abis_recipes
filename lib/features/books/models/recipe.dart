@@ -29,6 +29,7 @@ class Recipe {
 
   Recipe({
     this.url,
+    this.id=Isar.autoIncrement,
     this.title,
     this.coverImage,
     this.description,
@@ -40,6 +41,7 @@ class Recipe {
 
   // Copy with
   Recipe copyWith({
+    int? id,
     String? url,
     String? title,
     String? description,
@@ -50,6 +52,7 @@ class Recipe {
     List<int>? bookIds,
   }) {
     return Recipe(
+      id: id ?? this.id,
       url: url ?? this.url,
       title: title ?? this.title,
       coverImage: coverImage ?? this.coverImage,

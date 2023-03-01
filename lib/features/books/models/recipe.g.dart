@@ -187,6 +187,7 @@ Recipe _recipeDeserialize(
     bookIds: reader.readLongList(offsets[0]) ?? const [],
     coverImage: reader.readStringOrNull(offsets[1]),
     description: reader.readStringOrNull(offsets[2]),
+    id: id,
     images: reader.readStringList(offsets[3]),
     ingredients: reader.readObjectList<Ingredient>(
       offsets[4],
@@ -203,7 +204,6 @@ Recipe _recipeDeserialize(
     title: reader.readStringOrNull(offsets[6]),
     url: reader.readStringOrNull(offsets[7]),
   );
-  object.id = id;
   return object;
 }
 
@@ -1775,6 +1775,7 @@ extension RecipeQueryProperty on QueryBuilder<Recipe, Recipe, QQueryProperty> {
 
 Recipe _$RecipeFromJson(Map<String, dynamic> json) => Recipe(
       url: json['url'] as String?,
+      id: json['id'] as int? ?? Isar.autoIncrement,
       title: json['title'] as String?,
       coverImage: json['coverImage'] as String?,
       description: json['description'] as String?,
@@ -1789,7 +1790,7 @@ Recipe _$RecipeFromJson(Map<String, dynamic> json) => Recipe(
       bookIds:
           (json['bookIds'] as List<dynamic>?)?.map((e) => e as int).toList() ??
               const [],
-    )..id = json['id'] as int;
+    );
 
 Map<String, dynamic> _$RecipeToJson(Recipe instance) => <String, dynamic>{
       'url': instance.url,

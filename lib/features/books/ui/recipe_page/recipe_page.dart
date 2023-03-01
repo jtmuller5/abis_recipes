@@ -124,6 +124,116 @@ class RecipePage extends ConsumerWidget {
                             elevation: 0,
                             backgroundColor: Theme.of(context).colorScheme.background,
                             actions: [
+                              IconButton(
+                                  onPressed: () {
+
+                                    showModalBottomSheet(
+                                      context: context,
+                                      builder: (context) {
+                                        return StatefulBuilder(
+                                          builder: (context, setState) => DecoratedBox(
+                                            decoration: const BoxDecoration(borderRadius: BorderRadius.vertical(top: Radius.circular(8))),
+                                            child: ClipRRect(
+                                              borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
+                                              child: Column(
+                                                children: [
+                                                  ListTile(
+                                                    title: Text(
+                                                      'Select Recipe Books',
+                                                      style: Theme.of(context).textTheme.headlineMedium,
+                                                    ),
+                                                  ),
+                                                  Expanded(
+                                                      child: ListView.builder(
+                                                    itemCount: ref.watch(booksProvider).length,
+                                                    itemBuilder: (context, index) {
+                                                      Book book = ref.watch(booksProvider)[index];
+
+                                                      return CheckboxListTile(
+                                                        controlAffinity: ListTileControlAffinity.leading,
+                                                        title: Text(
+                                                          book.title,
+                                                        ),
+                                                        value:
+                                                            ref.watch(checkedBooksProvider.notifier).state.contains(book.id),
+                                                        onChanged: (value) {
+                                                          setState(() {
+                                                            if (value!) {
+                                                              ref.read(checkedBooksProvider.notifier).state = [
+                                                                ...ref.read(checkedBooksProvider.notifier).state,
+                                                                book.id
+                                                              ];
+                                                            } else {
+                                                              ref.read(checkedBooksProvider.notifier).state = ref
+                                                                  .read(checkedBooksProvider.notifier)
+                                                                  .state
+                                                                  .where((element) => element != book.id)
+                                                                  .toList();
+                                                            }
+                                                          });
+                                                        },
+                                                      );
+                                                    },
+                                                  )),
+                                                  Padding(
+                                                    padding: const EdgeInsets.all(8.0),
+                                                    child: Row(
+                                                      mainAxisAlignment: MainAxisAlignment.end,
+                                                      children: [
+                                                        TextButton(
+                                                            onPressed: () {
+                                                              Navigator.of(context).pop();
+                                                            },
+                                                            child: Text('Cancel')),
+                                                        gap16,
+                                                        OutlinedButton(
+                                                            onPressed: () async {
+                                                              if (ref.watch(recipeProvider)?.id != null) {
+                                                                Recipe newRecipe = Recipe(
+                                                                  id: ref.watch(recipeProvider)!.id,
+                                                                  bookIds: ref.watch(checkedBooksProvider),
+                                                                  title: ref.watch(recipeProvider)?.title,
+                                                                  images: ref.watch(recipeProvider)?.images != null
+                                                                      ? ref.watch(recipeProvider)!.images!
+                                                                      : [],
+                                                                  ingredients: ref
+                                                                      .watch(recipeProvider)
+                                                                      ?.ingredients
+                                                                      ?.map((e) => Ingredient(name: e.name))
+                                                                      .toList(),
+                                                                  instructions: ref
+                                                                      .watch(recipeProvider)
+                                                                      ?.instructions
+                                                                      ?.map((e) => Instruction(text: e.text))
+                                                                      .toList(),
+                                                                  url: ref.watch(urlProvider),
+                                                                );
+
+                                                                ref.watch(checkedBooksProvider).forEach((bookId) {
+                                                                  ref.watch(bookRecipesProvider(bookId).notifier).addRecipe(newRecipe);
+                                                                });
+
+                                                                await isar.writeTxn(() async {
+                                                                  await isar.recipes.put(newRecipe);
+                                                                });
+
+                                                                ref.watch(recipeProvider.notifier).updateRecipe(newRecipe);
+                                                              }
+                                                              Navigator.of(context).pop();
+                                                            },
+                                                            child: Text('Save'))
+                                                      ],
+                                                    ),
+                                                  )
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    );
+                                  },
+                                  icon: Icon(Icons.book)),
                               Builder(builder: (context) {
                                 return IconButton(
                                     onPressed: () async {
@@ -146,10 +256,7 @@ class RecipePage extends ConsumerWidget {
                                             const PopupMenuItem(value: 'reload', child: Text('Reload Recipe')),
                                             if (ref.watch(recipeProvider)?.url != null &&
                                                 isar.recipes.filter().urlContains(ref.watch(recipeProvider)!.url!).findAllSync().isNotEmpty)
-                                              const PopupMenuItem(
-                                                  value: 'delete',
-                                                  child: Text('Delete '
-                                                      'Recipe')),
+                                              const PopupMenuItem(value: 'delete', child: Text('Delete Recipe')),
                                           ],
                                         );
                                         if (value != null) {
@@ -237,12 +344,12 @@ class RecipePage extends ConsumerWidget {
                           SliverToBoxAdapter(child: Divider()),
                           if ((ref.watch(recipeProvider)?.instructions ?? []).isNotEmpty)
                             SliverToBoxAdapter(
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Text(
+                              child: ListTile(
+                                title: Text(
                                   'Directions',
                                   style: Theme.of(context).textTheme.headlineSmall!.copyWith(fontWeight: FontWeight.bold),
                                 ),
+                                subtitle: Text('${ref.watch(recipeProvider)?.instructions!.length} steps'),
                               ),
                             ),
                           SliverList(
@@ -274,6 +381,7 @@ class RecipePage extends ConsumerWidget {
                               childCount: (ref.watch(recipeProvider)?.instructions ?? []).length,
                             ),
                           ),
+                          SliverToBoxAdapter(child: gap64),
                         ]),
                       ),
                     ],
@@ -330,18 +438,25 @@ class RecipePage extends ConsumerWidget {
                                     gap16,
                                     OutlinedButton(
                                         onPressed: () async {
+                                          Recipe newRecipe = Recipe(
+                                            bookIds: [ref.watch(saveToBookProvider) ?? 0],
+                                            title: ref.watch(recipeProvider)?.title,
+                                            images: ref.watch(recipeProvider)?.images != null ? ref.watch(recipeProvider)!.images! : [],
+                                            ingredients: ref.watch(recipeProvider)?.ingredients?.map((e) => Ingredient(name: e.name)).toList(),
+                                            instructions: ref.watch(recipeProvider)?.instructions?.map((e) => Instruction(text: e.text)).toList(),
+                                            url: ref.watch(urlProvider),
+                                          );
+
+                                          ref.watch(checkedBooksProvider.notifier).state = [ref.watch(saveToBookProvider) ?? 0];
+                                          ref.watch(bookRecipesProvider(ref.watch(saveToBookProvider) ?? 0).notifier).addRecipe(newRecipe);
+                                          ref.watch(saveToBookProvider.notifier).state = null;
                                           await isar.writeTxn(() async {
-                                            Recipe newRecipe = Recipe(
-                                              bookIds: [ref.watch(saveToBookProvider) ?? 0],
-                                              title: ref.watch(recipeProvider)?.title,
-                                              images: ref.watch(recipeProvider)?.images != null ? ref.watch(recipeProvider)!.images! : [],
-                                              ingredients: ref.watch(recipeProvider)?.ingredients?.map((e) => Ingredient(name: e.name)).toList(),
-                                              instructions: ref.watch(recipeProvider)?.instructions?.map((e) => Instruction(text: e.text)).toList(),
-                                              url: ref.watch(urlProvider),
-                                            );
-                                            ref.watch(bookRecipesProvider(ref.watch(saveToBookProvider) ?? 0).notifier).addRecipe(newRecipe);
                                             await isar.recipes.put(newRecipe);
                                           });
+
+                                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                            content: Text('Recipe saved to book'),
+                                          ));
                                           Navigator.of(context).pop();
                                         },
                                         child: Text('Save'))

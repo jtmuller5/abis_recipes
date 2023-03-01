@@ -68,6 +68,16 @@ class BookRecipesNotifier extends StateNotifier<List<Recipe>> {
   void addRecipe(Recipe recipe) {
     state = [...state, recipe];
   }
+
+  Future<void> removeRecipe(Recipe recipe) async {
+    await isar.writeTxn(() async {
+      List<int> newBookIds = List.from(recipe.bookIds);
+      newBookIds.remove(bookId);
+      Recipe updatedRecipe = recipe.copyWith(bookIds: newBookIds);
+      await isar.recipes.put(updatedRecipe);
+    });
+    state = [...state]..remove(recipe);
+  }
 }
 
 final bookRecipesProvider = StateNotifierProvider.family<BookRecipesNotifier, List<Recipe>, int>((ref, bookId) {
@@ -77,3 +87,8 @@ final bookRecipesProvider = StateNotifierProvider.family<BookRecipesNotifier, Li
 final saveToBookProvider = StateProvider<int?>((ref) {
   return null;
 });
+
+final checkedBooksProvider = StateProvider<List<int>>((ref) {
+  return [];
+});
+

@@ -3,6 +3,7 @@ import 'package:abis_recipes/features/books/models/book.dart';
 import 'package:abis_recipes/features/books/models/recipe.dart';
 import 'package:abis_recipes/features/books/providers/books_provider.dart';
 import 'package:abis_recipes/features/books/ui/recipe_page/recipe_page.dart';
+import 'package:abis_recipes/features/home/providers/recipe_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -130,55 +131,102 @@ class BookPage extends ConsumerWidget {
             })
           ],
         ),
-        if( ref.watch(bookRecipesProvider(bookId)).length > 0)SliverList(
-          delegate: SliverChildBuilderDelegate(
-            (BuildContext context, int index) {
-              Recipe recipe = ref.watch(bookRecipesProvider(bookId))[index];
-              return ListTile(
-                leading: Hero(
-                  tag: 'recipe-${recipe.id}',
-                  child: SizedBox(
-                      height: 64,
-                      width: 64,
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: recipe.images?.firstOrNull != null
-                            ? Image.network(
-                                recipe.images?.first ?? '',
-                                fit: BoxFit.cover,
-                              )
-                            : ColoredBox(color: Theme.of(context).colorScheme.secondary, child: Icon(Icons.book)),
-                      )),
-                ),
-                title: Text(recipe.title ?? 'No title'),
-                subtitle: Text(recipe.description ?? ''),
-                onTap: () {
-                  setRecipe(ref, recipe);
-                  Navigator.of(context).push(MaterialPageRoute(builder: (context) => RecipePage()));
-                },
-              );
-            },
-            childCount: ref.watch(bookRecipesProvider(bookId)).length,
-          ),
-        ) else SliverFillRemaining(
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Animate(
-                    effects: [ScaleEffect()],
-                    child: Image.asset('assets/splash.png', height: 300)),
-                Animate(
-                    effects: [SlideEffect(
-                      begin: Offset(0, 0.5),
-                      end: Offset(0, 0),
-                    ),FadeEffect()],
-                    child: Text('No recipes in this book', style: Theme.of(context).textTheme.headlineSmall!.copyWith(color: Theme.of(context).colorScheme.primary),)),
-                gap64,
-              ],
+        if (ref.watch(bookRecipesProvider(bookId)).length > 0)
+          SliverList(
+            delegate: SliverChildBuilderDelegate(
+              (BuildContext context, int index) {
+                Recipe recipe = ref.watch(bookRecipesProvider(bookId))[index];
+                return Builder(
+                  builder: (context) {
+                    return ListTile(
+                      leading: Hero(
+                        tag: 'recipe-${recipe.id}',
+                        child: SizedBox(
+                            height: 64,
+                            width: 64,
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: recipe.images?.firstOrNull != null
+                                  ? Image.network(
+                                      recipe.images?.first ?? '',
+                                      fit: BoxFit.cover,
+                                    )
+                                  : ColoredBox(color: Theme.of(context).colorScheme.secondary, child: Icon(Icons.book)),
+                            )),
+                      ),
+                      title: Text(recipe.title ?? 'No title'),
+                      subtitle: Text(recipe.description ?? ''),
+                      onTap: () {
+                        setRecipe(ref, recipe);
+                        ref.watch(checkedBooksProvider.notifier).state = recipe.bookIds;
+                        Navigator.of(context).push(MaterialPageRoute(builder: (context) => RecipePage()));
+                      },
+                      onLongPress: () async {
+
+                        Rect? rect;
+                        RenderBox? overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
+                        final renderObject = context.findRenderObject();
+                        final translation = renderObject?.getTransformTo(null).getTranslation();
+                        if (translation != null && renderObject?.paintBounds != null) {
+                          final offset = Offset(translation.x, translation.y);
+                          rect = renderObject!.paintBounds.shift(offset);
+                        }
+                        if (rect != null) {
+                          var value = await showMenu<String>(
+                            context: context,
+                            position: RelativeRect.fromRect(
+                              rect,
+                              Offset.zero & overlay.size,
+                            ),
+                            items: [
+                              const PopupMenuItem(value: 'remove', child: Text('Remove from Book')),
+                              const PopupMenuItem(value: 'delete', child: Text('Delete Recipe')),
+                            ],
+                          );
+                          if (value != null) {
+                            debugPrint(value);
+                            if(value == 'remove'){
+                              await ref.read(bookRecipesProvider(bookId).notifier).removeRecipe(recipe);
+                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Recipe removed from book')));
+                            } else if (value == 'delete') {
+                              ref.watch(recipeProvider.notifier).updateRecipe(recipe);
+                              await ref.read(recipeProvider.notifier).deleteRecipes([recipe.id]);
+                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Recipe deleted')));
+                            }
+                          }
+                        }
+                      },
+                    );
+                  }
+                );
+              },
+              childCount: ref.watch(bookRecipesProvider(bookId)).length,
             ),
-          ),
-        )
+          )
+        else
+          SliverFillRemaining(
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Animate(effects: [ScaleEffect()], child: Image.asset('assets/splash.png', height: 300)),
+                  Animate(
+                      effects: [
+                        SlideEffect(
+                          begin: Offset(0, 0.5),
+                          end: Offset(0, 0),
+                        ),
+                        FadeEffect()
+                      ],
+                      child: Text(
+                        'No recipes in this book',
+                        style: Theme.of(context).textTheme.headlineSmall!.copyWith(color: Theme.of(context).colorScheme.primary),
+                      )),
+                  gap64,
+                ],
+              ),
+            ),
+          )
       ],
     ));
   }
