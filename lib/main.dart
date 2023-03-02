@@ -4,11 +4,10 @@ import 'package:abis_recipes/features/books/ui/recipe_page/recipe_page.dart';
 import 'package:abis_recipes/features/home/ui/home_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_sharing_intent/flutter_sharing_intent.dart';
-import 'package:flutter_sharing_intent/model/sharing_file.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:isar/isar.dart';
+import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 
 late Isar isar;
 
@@ -17,7 +16,6 @@ Future<void> main() async {
     RecipeSchema,
     BookSchema,
   ]);
-
 
   runApp(ProviderScope(child: const MyApp()));
 }
@@ -35,13 +33,11 @@ class _MyAppState extends ConsumerState<MyApp> {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-        statusBarColor: Colors.transparent,
-        statusBarIconBrightness: Brightness.dark));
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(statusBarColor: Colors.transparent, statusBarIconBrightness: Brightness.dark));
 
     return MaterialApp(
       title: 'Abi\'s Recipes',
+      debugShowCheckedModeBanner: false,
       navigatorKey: navigatorKey,
       theme: ThemeData(
         useMaterial3: true,
@@ -61,7 +57,7 @@ class _MyAppState extends ConsumerState<MyApp> {
           ),
         ),
         appBarTheme: AppBarTheme(
-           iconTheme: IconThemeData(color: flexSchemeLight.primary),
+          iconTheme: IconThemeData(color: flexSchemeLight.primary),
         ),
         inputDecorationTheme: InputDecorationTheme(
           border: OutlineInputBorder(
@@ -85,29 +81,56 @@ class _MyAppState extends ConsumerState<MyApp> {
   void initState() {
     super.initState();
 
-    FlutterSharingIntent.instance.getMediaStream().listen((List<SharedFile> value) {
-      print("Shared: getMediaStream ${value.map((f) => f.value).join(",")}");
+    ReceiveSharingIntent.getInitialTextAsUri().then((Uri? value) {
+      print("Shared: getInitialTextAsUri ${value?.toString()}");
 
-      debugPrint('value.first.value: ' + value.first.value.toString());
-      if (value.isNotEmpty && checkValidUrl(value.first.value ?? "")) {
-        loadRecipe(ref, value.first.value!);
+      if (value != null && checkValidUrl(value.toString())) {
+        loadRecipe(ref, value.toString());
+        Navigator.of(navigatorKey.currentContext!).push(MaterialPageRoute(builder: (context) => RecipePage()));
+      }
+    }).onError((error, stackTrace) {
+      print("getInitialSharing error: $error");
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.toString())));
+    });
+
+    ReceiveSharingIntent.getTextStreamAsUri().listen((Uri value) {
+      print("Shared: getTextStreamAsUri ${value.toString()}");
+
+      debugPrint('value.path: ' + value.path);
+      if (value.path.isNotEmpty && checkValidUrl(value.toString())) {
+        loadRecipe(ref, value.toString());
+        Navigator.of(navigatorKey.currentContext!).push(MaterialPageRoute(builder: (context) => RecipePage()));
+      }
+    }, onError: (err) {
+      print("getTextStreamAsUri error: $err");
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(err.toString())));
+    });
+
+    /*ReceiveSharingIntent.getMediaStream().listen((List<SharedMediaFile> value) {
+      print("Shared: getMediaStream ${value.map((f) => f.path).join(",")}");
+
+      debugPrint('value.first.value: ' + value.first.path.toString());
+      if (value.isNotEmpty && checkValidUrl(value.first.path ?? "")) {
+        loadRecipe(ref, value.first.path!);
         Navigator.of(navigatorKey.currentContext!).push(MaterialPageRoute(builder: (context) => RecipePage()));
       }
     }, onError: (err) {
       print("getIntentDataStream error: $err");
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(err.toString())));
     });
 
-    FlutterSharingIntent.instance.getInitialSharing().then((List<SharedFile> value) {
-      print("Shared: getInitialSharing ${value.map((f) => f.value).join(",")}");
+    ReceiveSharingIntent.getInitialMedia().then((List<SharedMediaFile> value) {
+      print("Shared: getInitialSharing ${value.map((f) => f.path).join(",")}");
 
-      if (value.isNotEmpty && checkValidUrl(value.first.value ?? "")) {
-        loadRecipe(ref, value.first.value!);
+      if (value.isNotEmpty && checkValidUrl(value.first.path ?? "")) {
+        loadRecipe(ref, value.first.path);
         Navigator.of(navigatorKey.currentContext!).push(MaterialPageRoute(builder: (context) => RecipePage()));
       }
-    });
+    }).onError((error, stackTrace) {
+      print("getInitialSharing error: $error");
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.toString())));
+    });*/
   }
-
-
 }
 
 bool checkValidUrl(String url) {

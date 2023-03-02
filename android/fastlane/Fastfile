@@ -1,0 +1,44 @@
+update_fastlane
+
+default_platform(:android)
+
+platform :android do
+  desc "Runs all the tests"
+  lane :test do
+    gradle(task: "test")
+  end
+
+  lane :bump_version_code do
+    versionCode = File.read("metadata/versionCode").to_i
+         versionCode = versionCode +1
+
+         f = File.new("metadata/versionCode", "w")
+         f.write(versionCode)
+         f.close
+         versionCode
+  end
+
+  desc "Deploy a new version to the Google Play"
+  lane :prod do
+     versionCode = bump_version_code
+
+     sh("flutter","build","appbundle","--build-number=#{versionCode}")
+
+     upload_to_play_store(
+        track: 'production',
+        aab: '../build/app/outputs/bundle/release/app-release.aab',
+      )
+  end
+
+  desc "Deploy a new version to the beta test track of Google Play"
+  lane :internal do
+     versionCode = bump_version_code
+
+     sh("flutter","build","appbundle","--build-number=#{versionCode}")
+
+     upload_to_play_store(
+        track: 'internal',
+        aab: '../build/app/outputs/bundle/release/app-release.aab',
+      )
+  end
+end

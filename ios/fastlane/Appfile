@@ -1,0 +1,8 @@
+app_identifier("com.mullr.abisRecipes") # The bundle identifier of your app
+apple_id("jtmuller5@gmail.com") # Your Apple Developer Portal username
+
+itc_team_id("121973046") # App Store Connect Team ID
+team_id("592Z9GPUM9") # Developer Portal Team ID
+
+# For more information about the Appfile, see:
+#     https://docs.fastlane.tools/advanced/#appfile
