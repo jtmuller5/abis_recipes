@@ -1,6 +1,7 @@
 import 'package:abis_recipes/features/books/models/book.dart';
 import 'package:abis_recipes/features/books/models/recipe.dart';
 import 'package:abis_recipes/features/books/ui/recipe_page/recipe_page.dart';
+import 'package:abis_recipes/features/home/providers/loading_provider.dart';
 import 'package:abis_recipes/features/home/ui/home_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -85,6 +86,7 @@ class _MyAppState extends ConsumerState<MyApp> {
       print("Shared: getInitialTextAsUri ${value?.toString()}");
 
       if (value != null && checkValidUrl(value.toString())) {
+        ref.watch(urlProvider.notifier).state = value.toString();
         loadRecipe(ref, value.toString());
         Navigator.of(navigatorKey.currentContext!).push(MaterialPageRoute(builder: (context) => RecipePage()));
       }
@@ -98,6 +100,7 @@ class _MyAppState extends ConsumerState<MyApp> {
 
       debugPrint('value.path: ' + value.path);
       if (value.path.isNotEmpty && checkValidUrl(value.toString())) {
+        ref.watch(urlProvider.notifier).state = value.toString();
         loadRecipe(ref, value.toString());
         Navigator.of(navigatorKey.currentContext!).push(MaterialPageRoute(builder: (context) => RecipePage()));
       }

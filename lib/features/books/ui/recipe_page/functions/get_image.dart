@@ -1,18 +1,17 @@
 import 'package:abis_recipes/features/books/ui/recipe_page/services/html_processor.dart';
-import 'package:abis_recipes/features/home/providers/loading_provider.dart';
 import 'package:abis_recipes/features/home/providers/recipe_provider.dart';
 import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'package:flutter/foundation.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-void getImage(BeautifulSoup bs, WidgetRef ref, {bool print = false}) {
+void getImage(BeautifulSoup bs, WidgetRef ref,String url, {bool print = false}) {
   Bs4Element? image = bs.img;
 
   String? imageUrl;
 
   try {
 
-    if(ref.watch(urlProvider)!.contains('cakeculator')){
+    if(url.contains('cakeculator')){
       Bs4Element? cakeDiv = bs.find('*',id: 'Cake-Section');
 
       Bs4Element? cakeImage = cakeDiv?.find('*',class_: 'post-main-rtb');

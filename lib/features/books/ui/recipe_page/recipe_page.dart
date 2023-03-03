@@ -437,10 +437,10 @@ Future<void> loadRecipe(WidgetRef ref, url) async {
       BeautifulSoup bs = BeautifulSoup(document.outerHtml);
 
       ref.watch(recipeProvider.notifier).createRecipe(url);
-      getTitle(bs, ref);
-      getImage(bs, ref);
-      getIngredients(bs, ref);
-      getInstructions(bs, ref);
+      getTitle(bs, ref,url);
+      getImage(bs, ref,url);
+      getIngredients(bs, ref,url);
+      getInstructions(bs, ref,url);
 
       if (ref.watch(recipeProvider)?.title == null ||
           ref.watch(recipeProvider)?.images == null ||

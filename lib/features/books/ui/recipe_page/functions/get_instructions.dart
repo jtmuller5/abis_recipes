@@ -9,10 +9,10 @@ import 'package:flutter/foundation.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:recase/recase.dart';
 
-void getInstructions(BeautifulSoup bs, WidgetRef ref, {bool print = false}) {
+void getInstructions(BeautifulSoup bs, WidgetRef ref,String url, {bool print = false}) {
   List<Bs4Element>? listItems = [];
 
-  if (ref.watch(urlProvider)!.contains('cakeculator')) {
+  if (url.contains('cakeculator')) {
     listItems = getCakeculatorInstructions(bs);
   } else {
     Bs4Element? instructions = bs.find('*', class_: 'instruction');

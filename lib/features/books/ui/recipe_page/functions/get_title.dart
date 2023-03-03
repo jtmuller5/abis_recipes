@@ -3,7 +3,7 @@ import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'package:flutter/foundation.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-void getTitle(BeautifulSoup bs, WidgetRef ref, {bool print = false}) {
+void getTitle(BeautifulSoup bs, WidgetRef ref,String url, {bool print = false}) {
   Bs4Element? title = bs.title;
 
   if(print)debugPrint('title: ' + title.toString());
