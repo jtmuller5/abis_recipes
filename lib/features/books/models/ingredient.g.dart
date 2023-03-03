@@ -18,13 +18,18 @@ const IngredientSchema = Schema(
       name: r'amount',
       type: IsarType.string,
     ),
-    r'name': PropertySchema(
+    r'id': PropertySchema(
       id: 1,
+      name: r'id',
+      type: IsarType.long,
+    ),
+    r'name': PropertySchema(
+      id: 2,
       name: r'name',
       type: IsarType.string,
     ),
     r'unit': PropertySchema(
-      id: 2,
+      id: 3,
       name: r'unit',
       type: IsarType.string,
     )
@@ -69,8 +74,9 @@ void _ingredientSerialize(
   Map<Type, List<int>> allOffsets,
 ) {
   writer.writeString(offsets[0], object.amount);
-  writer.writeString(offsets[1], object.name);
-  writer.writeString(offsets[2], object.unit);
+  writer.writeLong(offsets[1], object.id);
+  writer.writeString(offsets[2], object.name);
+  writer.writeString(offsets[3], object.unit);
 }
 
 Ingredient _ingredientDeserialize(
@@ -81,8 +87,9 @@ Ingredient _ingredientDeserialize(
 ) {
   final object = Ingredient(
     amount: reader.readStringOrNull(offsets[0]),
-    name: reader.readStringOrNull(offsets[1]),
-    unit: reader.readStringOrNull(offsets[2]),
+    id: reader.readLongOrNull(offsets[1]) ?? Isar.autoIncrement,
+    name: reader.readStringOrNull(offsets[2]),
+    unit: reader.readStringOrNull(offsets[3]),
   );
   return object;
 }
@@ -97,8 +104,10 @@ P _ingredientDeserializeProp<P>(
     case 0:
       return (reader.readStringOrNull(offset)) as P;
     case 1:
-      return (reader.readStringOrNull(offset)) as P;
+      return (reader.readLongOrNull(offset) ?? Isar.autoIncrement) as P;
     case 2:
+      return (reader.readStringOrNull(offset)) as P;
+    case 3:
       return (reader.readStringOrNull(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -251,6 +260,59 @@ extension IngredientQueryFilter
       return query.addFilterCondition(FilterCondition.greaterThan(
         property: r'amount',
         value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<Ingredient, Ingredient, QAfterFilterCondition> idEqualTo(
+      int value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'id',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Ingredient, Ingredient, QAfterFilterCondition> idGreaterThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'id',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Ingredient, Ingredient, QAfterFilterCondition> idLessThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'id',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Ingredient, Ingredient, QAfterFilterCondition> idBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'id',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
       ));
     });
   }
@@ -556,6 +618,7 @@ extension IngredientQueryObject
 // **************************************************************************
 
 Ingredient _$IngredientFromJson(Map<String, dynamic> json) => Ingredient(
+      id: json['id'] as int? ?? Isar.autoIncrement,
       name: json['name'] as String?,
       amount: json['amount'] as String?,
       unit: json['unit'] as String?,
@@ -563,6 +626,7 @@ Ingredient _$IngredientFromJson(Map<String, dynamic> json) => Ingredient(
 
 Map<String, dynamic> _$IngredientToJson(Ingredient instance) =>
     <String, dynamic>{
+      'id': instance.id,
       'name': instance.name,
       'amount': instance.amount,
       'unit': instance.unit,

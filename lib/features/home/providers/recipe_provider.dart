@@ -3,6 +3,7 @@ import 'package:abis_recipes/features/books/models/instruction.dart';
 import 'package:abis_recipes/features/books/models/recipe.dart';
 import 'package:abis_recipes/features/books/providers/books_provider.dart';
 import 'package:abis_recipes/features/books/ui/recipe_page/recipe_page.dart';
+import 'package:abis_recipes/features/home/providers/loading_provider.dart';
 import 'package:abis_recipes/main.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -12,6 +13,7 @@ class RecipeNotifier extends StateNotifier<Recipe?> {
   RecipeNotifier() : super(null);
 
   static void navigateToRecipe(Recipe recipe, WidgetRef ref, BuildContext context) {
+    ref.watch(urlProvider.notifier).state = recipe.url;
     setRecipe(ref, recipe);
     ref.watch(checkedBooksProvider.notifier).state = recipe.bookIds;
     Navigator.of(context).push(MaterialPageRoute(builder: (context) => RecipePage()));
@@ -43,7 +45,7 @@ class RecipeNotifier extends StateNotifier<Recipe?> {
 
   void addInstruction(Instruction instruction) => state = state!.copyWith(instructions: [...state!.instructions!, instruction]);
 
-void updateInstruction(Instruction instruction) {
+  void updateInstruction(Instruction instruction) {
     final index = state!.instructions!.indexWhere((element) => element.text == instruction.text);
     state = state!.copyWith(instructions: [...state!.instructions!]..[index] = instruction);
   }
@@ -84,7 +86,7 @@ class RecipesNotifier extends StateNotifier<List<Recipe>> {
     });
 
     ref.listen(recipeProvider, (previous, next) {
-      state= isar.recipes.buildQuery<Recipe>().findAllSync();
+      state = isar.recipes.buildQuery<Recipe>().findAllSync();
     });
   }
 
@@ -102,7 +104,11 @@ class RecipesNotifier extends StateNotifier<List<Recipe>> {
     state = recipes;
   }
 
-  void addRecipe(Recipe recipe) {
+  Future<void> addRecipe(Recipe recipe) async {
+
+    await isar.writeTxn(() async {
+      await isar.recipes.put(recipe);
+    });
     state = [...state, recipe];
   }
 }

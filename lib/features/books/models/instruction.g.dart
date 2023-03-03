@@ -13,23 +13,28 @@ const InstructionSchema = Schema(
   name: r'Instruction',
   id: 4657070553429627997,
   properties: {
-    r'image': PropertySchema(
+    r'id': PropertySchema(
       id: 0,
+      name: r'id',
+      type: IsarType.long,
+    ),
+    r'image': PropertySchema(
+      id: 1,
       name: r'image',
       type: IsarType.string,
     ),
     r'shortText': PropertySchema(
-      id: 1,
+      id: 2,
       name: r'shortText',
       type: IsarType.string,
     ),
     r'shortened': PropertySchema(
-      id: 2,
+      id: 3,
       name: r'shortened',
       type: IsarType.bool,
     ),
     r'text': PropertySchema(
-      id: 3,
+      id: 4,
       name: r'text',
       type: IsarType.string,
     )
@@ -73,10 +78,11 @@ void _instructionSerialize(
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
-  writer.writeString(offsets[0], object.image);
-  writer.writeString(offsets[1], object.shortText);
-  writer.writeBool(offsets[2], object.shortened);
-  writer.writeString(offsets[3], object.text);
+  writer.writeLong(offsets[0], object.id);
+  writer.writeString(offsets[1], object.image);
+  writer.writeString(offsets[2], object.shortText);
+  writer.writeBool(offsets[3], object.shortened);
+  writer.writeString(offsets[4], object.text);
 }
 
 Instruction _instructionDeserialize(
@@ -86,10 +92,11 @@ Instruction _instructionDeserialize(
   Map<Type, List<int>> allOffsets,
 ) {
   final object = Instruction(
-    image: reader.readStringOrNull(offsets[0]),
-    shortText: reader.readStringOrNull(offsets[1]),
-    shortened: reader.readBoolOrNull(offsets[2]),
-    text: reader.readStringOrNull(offsets[3]),
+    id: reader.readLongOrNull(offsets[0]) ?? Isar.autoIncrement,
+    image: reader.readStringOrNull(offsets[1]),
+    shortText: reader.readStringOrNull(offsets[2]),
+    shortened: reader.readBoolOrNull(offsets[3]),
+    text: reader.readStringOrNull(offsets[4]),
   );
   return object;
 }
@@ -102,12 +109,14 @@ P _instructionDeserializeProp<P>(
 ) {
   switch (propertyId) {
     case 0:
-      return (reader.readStringOrNull(offset)) as P;
+      return (reader.readLongOrNull(offset) ?? Isar.autoIncrement) as P;
     case 1:
       return (reader.readStringOrNull(offset)) as P;
     case 2:
-      return (reader.readBoolOrNull(offset)) as P;
+      return (reader.readStringOrNull(offset)) as P;
     case 3:
+      return (reader.readBoolOrNull(offset)) as P;
+    case 4:
       return (reader.readStringOrNull(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -116,6 +125,59 @@ P _instructionDeserializeProp<P>(
 
 extension InstructionQueryFilter
     on QueryBuilder<Instruction, Instruction, QFilterCondition> {
+  QueryBuilder<Instruction, Instruction, QAfterFilterCondition> idEqualTo(
+      int value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'id',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Instruction, Instruction, QAfterFilterCondition> idGreaterThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'id',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Instruction, Instruction, QAfterFilterCondition> idLessThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'id',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Instruction, Instruction, QAfterFilterCondition> idBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'id',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
   QueryBuilder<Instruction, Instruction, QAfterFilterCondition> imageIsNull() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(const FilterCondition.isNull(
@@ -604,6 +666,7 @@ extension InstructionQueryObject
 // **************************************************************************
 
 Instruction _$InstructionFromJson(Map<String, dynamic> json) => Instruction(
+      id: json['id'] as int? ?? Isar.autoIncrement,
       text: json['text'] as String?,
       image: json['image'] as String?,
       shortened: json['shortened'] as bool? ?? false,
@@ -612,6 +675,7 @@ Instruction _$InstructionFromJson(Map<String, dynamic> json) => Instruction(
 
 Map<String, dynamic> _$InstructionToJson(Instruction instance) =>
     <String, dynamic>{
+      'id': instance.id,
       'text': instance.text,
       'image': instance.image,
       'shortened': instance.shortened,

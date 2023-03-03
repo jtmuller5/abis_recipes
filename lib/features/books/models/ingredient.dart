@@ -7,6 +7,8 @@ part 'ingredient.g.dart';
 @JsonSerializable(explicitToJson: true)
 class Ingredient{
 
+  int id = Isar.autoIncrement;
+
   String? name;
 
   String? amount;
@@ -14,6 +16,7 @@ class Ingredient{
   String? unit;
 
   Ingredient({
+    this.id = Isar.autoIncrement,
     this.name,
     this.amount,
     this.unit,

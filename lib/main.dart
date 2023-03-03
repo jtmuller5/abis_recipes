@@ -1,4 +1,5 @@
 import 'package:abis_recipes/features/books/models/book.dart';
+import 'package:abis_recipes/features/books/models/note.dart';
 import 'package:abis_recipes/features/books/models/recipe.dart';
 import 'package:abis_recipes/features/books/ui/recipe_page/recipe_page.dart';
 import 'package:abis_recipes/features/home/providers/loading_provider.dart';
@@ -9,16 +10,53 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:isar/isar.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 late Isar isar;
 
 Future<void> main() async {
+  // Ensure initialized
+  WidgetsFlutterBinding.ensureInitialized();
   isar = await Isar.open([
     RecipeSchema,
     BookSchema,
+    NoteSchema,
   ]);
 
+  //await isar.writeTxn(() async => await isar.clear());
+
+  await performMigrationIfNeeded(isar);
+
   runApp(ProviderScope(child: const MyApp()));
+}
+
+Future<void> performMigrationIfNeeded(Isar isar) async {
+  final prefs = await SharedPreferences.getInstance();
+  final currentVersion = prefs.getInt('version') ?? 2;
+  switch(currentVersion) {
+    case 1:
+      await migrateV1ToV2(isar);
+      break;
+    case 2:
+      return;
+    default:
+      await migrateV1ToV2(isar);
+  }
+
+  // Update version
+  await prefs.setInt('version', 2);
+}
+
+Future<void> migrateV1ToV2(Isar isar) async {
+  final recipesCount = await isar.recipes.count();
+
+  // We paginate through the users to avoid loading all users into memory at once
+  for (var i = 0; i < recipesCount; i += 50) {
+    final recipes = await isar.recipes.where().offset(i).limit(50).findAll();
+    await isar.writeTxn((isar) async {
+      await isar.recipes.putAll(recipes);
+    } as Future Function());
+  }
 }
 
 GlobalObjectKey<NavigatorState> navigatorKey = GlobalObjectKey<NavigatorState>(NavigatorState());

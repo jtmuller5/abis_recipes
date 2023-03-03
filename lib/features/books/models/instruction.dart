@@ -6,6 +6,7 @@ part 'instruction.g.dart';
 @embedded
 @JsonSerializable(explicitToJson: true)
 class Instruction {
+  int id = Isar.autoIncrement;
 
   String? text;
 
@@ -16,6 +17,7 @@ class Instruction {
   String? shortText;
 
   Instruction({
+    this.id = Isar.autoIncrement,
     this.text,
     this.image,
     this.shortened = false,
@@ -28,12 +30,14 @@ class Instruction {
 
   // Copy with
   Instruction copyWith({
+    int? id,
     String? text,
     String? image,
     bool? shortened,
     String? shortText,
   }) {
     return Instruction(
+      id: id ?? this.id,
       text: text ?? this.text,
       image: image ?? this.image,
       shortened: shortened ?? this.shortened,

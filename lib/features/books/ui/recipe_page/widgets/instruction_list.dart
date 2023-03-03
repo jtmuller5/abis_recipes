@@ -1,7 +1,10 @@
 import 'package:abis_recipes/features/books/models/gpt_message.dart';
 import 'package:abis_recipes/features/books/models/instruction.dart';
+import 'package:abis_recipes/features/books/models/note.dart';
 import 'package:abis_recipes/features/books/services/chat_gpt_service.dart';
 import 'package:abis_recipes/features/home/providers/recipe_provider.dart';
+import 'package:abis_recipes/main.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -44,7 +47,6 @@ class InstructionTile extends ConsumerStatefulWidget {
 }
 
 class _InstructionTileState extends ConsumerState<InstructionTile> {
-
   bool showShort = false;
 
   @override
@@ -76,10 +78,11 @@ class _InstructionTileState extends ConsumerState<InstructionTile> {
                 var value = await showMenu<String>(
                   context: context,
                   position: RelativeRect.fromRect(
-                    rect,
-                    Offset.zero & overlay.size,
+                    rect.translate(rect.width, 0),
+                    Offset.zero & overlay.size ,
                   ),
                   items: [
+                    const PopupMenuItem(value: 'note', child: Text('Add Note')),
                     const PopupMenuItem(value: 'shorten', child: Text('Shorten')),
                   ],
                 );
@@ -103,6 +106,44 @@ class _InstructionTileState extends ConsumerState<InstructionTile> {
                         content: Text('Instruction cannot be shortened'),
                       ));
                     }
+                  } else if (value == 'note') {
+                    final noteText = await showDialog<String>(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: Text('New Note'),
+                          content: TextField(
+                            autofocus: true,
+                            decoration: InputDecoration(hintText: 'Enter your note here'),
+                          ),
+                          actions: [
+                            TextButton(
+                              child: Text('Cancel'),
+                              onPressed: () => Navigator.of(context).pop(),
+                            ),
+                            TextButton(
+                              child: Text('Save'),
+                              onPressed: () => Navigator.of(context).pop(),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+
+                    if (noteText != null && noteText.isNotEmpty) {
+
+                      Note note = Note(
+                        text: noteText,
+                        recipeId: ref.watch(recipeProvider)!.id,
+                        instructionId: widget.instruction.id,
+                        createdAt: DateTime.now(),
+                      );
+
+                      // Save note to isar
+                      await isar.writeTxn(() async {
+                        await isar.notes.put(note);
+                      });
+                    }
                   }
                 }
               }
@@ -115,10 +156,26 @@ class _InstructionTileState extends ConsumerState<InstructionTile> {
                   style: Theme.of(context).textTheme.titleMedium!.copyWith(color: Theme.of(context).colorScheme.onPrimary)),
             ),
           ),
-          title: Text(
-           showShort? widget.instruction.shortText ?? '' : widget.instruction.text ?? '',
+          title: Text(showShort ? widget.instruction.shortText ?? '' : widget.instruction.text ?? '',
+              style: Theme.of(context).textTheme.bodyLarge!.copyWith(fontSize: 18))
+
+          /*SelectableText(
+            showShort ? widget.instruction.shortText ?? '' : widget.instruction.text ?? '',
             style: Theme.of(context).textTheme.bodyLarge!.copyWith(fontSize: 18),
-          ),
+            contextMenuBuilder: (context, editableTextState) {
+              return AdaptiveTextSelectionToolbar(
+                  anchors: editableTextState.contextMenuAnchors,
+                  children: [
+                    InkWell(
+                      onTap: (){},
+                      child: SizedBox(
+                        width: 200.0,
+                        child: Text('Note'),
+                      ),
+                    )
+                  ]);
+            },
+          ),*/
         );
       }),
     );

@@ -10,21 +10,18 @@ class SearchView extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-
     TextEditingController searchController = useTextEditingController();
     return Scaffold(
       body: CustomScrollView(
         slivers: [
-          SliverAppBar(
-            title: Text('Search')
-          ),
+          SliverAppBar(title: Text('Search')),
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.all(16.0),
               child: TextField(
                 controller: searchController,
                 onChanged: (value) {
-                  ref.watch(searchProvider.notifier).state=value;
+                  ref.watch(searchProvider.notifier).state = value;
                 },
                 decoration: InputDecoration(
                   labelText: 'Search',
