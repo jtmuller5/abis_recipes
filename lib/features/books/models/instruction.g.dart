@@ -18,13 +18,18 @@ const InstructionSchema = Schema(
       name: r'image',
       type: IsarType.string,
     ),
-    r'shortened': PropertySchema(
+    r'shortText': PropertySchema(
       id: 1,
+      name: r'shortText',
+      type: IsarType.string,
+    ),
+    r'shortened': PropertySchema(
+      id: 2,
       name: r'shortened',
       type: IsarType.bool,
     ),
     r'text': PropertySchema(
-      id: 2,
+      id: 3,
       name: r'text',
       type: IsarType.string,
     )
@@ -48,6 +53,12 @@ int _instructionEstimateSize(
     }
   }
   {
+    final value = object.shortText;
+    if (value != null) {
+      bytesCount += 3 + value.length * 3;
+    }
+  }
+  {
     final value = object.text;
     if (value != null) {
       bytesCount += 3 + value.length * 3;
@@ -63,8 +74,9 @@ void _instructionSerialize(
   Map<Type, List<int>> allOffsets,
 ) {
   writer.writeString(offsets[0], object.image);
-  writer.writeBool(offsets[1], object.shortened);
-  writer.writeString(offsets[2], object.text);
+  writer.writeString(offsets[1], object.shortText);
+  writer.writeBool(offsets[2], object.shortened);
+  writer.writeString(offsets[3], object.text);
 }
 
 Instruction _instructionDeserialize(
@@ -75,8 +87,9 @@ Instruction _instructionDeserialize(
 ) {
   final object = Instruction(
     image: reader.readStringOrNull(offsets[0]),
-    shortened: reader.readBoolOrNull(offsets[1]),
-    text: reader.readStringOrNull(offsets[2]),
+    shortText: reader.readStringOrNull(offsets[1]),
+    shortened: reader.readBoolOrNull(offsets[2]),
+    text: reader.readStringOrNull(offsets[3]),
   );
   return object;
 }
@@ -91,8 +104,10 @@ P _instructionDeserializeProp<P>(
     case 0:
       return (reader.readStringOrNull(offset)) as P;
     case 1:
-      return (reader.readBoolOrNull(offset)) as P;
+      return (reader.readStringOrNull(offset)) as P;
     case 2:
+      return (reader.readBoolOrNull(offset)) as P;
+    case 3:
       return (reader.readStringOrNull(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -245,6 +260,160 @@ extension InstructionQueryFilter
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.greaterThan(
         property: r'image',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<Instruction, Instruction, QAfterFilterCondition>
+      shortTextIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'shortText',
+      ));
+    });
+  }
+
+  QueryBuilder<Instruction, Instruction, QAfterFilterCondition>
+      shortTextIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'shortText',
+      ));
+    });
+  }
+
+  QueryBuilder<Instruction, Instruction, QAfterFilterCondition>
+      shortTextEqualTo(
+    String? value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'shortText',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Instruction, Instruction, QAfterFilterCondition>
+      shortTextGreaterThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'shortText',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Instruction, Instruction, QAfterFilterCondition>
+      shortTextLessThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'shortText',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Instruction, Instruction, QAfterFilterCondition>
+      shortTextBetween(
+    String? lower,
+    String? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'shortText',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Instruction, Instruction, QAfterFilterCondition>
+      shortTextStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'shortText',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Instruction, Instruction, QAfterFilterCondition>
+      shortTextEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'shortText',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Instruction, Instruction, QAfterFilterCondition>
+      shortTextContains(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'shortText',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Instruction, Instruction, QAfterFilterCondition>
+      shortTextMatches(String pattern, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'shortText',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Instruction, Instruction, QAfterFilterCondition>
+      shortTextIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'shortText',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<Instruction, Instruction, QAfterFilterCondition>
+      shortTextIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'shortText',
         value: '',
       ));
     });
@@ -438,6 +607,7 @@ Instruction _$InstructionFromJson(Map<String, dynamic> json) => Instruction(
       text: json['text'] as String?,
       image: json['image'] as String?,
       shortened: json['shortened'] as bool? ?? false,
+      shortText: json['shortText'] as String?,
     );
 
 Map<String, dynamic> _$InstructionToJson(Instruction instance) =>
@@ -445,4 +615,5 @@ Map<String, dynamic> _$InstructionToJson(Instruction instance) =>
       'text': instance.text,
       'image': instance.image,
       'shortened': instance.shortened,
+      'shortText': instance.shortText,
     };
