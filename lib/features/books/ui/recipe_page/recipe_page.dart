@@ -383,12 +383,8 @@ class RecipePage extends ConsumerWidget {
                                     gap16,
                                     OutlinedButton(
                                         onPressed: () async {
-                                          Recipe newRecipe = Recipe(
+                                          Recipe newRecipe = ref.watch(recipeProvider)!.copyWith(
                                             bookIds: [ref.watch(saveToBookProvider) ?? 0],
-                                            title: ref.watch(recipeProvider)?.title,
-                                            images: ref.watch(recipeProvider)?.images != null ? ref.watch(recipeProvider)!.images! : [],
-                                            ingredients: ref.watch(recipeProvider)?.ingredients?.map((e) => Ingredient(name: e.name)).toList(),
-                                            instructions: ref.watch(recipeProvider)?.instructions?.map((e) => Instruction(text: e.text)).toList(),
                                             url: ref.watch(urlProvider),
                                           );
 
