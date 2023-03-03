@@ -45,9 +45,30 @@ class RecipeNotifier extends StateNotifier<Recipe?> {
 
   void addInstruction(Instruction instruction) => state = state!.copyWith(instructions: [...state!.instructions!, instruction]);
 
-  void updateInstruction(Instruction instruction) {
+  Future<void> updateInstruction(Instruction instruction) async {
     final index = state!.instructions!.indexWhere((element) => element.text == instruction.text);
-    state = state!.copyWith(instructions: [...state!.instructions!]..[index] = instruction);
+
+    Recipe newState = state!.copyWith(instructions: [...state!.instructions!]..[index] = instruction);
+
+    await isar.writeTxn(() async {
+      final success = await isar.recipes.put(newState);
+      print('Recipe updated: $success');
+    });
+
+    state = newState;
+  }
+
+  Future<void> updateIngredient(Ingredient ingredient) async {
+    final index = state!.ingredients!.indexWhere((element) => element.name == ingredient.name);
+
+    Recipe newState =state!.copyWith(ingredients: [...state!.ingredients!]..[index] = ingredient);
+
+    await isar.writeTxn(() async {
+      final success = await isar.recipes.put(newState);
+      print('Recipe updated: $success');
+    });
+
+    state = newState;
   }
 
   void removeInstruction(Instruction instruction) => state = state!.copyWith(instructions: [...state!.instructions!]..remove(instruction));
@@ -86,7 +107,9 @@ class RecipesNotifier extends StateNotifier<List<Recipe>> {
     });
 
     ref.listen(recipeProvider, (previous, next) {
+      debugPrint('Recipe changed: $next');
       state = isar.recipes.buildQuery<Recipe>().findAllSync();
+      debugPrint('state: ' + state.toString());
     });
   }
 

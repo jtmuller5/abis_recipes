@@ -69,6 +69,7 @@ const RecipeSchema = CollectionSchema(
   links: {},
   embeddedSchemas: {
     r'Ingredient': IngredientSchema,
+    r'Note': NoteSchema,
     r'Instruction': InstructionSchema
   },
   getId: _recipeGetId,

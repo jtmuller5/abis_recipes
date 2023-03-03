@@ -1,5 +1,6 @@
 import 'package:abis_recipes/features/books/models/ingredient.dart';
 import 'package:abis_recipes/features/books/models/instruction.dart';
+import 'package:abis_recipes/features/books/models/note.dart';
 import 'package:isar/isar.dart';
 import 'package:json_annotation/json_annotation.dart';
 

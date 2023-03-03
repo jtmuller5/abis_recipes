@@ -1,12 +1,13 @@
 import 'package:isar/isar.dart';
 import 'package:json_annotation/json_annotation.dart';
 
+import 'note.dart';
+
 part 'instruction.g.dart';
 
 @embedded
 @JsonSerializable(explicitToJson: true)
 class Instruction {
-  int id = Isar.autoIncrement;
 
   String? text;
 
@@ -16,32 +17,45 @@ class Instruction {
 
   String? shortText;
 
+  Note? note;
+
   Instruction({
-    this.id = Isar.autoIncrement,
     this.text,
     this.image,
     this.shortened = false,
     this.shortText,
+    this.note,
   });
 
   factory Instruction.fromJson(Map<String, dynamic> json) => _$InstructionFromJson(json);
 
   Map<String, dynamic> toJson() => _$InstructionToJson(this);
 
-  // Copy with
+  // Copy with and handle nulls
   Instruction copyWith({
-    int? id,
     String? text,
     String? image,
     bool? shortened,
     String? shortText,
+    Note? note,
   }) {
     return Instruction(
-      id: id ?? this.id,
       text: text ?? this.text,
       image: image ?? this.image,
       shortened: shortened ?? this.shortened,
       shortText: shortText ?? this.shortText,
+      note: note ?? this.note,
+    );
+  }
+
+  // Copy with and remove note
+  Instruction copyWithNoNote() {
+    return Instruction(
+      text: this.text,
+      image: this.image,
+      shortened: this.shortened,
+      shortText: this.shortText,
+      note: null,
     );
   }
 }

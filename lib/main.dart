@@ -20,10 +20,9 @@ Future<void> main() async {
   isar = await Isar.open([
     RecipeSchema,
     BookSchema,
-    NoteSchema,
   ]);
 
-  //await isar.writeTxn(() async => await isar.clear());
+  // await isar.writeTxn(() async => await isar.clear());
 
   await performMigrationIfNeeded(isar);
 

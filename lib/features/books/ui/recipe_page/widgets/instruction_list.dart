@@ -7,6 +7,7 @@ import 'package:abis_recipes/main.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class InstructionList extends ConsumerWidget {
@@ -18,7 +19,7 @@ class InstructionList extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return SliverList(
       delegate: SliverChildBuilderDelegate(
-        (BuildContext context, int index) {
+            (BuildContext context, int index) {
           Instruction instruction = (ref.watch(recipeProvider)?.instructions ?? [])[index];
 
           return InstructionTile(
@@ -34,10 +35,10 @@ class InstructionList extends ConsumerWidget {
 
 class InstructionTile extends ConsumerStatefulWidget {
   const InstructionTile(
-    this.instruction,
-    this.index, {
-    Key? key,
-  }) : super(key: key);
+      this.instruction,
+      this.index, {
+        Key? key,
+      }) : super(key: key);
 
   final Instruction instruction;
   final int index;
@@ -56,110 +57,161 @@ class _InstructionTileState extends ConsumerState<InstructionTile> {
         ScaleEffect(delay: Duration(milliseconds: 50 * widget.index)),
         FadeEffect(delay: Duration(milliseconds: 10 * widget.index)),
       ],
-      child: Builder(builder: (context) {
-        return ListTile(
-          contentPadding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8),
-          minLeadingWidth: 0,
-          onTap: () async {
-            if (widget.instruction.shortened ?? false) {
-              setState(() {
-                showShort = !showShort;
-              });
-            } else {
-              Rect? rect;
-              RenderBox? overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
-              final renderObject = context.findRenderObject();
-              final translation = renderObject?.getTransformTo(null).getTranslation();
-              if (translation != null && renderObject?.paintBounds != null) {
-                final offset = Offset(translation.x, translation.y);
-                rect = renderObject!.paintBounds.shift(offset);
-              }
-              if (rect != null) {
-                var value = await showMenu<String>(
-                  context: context,
-                  position: RelativeRect.fromRect(
-                    rect.translate(rect.width, 0),
-                    Offset.zero & overlay.size ,
-                  ),
-                  items: [
-                    const PopupMenuItem(value: 'note', child: Text('Add Note')),
-                    const PopupMenuItem(value: 'shorten', child: Text('Shorten')),
-                  ],
-                );
-                if (value != null) {
-                  if (value == 'shorten') {
-                    if (!(widget.instruction.shortened ?? false) && (widget.instruction.text ?? '').length > 80) {
-                      GptMessage message = await ChatGptService.shortenContent(widget.instruction.text!);
+      child: Builder(
+        builder: (context) {
+          return InkWell(
+            onTap: () async {
+              if (widget.instruction.shortened ?? false) {
+                setState(() {
+                  showShort = !showShort;
+                });
+              } else {
+                Rect? rect;
+                RenderBox? overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
+                final renderObject = context.findRenderObject();
+                final translation = renderObject?.getTransformTo(null).getTranslation();
+                if (translation != null && renderObject?.paintBounds != null) {
+                  final offset = Offset(translation.x, translation.y);
+                  rect = renderObject!.paintBounds.shift(offset);
+                }
+                if (rect != null) {
+                  var value = await showMenu<String>(
+                    context: context,
+                    position: RelativeRect.fromRect(
+                      rect.translate(rect.width, 0),
+                      Offset.zero & overlay.size ,
+                    ),
+                    items: [
+                      const PopupMenuItem(value: 'note', child: Text('Add Note')),
+                      const PopupMenuItem(value: 'shorten', child: Text('Shorten')),
+                    ],
+                  );
+                  if (value != null) {
+                    if (value == 'shorten') {
+                      if (!(widget.instruction.shortened ?? false) && (widget.instruction.text ?? '').length > 80) {
+                        GptMessage message = await ChatGptService.shortenContent(widget.instruction.text!);
 
-                      Instruction newInstruction = widget.instruction.copyWith(
-                        shortText: message.choices.first.message.content.trim().replaceAll('"', ''),
-                        shortened: true,
-                      );
-
-                      ref.read(recipeProvider.notifier).updateInstruction(newInstruction);
-
-                      setState(() {
-                        showShort = true;
-                      });
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                        content: Text('Instruction cannot be shortened'),
-                      ));
-                    }
-                  } else if (value == 'note') {
-                    final noteText = await showDialog<String>(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          title: Text('New Note'),
-                          content: TextField(
-                            autofocus: true,
-                            decoration: InputDecoration(hintText: 'Enter your note here'),
-                          ),
-                          actions: [
-                            TextButton(
-                              child: Text('Cancel'),
-                              onPressed: () => Navigator.of(context).pop(),
-                            ),
-                            TextButton(
-                              child: Text('Save'),
-                              onPressed: () => Navigator.of(context).pop(),
-                            ),
-                          ],
+                        Instruction newInstruction = widget.instruction.copyWith(
+                          shortText: message.choices.first.message.content.trim().replaceAll('"', ''),
+                          shortened: true,
                         );
-                      },
-                    );
 
-                    if (noteText != null && noteText.isNotEmpty) {
+                        ref.read(recipeProvider.notifier).updateInstruction(newInstruction);
 
-                      Note note = Note(
-                        text: noteText,
-                        recipeId: ref.watch(recipeProvider)!.id,
-                        instructionId: widget.instruction.id,
-                        createdAt: DateTime.now(),
+                        setState(() {
+                          showShort = true;
+                        });
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          content: Text('Instruction cannot be shortened'),
+                        ));
+                      }
+                    } else if (value == 'note') {
+                      final noteText = await showDialog<String>(
+                        context: context,
+                        builder: (BuildContext context) {
+
+                          TextEditingController noteController = TextEditingController();
+                          return AlertDialog(
+                            title: Text('New Note'),
+                            content: TextField(
+                              controller: noteController,
+                              autofocus: true,
+                              decoration: InputDecoration(hintText: 'Enter your note here'),
+                            ),
+                            actions: [
+                              TextButton(
+                                child: Text('Cancel'),
+                                onPressed: () => Navigator.of(context).pop(),
+                              ),
+                              TextButton(
+                                child: Text('Save'),
+                                onPressed: () => Navigator.of(context).pop(noteController.text),
+                              ),
+                            ],
+                          );
+                        },
                       );
 
-                      // Save note to isar
-                      await isar.writeTxn(() async {
-                        await isar.notes.put(note);
-                      });
+                      if (noteText != null && noteText.isNotEmpty) {
+
+                        Note note = Note(
+                          text: noteText,
+                          recipeId: ref.watch(recipeProvider)!.id,
+                          createdAt: DateTime.now(),
+                        );
+
+                        await ref.read(recipeProvider.notifier).updateInstruction(widget.instruction.copyWith(note: note));
+                      }
                     }
                   }
                 }
               }
-            }
-          },
-          leading: CircleAvatar(
-            backgroundColor: Theme.of(context).colorScheme.primary,
-            child: Center(
-              child: Text('${widget.index + 1}',
-                  style: Theme.of(context).textTheme.titleMedium!.copyWith(color: Theme.of(context).colorScheme.onPrimary)),
-            ),
-          ),
-          title: Text(showShort ? widget.instruction.shortText ?? '' : widget.instruction.text ?? '',
-              style: Theme.of(context).textTheme.bodyLarge!.copyWith(fontSize: 18))
+            },
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16,vertical: 8.0),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8, top: 8),
+                    child: SizedBox(
+                      width: 40,
+                      child: Column(
+                        children: [
+                          CircleAvatar(
+                            backgroundColor: Theme.of(context).colorScheme.primary,
+                            child: Center(
+                              child: Text('${widget.index + 1}',
+                                  style: Theme.of(context).textTheme.titleMedium!.copyWith(color: Theme.of(context).colorScheme.onPrimary)),
+                            ),
+                          ),
+                          if (widget.instruction.note != null)
+                            IconButton(
+                              constraints: BoxConstraints.tightFor(width: 40, height: 40),
+                              icon: Icon(
+                                Icons.sticky_note_2_outlined,
+                                color: Theme.of(context).colorScheme.primary,
 
-          /*SelectableText(
+                              ),
+                              onPressed: (){
+                                // Display note
+                                showDialog(
+                                  context: context,
+                                  builder: (context) => AlertDialog(
+                                    title: Text('Note'),
+                                    content: Text(widget.instruction.note!.text ?? ''),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: (){
+                                          Navigator.of(context).pop();
+                                        },
+                                        child: Text('Close'),
+                                      )
+                                    ],
+                                  ),
+                                );
+                              },
+                            ) else SizedBox(height: 40,width: 40,),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: Text(showShort ? widget.instruction.shortText ?? '' : widget.instruction.text ?? '',
+                        style: Theme.of(context).textTheme.bodyLarge!.copyWith(fontSize: 18)),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+/*SelectableText(
             showShort ? widget.instruction.shortText ?? '' : widget.instruction.text ?? '',
             style: Theme.of(context).textTheme.bodyLarge!.copyWith(fontSize: 18),
             contextMenuBuilder: (context, editableTextState) {
@@ -176,8 +228,4 @@ class _InstructionTileState extends ConsumerState<InstructionTile> {
                   ]);
             },
           ),*/
-        );
-      }),
-    );
-  }
-}
+
