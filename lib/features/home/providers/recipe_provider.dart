@@ -43,6 +43,11 @@ class RecipeNotifier extends StateNotifier<Recipe?> {
 
   void addInstruction(Instruction instruction) => state = state!.copyWith(instructions: [...state!.instructions!, instruction]);
 
+void updateInstruction(Instruction instruction) {
+    final index = state!.instructions!.indexWhere((element) => element.text == instruction.text);
+    state = state!.copyWith(instructions: [...state!.instructions!]..[index] = instruction);
+  }
+
   void removeInstruction(Instruction instruction) => state = state!.copyWith(instructions: [...state!.instructions!]..remove(instruction));
 
   void addIngredient(Ingredient ingredient) {

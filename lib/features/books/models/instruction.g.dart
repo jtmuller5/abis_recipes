@@ -18,8 +18,13 @@ const InstructionSchema = Schema(
       name: r'image',
       type: IsarType.string,
     ),
-    r'text': PropertySchema(
+    r'shortened': PropertySchema(
       id: 1,
+      name: r'shortened',
+      type: IsarType.bool,
+    ),
+    r'text': PropertySchema(
+      id: 2,
       name: r'text',
       type: IsarType.string,
     )
@@ -58,7 +63,8 @@ void _instructionSerialize(
   Map<Type, List<int>> allOffsets,
 ) {
   writer.writeString(offsets[0], object.image);
-  writer.writeString(offsets[1], object.text);
+  writer.writeBool(offsets[1], object.shortened);
+  writer.writeString(offsets[2], object.text);
 }
 
 Instruction _instructionDeserialize(
@@ -69,7 +75,8 @@ Instruction _instructionDeserialize(
 ) {
   final object = Instruction(
     image: reader.readStringOrNull(offsets[0]),
-    text: reader.readStringOrNull(offsets[1]),
+    shortened: reader.readBoolOrNull(offsets[1]),
+    text: reader.readStringOrNull(offsets[2]),
   );
   return object;
 }
@@ -84,6 +91,8 @@ P _instructionDeserializeProp<P>(
     case 0:
       return (reader.readStringOrNull(offset)) as P;
     case 1:
+      return (reader.readBoolOrNull(offset)) as P;
+    case 2:
       return (reader.readStringOrNull(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -237,6 +246,34 @@ extension InstructionQueryFilter
       return query.addFilterCondition(FilterCondition.greaterThan(
         property: r'image',
         value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<Instruction, Instruction, QAfterFilterCondition>
+      shortenedIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'shortened',
+      ));
+    });
+  }
+
+  QueryBuilder<Instruction, Instruction, QAfterFilterCondition>
+      shortenedIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'shortened',
+      ));
+    });
+  }
+
+  QueryBuilder<Instruction, Instruction, QAfterFilterCondition>
+      shortenedEqualTo(bool? value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'shortened',
+        value: value,
       ));
     });
   }
@@ -400,10 +437,12 @@ extension InstructionQueryObject
 Instruction _$InstructionFromJson(Map<String, dynamic> json) => Instruction(
       text: json['text'] as String?,
       image: json['image'] as String?,
+      shortened: json['shortened'] as bool? ?? false,
     );
 
 Map<String, dynamic> _$InstructionToJson(Instruction instance) =>
     <String, dynamic>{
       'text': instance.text,
       'image': instance.image,
+      'shortened': instance.shortened,
     };

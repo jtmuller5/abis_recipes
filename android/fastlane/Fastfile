@@ -22,7 +22,7 @@ platform :android do
   lane :prod do
      versionCode = bump_version_code
 
-     sh("flutter","build","appbundle","--build-number=#{versionCode}")
+     sh("flutter","build","appbundle","--build-number=#{versionCode}","--dart-define=chat_key=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")
 
      upload_to_play_store(
         track: 'production',
@@ -34,7 +34,7 @@ platform :android do
   lane :internal do
      versionCode = bump_version_code
 
-     sh("flutter","build","appbundle","--build-number=#{versionCode}")
+     sh("flutter","build","appbundle","--build-number=#{versionCode}","--dart-define=chat_key=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")
 
      upload_to_play_store(
         track: 'internal',

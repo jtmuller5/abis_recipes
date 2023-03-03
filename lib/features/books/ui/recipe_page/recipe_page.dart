@@ -3,14 +3,18 @@ import 'dart:ui';
 
 import 'package:abis_recipes/app/constants.dart';
 import 'package:abis_recipes/features/books/models/book.dart';
+import 'package:abis_recipes/features/books/models/gpt_message.dart';
 import 'package:abis_recipes/features/books/models/ingredient.dart';
 import 'package:abis_recipes/features/books/models/instruction.dart';
 import 'package:abis_recipes/features/books/models/recipe.dart';
 import 'package:abis_recipes/features/books/providers/books_provider.dart';
+import 'package:abis_recipes/features/books/services/chat_gpt_service.dart';
 import 'package:abis_recipes/features/books/ui/recipe_page/functions/get_image.dart';
 import 'package:abis_recipes/features/books/ui/recipe_page/functions/get_ingredients.dart';
 import 'package:abis_recipes/features/books/ui/recipe_page/functions/get_instructions.dart';
 import 'package:abis_recipes/features/books/ui/recipe_page/functions/get_title.dart';
+import 'package:abis_recipes/features/books/ui/recipe_page/widgets/ingredient_list.dart';
+import 'package:abis_recipes/features/books/ui/recipe_page/widgets/instruction_list.dart';
 import 'package:abis_recipes/features/books/ui/recipe_page/widgets/recipe_header.dart';
 import 'package:abis_recipes/features/home/providers/loading_provider.dart';
 import 'package:abis_recipes/features/home/providers/recipe_provider.dart';
@@ -126,7 +130,6 @@ class RecipePage extends ConsumerWidget {
                             actions: [
                               IconButton(
                                   onPressed: () {
-
                                     showModalBottomSheet(
                                       context: context,
                                       builder: (context) {
@@ -154,8 +157,7 @@ class RecipePage extends ConsumerWidget {
                                                         title: Text(
                                                           book.title,
                                                         ),
-                                                        value:
-                                                            ref.watch(checkedBooksProvider.notifier).state.contains(book.id),
+                                                        value: ref.watch(checkedBooksProvider.notifier).state.contains(book.id),
                                                         onChanged: (value) {
                                                           setState(() {
                                                             if (value!) {
@@ -311,36 +313,7 @@ class RecipePage extends ConsumerWidget {
                                 ),
                               ),
                             ),
-                          SliverList(
-                            delegate: SliverChildBuilderDelegate(
-                              (BuildContext context, int index) {
-                                Ingredient? ingredient = ref.watch(recipeProvider)?.ingredients?[index];
-                                return Animate(
-                                  effects: [
-                                    ScaleEffect(delay: Duration(milliseconds: 50 * index)),
-                                    FadeEffect(delay: Duration(milliseconds: 10 * index)),
-                                  ],
-                                  child: Column(
-                                    children: [
-                                      ListTile(
-                                        title: Text(
-                                          ingredient?.name ?? '',
-                                          style: Theme.of(context).textTheme.bodyLarge!.copyWith(fontSize: 18),
-                                        ),
-                                      ),
-                                      // Divider
-                                      if (index != (ref.watch(recipeProvider)?.ingredients ?? []).length - 1)
-                                        Divider(
-                                          height: 4,
-                                          color: Theme.of(context).colorScheme.secondaryContainer,
-                                        ),
-                                    ],
-                                  ),
-                                );
-                              },
-                              childCount: (ref.watch(recipeProvider)?.ingredients ?? []).length,
-                            ),
-                          ),
+                          IngredientList(),
                           SliverToBoxAdapter(child: Divider()),
                           if ((ref.watch(recipeProvider)?.instructions ?? []).isNotEmpty)
                             SliverToBoxAdapter(
@@ -352,35 +325,7 @@ class RecipePage extends ConsumerWidget {
                                 subtitle: Text('${ref.watch(recipeProvider)?.instructions!.length} steps'),
                               ),
                             ),
-                          SliverList(
-                            delegate: SliverChildBuilderDelegate(
-                              (BuildContext context, int index) {
-                                Instruction instruction = (ref.watch(recipeProvider)?.instructions ?? [])[index];
-                                return Animate(
-                                  effects: [
-                                    ScaleEffect(delay: Duration(milliseconds: 50 * index)),
-                                    FadeEffect(delay: Duration(milliseconds: 10 * index)),
-                                  ],
-                                  child: ListTile(
-                                    contentPadding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8),
-                                    minLeadingWidth: 0,
-                                    leading: CircleAvatar(
-                                      backgroundColor: Theme.of(context).colorScheme.primary,
-                                      child: Center(
-                                        child: Text('${index + 1}',
-                                            style: Theme.of(context).textTheme.titleMedium!.copyWith(color: Theme.of(context).colorScheme.onPrimary)),
-                                      ),
-                                    ),
-                                    title: Text(
-                                      instruction.text ?? '',
-                                      style: Theme.of(context).textTheme.bodyLarge!.copyWith(fontSize: 18),
-                                    ),
-                                  ),
-                                );
-                              },
-                              childCount: (ref.watch(recipeProvider)?.instructions ?? []).length,
-                            ),
-                          ),
+                          InstructionList(),
                           SliverToBoxAdapter(child: gap64),
                         ]),
                       ),
