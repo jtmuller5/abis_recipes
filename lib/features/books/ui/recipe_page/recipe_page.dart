@@ -334,87 +334,89 @@ class RecipePage extends ConsumerWidget {
       ),
       floatingActionButton: ref.watch(errorProvider)
           ? null
-          : FloatingActionButton.extended(
-              onPressed: () {
-                showModalBottomSheet(
-                  context: context,
-                  builder: (context) {
-                    return StatefulBuilder(
-                      builder: (context, setState) => DecoratedBox(
-                        decoration: const BoxDecoration(borderRadius: BorderRadius.vertical(top: Radius.circular(8))),
-                        child: ClipRRect(
-                          borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
-                          child: Column(
-                            children: [
-                              ListTile(
-                                title: Text(
-                                  'Save to Book',
-                                  style: Theme.of(context).textTheme.headlineSmall,
-                                ),
-                              ),
-                              Expanded(
-                                child: ListView.builder(
-                                  itemBuilder: (context, index) {
-                                    Book book = ref.watch(booksProvider)[index];
-                                    return RadioListTile(
-                                      title: Text(book.title ?? ''),
-                                      value: book.id,
-                                      groupValue: ref.watch(saveToBookProvider),
-                                      onChanged: (value) {
-                                        setState(() {
-                                          ref.read(saveToBookProvider.notifier).state = value;
-                                        });
+          : isar.recipes.filter().urlEqualTo(ref.watch(urlProvider)).findAllSync().isNotEmpty
+              ? null
+              : FloatingActionButton.extended(
+                  onPressed: () {
+                    showModalBottomSheet(
+                      context: context,
+                      builder: (context) {
+                        return StatefulBuilder(
+                          builder: (context, setState) => DecoratedBox(
+                            decoration: const BoxDecoration(borderRadius: BorderRadius.vertical(top: Radius.circular(8))),
+                            child: ClipRRect(
+                              borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
+                              child: Column(
+                                children: [
+                                  ListTile(
+                                    title: Text(
+                                      'Save to Book',
+                                      style: Theme.of(context).textTheme.headlineSmall,
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: ListView.builder(
+                                      itemBuilder: (context, index) {
+                                        Book book = ref.watch(booksProvider)[index];
+                                        return RadioListTile(
+                                          title: Text(book.title ?? ''),
+                                          value: book.id,
+                                          groupValue: ref.watch(saveToBookProvider),
+                                          onChanged: (value) {
+                                            setState(() {
+                                              ref.read(saveToBookProvider.notifier).state = value;
+                                            });
+                                          },
+                                        );
                                       },
-                                    );
-                                  },
-                                  itemCount: ref.watch(booksProvider).length,
-                                ),
+                                      itemCount: ref.watch(booksProvider).length,
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: [
+                                        TextButton(
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                            },
+                                            child: Text('Cancel')),
+                                        gap16,
+                                        OutlinedButton(
+                                            onPressed: () async {
+                                              Recipe newRecipe = ref.watch(recipeProvider)!.copyWith(
+                                                bookIds: [ref.watch(saveToBookProvider) ?? 0],
+                                                url: ref.watch(urlProvider),
+                                              );
+
+                                              ref.watch(checkedBooksProvider.notifier).state = [ref.watch(saveToBookProvider) ?? 0];
+                                              ref.watch(bookRecipesProvider(ref.watch(saveToBookProvider) ?? 0).notifier).addRecipe(newRecipe);
+                                              ref.watch(saveToBookProvider.notifier).state = null;
+                                              await isar.writeTxn(() async {
+                                                await isar.recipes.put(newRecipe);
+                                              });
+
+                                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                                content: Text('Recipe saved to book'),
+                                              ));
+                                              Navigator.of(context).pop();
+                                            },
+                                            child: Text('Save'))
+                                      ],
+                                    ),
+                                  )
+                                ],
                               ),
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  children: [
-                                    TextButton(
-                                        onPressed: () {
-                                          Navigator.of(context).pop();
-                                        },
-                                        child: Text('Cancel')),
-                                    gap16,
-                                    OutlinedButton(
-                                        onPressed: () async {
-                                          Recipe newRecipe = ref.watch(recipeProvider)!.copyWith(
-                                            bookIds: [ref.watch(saveToBookProvider) ?? 0],
-                                            url: ref.watch(urlProvider),
-                                          );
-
-                                          ref.watch(checkedBooksProvider.notifier).state = [ref.watch(saveToBookProvider) ?? 0];
-                                          ref.watch(bookRecipesProvider(ref.watch(saveToBookProvider) ?? 0).notifier).addRecipe(newRecipe);
-                                          ref.watch(saveToBookProvider.notifier).state = null;
-                                          await isar.writeTxn(() async {
-                                            await isar.recipes.put(newRecipe);
-                                          });
-
-                                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                            content: Text('Recipe saved to book'),
-                                          ));
-                                          Navigator.of(context).pop();
-                                        },
-                                        child: Text('Save'))
-                                  ],
-                                ),
-                              )
-                            ],
+                            ),
                           ),
-                        ),
-                      ),
+                        );
+                      },
                     );
                   },
-                );
-              },
-              label: Text('Save'),
-              icon: const Icon(Icons.bookmark_border),
-            ),
+                  label: Text('Save'),
+                  icon: const Icon(Icons.bookmark_border),
+                ),
     );
   }
 }
