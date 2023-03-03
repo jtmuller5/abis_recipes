@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:abis_recipes/features/books/models/instruction.dart';
 import 'package:abis_recipes/features/books/ui/recipe_page/services/html_processor.dart';
+import 'package:abis_recipes/features/home/providers/loading_provider.dart';
 import 'package:abis_recipes/features/home/providers/recipe_provider.dart';
 import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'package:flutter/foundation.dart';
@@ -9,21 +10,28 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:recase/recase.dart';
 
 void getInstructions(BeautifulSoup bs, WidgetRef ref, {bool print = false}) {
-  Bs4Element? instructions = bs.find('*', class_: 'instruction');
+  List<Bs4Element>? listItems = [];
 
-  if (instructions == null) {
-    instructions = bs.find('*', class_: 'directions');
+  if (ref.watch(urlProvider)!.contains('cakeculator')) {
+    listItems = getCakeculatorInstructions(bs);
+  } else {
+    Bs4Element? instructions = bs.find('*', class_: 'instruction');
 
-    log('Found Directions');
+    if (instructions == null) {
+      instructions = bs.find('*', class_: 'directions');
+
+      if (instructions != null) log('Found Directions');
+    }
+
+    if (instructions == null) {
+      instructions = bs.find('*', class_: 'steps');
+
+      if (instructions != null) log('Found Steps');
+    }
+
+    debugPrint('instructions: ' + instructions.toString());
+    listItems = instructions?.findAll('li');
   }
-
-  if (instructions == null) {
-    instructions = bs.find('*', class_: 'steps');
-
-    log('Found Steps');
-  }
-
-  List<Bs4Element>? listItems = instructions?.findAll('li');
 
   listItems?.forEach((listItem) {
 // log('List Item: ' + removeHtmlTags(element.text));
@@ -64,4 +72,11 @@ void getInstructions(BeautifulSoup bs, WidgetRef ref, {bool print = false}) {
 
     ref.read(recipeProvider.notifier).addInstruction(Instruction(text: ReCase(instruction.trim()).sentenceCase + '.'));
   });
+}
+
+List<Bs4Element> getCakeculatorInstructions(BeautifulSoup bs) {
+  Bs4Element? instructions = bs.find('ol');
+
+  debugPrint('instructions: ' + instructions.toString());
+  return instructions?.findAll('li') ?? [];
 }

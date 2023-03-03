@@ -1,4 +1,5 @@
 import 'package:abis_recipes/features/books/ui/recipe_page/services/html_processor.dart';
+import 'package:abis_recipes/features/home/providers/loading_provider.dart';
 import 'package:abis_recipes/features/home/providers/recipe_provider.dart';
 import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'package:flutter/foundation.dart';
@@ -10,7 +11,19 @@ void getImage(BeautifulSoup bs, WidgetRef ref, {bool print = false}) {
   String? imageUrl;
 
   try {
-    imageUrl = bs.head?.find('meta', attrs: {'property': 'og:image'})?.attributes['content'];
+
+    if(ref.watch(urlProvider)!.contains('cakeculator')){
+      Bs4Element? cakeDiv = bs.find('*',id: 'Cake-Section');
+
+      Bs4Element? cakeImage = cakeDiv?.find('*',class_: 'post-main-rtb');
+
+      imageUrl = cakeImage?.img?.attributes['src'];
+    }
+
+    debugPrint('image: ' + image.toString());
+    if(imageUrl == null || !HtmlProcessor.isHttps(imageUrl!)){
+      imageUrl = bs.head?.find('meta', attrs: {'property': 'og:image'})?.attributes['content'];
+    }
 
     if (imageUrl == null || imageUrl == '') {
       if (image?.attributes['src'] != null && image?.attributes['src'] != '') {
@@ -42,6 +55,7 @@ void getImage(BeautifulSoup bs, WidgetRef ref, {bool print = false}) {
         debugPrint('Video: ' + (bs.find('div').toString()));
         imageUrl = bs.find('*', attrs: {'poster': true})?.attributes['poster'];
       }
+
     } else {
       debugPrint('Meta image: ' + imageUrl.toString());
     }
