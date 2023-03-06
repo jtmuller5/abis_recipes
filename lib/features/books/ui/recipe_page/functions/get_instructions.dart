@@ -1,7 +1,7 @@
 import 'dart:developer';
 
 import 'package:abis_recipes/features/books/models/instruction.dart';
-import 'package:abis_recipes/features/books/ui/recipe_page/services/html_processor.dart';
+import 'package:abis_recipes/features/books/services/html_processor.dart';
 import 'package:abis_recipes/features/home/providers/loading_provider.dart';
 import 'package:abis_recipes/features/home/providers/recipe_provider.dart';
 import 'package:beautiful_soup_dart/beautiful_soup.dart';
@@ -12,19 +12,28 @@ import 'package:recase/recase.dart';
 void getInstructions(BeautifulSoup bs, WidgetRef ref, String url, {bool print = false}) {
   List<Bs4Element>? listItems = [];
 
+  /// Handle special cases
   if (url.contains('cakeculator')) {
     listItems = getCakeculatorInstructions(bs);
+  } else if (url.contains('foodnetwork')) {
+    listItems = bs.findAll('*', class_: 'o-Method__m-Step');
+  } else if (url.contains('bonappetit.com')) {
+    Bs4Element? instructionSection = bs.find('*', class_: 'InstructionListWrapper');
+
+    listItems = instructionSection?.findAll('p');
   } else {
     Bs4Element? instructions = bs.find('*', class_: 'instruction');
 
     if (instructions == null) {
       instructions = bs.find('*', class_: 'directions');
+      if (instructions == null) instructions = bs.find('*', class_: 'Directions');
 
       if (instructions != null) log('Found Directions');
     }
 
     if (instructions == null) {
       instructions = bs.find('*', class_: 'steps');
+      if (instructions == null) instructions = bs.find('*', class_: 'Steps');
 
       if (instructions != null) log('Found Steps');
     }

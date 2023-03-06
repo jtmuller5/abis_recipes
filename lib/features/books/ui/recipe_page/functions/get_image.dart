@@ -1,4 +1,4 @@
-import 'package:abis_recipes/features/books/ui/recipe_page/services/html_processor.dart';
+import 'package:abis_recipes/features/books/services/html_processor.dart';
 import 'package:abis_recipes/features/home/providers/recipe_provider.dart';
 import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'package:flutter/foundation.dart';

@@ -1,15 +1,11 @@
-import 'dart:developer';
-import 'dart:ffi';
 import 'dart:ui';
 
 import 'package:abis_recipes/app/constants.dart';
 import 'package:abis_recipes/features/books/models/book.dart';
-import 'package:abis_recipes/features/books/models/gpt_message.dart';
 import 'package:abis_recipes/features/books/models/ingredient.dart';
 import 'package:abis_recipes/features/books/models/instruction.dart';
 import 'package:abis_recipes/features/books/models/recipe.dart';
 import 'package:abis_recipes/features/books/providers/books_provider.dart';
-import 'package:abis_recipes/features/books/services/chat_gpt_service.dart';
 import 'package:abis_recipes/features/books/ui/recipe_page/functions/get_image.dart';
 import 'package:abis_recipes/features/books/ui/recipe_page/functions/get_ingredients.dart';
 import 'package:abis_recipes/features/books/ui/recipe_page/functions/get_instructions.dart';
@@ -367,7 +363,7 @@ Future<void> loadRecipe(WidgetRef ref, url) async {
         ref.watch(errorProvider.notifier).state = true;
       }
     } catch (e) {
-      debugPrint('Error: ' + e.toString());
+      debugPrint('Top Error: ' + e.toString());
       ref.watch(errorProvider.notifier).state = true;
     }
   } else {
