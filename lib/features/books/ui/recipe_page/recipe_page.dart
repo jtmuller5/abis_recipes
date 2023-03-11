@@ -28,6 +28,8 @@ import 'package:html/parser.dart' as parser;
 import 'package:http/http.dart' as http;
 import 'package:isar/isar.dart';
 
+import '../../../shared/ui/browser/browser_view.dart';
+
 class RecipePage extends ConsumerWidget {
   const RecipePage({Key? key}) : super(key: key);
 
@@ -61,8 +63,22 @@ class RecipePage extends ConsumerWidget {
                             )
                           ],
                           child: Text(
-                            'Error loading recipe',
+                            'We couldn\'t find a recipe here',
                             style: Theme.of(context).textTheme.headlineSmall!.copyWith(color: Theme.of(context).colorScheme.primary),
+                          ),
+                        ),
+                        gap32,
+                        Animate(
+                          effects: [
+                            SlideEffect(
+                              begin: Offset(0, 0.5),
+                              end: Offset(0, 0),
+                            )
+                          ],
+                          child: Text(
+                            'This can happen if the web page actually doesn\'t contain a recipe, or if the recipe is not in a format we can understand.',
+                            textAlign: TextAlign.center,
+                            style: Theme.of(context).textTheme.bodyMedium,
                           ),
                         ),
                         if (kDebugMode)
@@ -74,6 +90,28 @@ class RecipePage extends ConsumerWidget {
                               Text(ref.watch(recipeProvider)?.instructions.toString() ?? ''),
                             ],
                           ),
+                        if (ref.watch(urlProvider) != null) ...[
+                          gap32,
+                          Animate(
+                            effects: [
+                              SlideEffect(
+                                begin: Offset(0, 0.5),
+                                end: Offset(0, 0),
+                              )
+                            ],
+                            child: TextButton(
+                              onPressed: () async {
+                                await Clipboard.setData(ClipboardData(text: ref.watch(urlProvider)));
+                                Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (context) => BrowserView(url: ref.watch(urlProvider)!),
+                                ));
+                              },
+                              child: Text(
+                                'See the page',
+                              ),
+                            ),
+                          ),
+                        ],
                         Animate(
                           effects: [
                             SlideEffect(
@@ -82,7 +120,7 @@ class RecipePage extends ConsumerWidget {
                             )
                           ],
                           child: TextButton(
-                            onPressed: () {
+                            onPressed: () async {
                               Navigator.of(context).pop();
                             },
                             child: Text(
@@ -361,6 +399,8 @@ Future<void> loadRecipe(WidgetRef ref, url) async {
           (ref.watch(recipeProvider)?.ingredients ?? []).isEmpty ||
           (ref.watch(recipeProvider)?.instructions ?? []).isEmpty) {
         ref.watch(errorProvider.notifier).state = true;
+      } else {
+        ref.watch(errorProvider.notifier).state = false;
       }
     } catch (e) {
       debugPrint('Top Error: ' + e.toString());

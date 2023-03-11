@@ -13,6 +13,7 @@ class RecipeNotifier extends StateNotifier<Recipe?> {
   RecipeNotifier() : super(null);
 
   static void navigateToRecipe(Recipe recipe, WidgetRef ref, BuildContext context) {
+    ref.watch(errorProvider.notifier).state = false;
     ref.watch(urlProvider.notifier).state = recipe.url;
     setRecipe(ref, recipe);
     ref.watch(checkedBooksProvider.notifier).state = recipe.bookIds;
