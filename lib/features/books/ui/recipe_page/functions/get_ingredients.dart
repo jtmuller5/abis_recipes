@@ -31,19 +31,6 @@ void getIngredients(BeautifulSoup bs, WidgetRef ref, String url, {bool print = f
       String ingredient = amounts![i].text + ' ' + items![i].text;
       ref.read(recipeProvider.notifier).addIngredient(Ingredient(name: HtmlProcessor.capitalize(ingredient.trim())));
     }
-  } else if (url.contains('americastestkitchen')) {
-    debugPrint('testkitchen');
-    Bs4Element? recipe = bs.find('script', attrs: {'type': 'application/ld+json'});
-
-    Map<String, dynamic> recipeMap= jsonDecode(recipe!.text);
-
-    List<String> ingredientsList = recipeMap['recipeIngredient'].cast<String>();
-
-    ingredientsList.forEach((element) {
-      ref.read(recipeProvider.notifier).addIngredient(Ingredient(name: HtmlProcessor.capitalize(element)));
-    });
-
-    return;
   }
 
   if (url.contains('pillsbury.com')) {
@@ -77,6 +64,21 @@ void getIngredients(BeautifulSoup bs, WidgetRef ref, String url, {bool print = f
       debugPrint('ingredients is empty');
       ingredients = ingredientSection?.findAll('li');
     }
+  }
+
+  /// Look for structured recipe data
+  if((ingredients ?? []).isEmpty){
+    Bs4Element? recipe = bs.find('script', attrs: {'type': 'application/ld+json'});
+
+    Map<String, dynamic> recipeMap= jsonDecode(recipe!.text);
+
+    List<String> ingredientsList = recipeMap['recipeIngredient'].cast<String>();
+
+    ingredientsList.forEach((element) {
+      ref.read(recipeProvider.notifier).addIngredient(Ingredient(name: HtmlProcessor.capitalize(element)));
+    });
+
+    return;
   }
 
   /// Print ingredients
