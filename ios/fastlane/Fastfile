@@ -24,6 +24,6 @@ platform :ios do
       increment_build_number(xcodeproj: "Runner.xcodeproj")
       build_number = get_build_number(xcodeproj: "Runner.xcodeproj")
       sh("flutter","build","ipa","--build-number", "#{build_number}","--dart-define=chat_key=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")
-      upload_to_testflight(ipa: "../build/ios/ipa/para.ipa")
+      upload_to_testflight(ipa: "../build/ios/ipa/abis_recipes.ipa")
     end
 end

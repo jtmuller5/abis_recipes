@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:developer';
 
 import 'package:abis_recipes/features/books/models/instruction.dart';
@@ -21,7 +22,22 @@ void getInstructions(BeautifulSoup bs, WidgetRef ref, String url, {bool print = 
     Bs4Element? instructionSection = bs.find('*', class_: 'InstructionListWrapper');
 
     listItems = instructionSection?.findAll('p');
-  } else {
+  } else if (url.contains('americastestkitchen')) {
+    debugPrint('testkitchen');
+    Bs4Element? recipe = bs.find('script', attrs: {'type': 'application/ld+json'});
+
+    Map<String, dynamic> recipeMap= jsonDecode(recipe!.text);
+
+    log(recipeMap.toString());
+
+    List<String> ingredientsList = recipeMap['recipeInstructions'].map((e) => e['text']).cast<String>().toList();
+
+    ingredientsList.forEach((element) {
+      ref.read(recipeProvider.notifier).addInstruction(Instruction(text: ReCase(element.trim()).sentenceCase + '.'));
+    });
+
+    return;
+  }else {
     Bs4Element? instructions = bs.find('*', class_: 'instruction');
 
     if (instructions == null) {

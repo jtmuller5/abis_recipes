@@ -48,11 +48,13 @@ class RecipePage extends ConsumerWidget {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Animate(
-                          effects: [ScaleEffect()],
-                          child: Image.asset(
-                            'assets/splash.png',
-                            height: 300,
+                        Flexible(
+                          child: Animate(
+                            effects: [ScaleEffect()],
+                            child: Image.asset(
+                              'assets/splash.png',
+                              height: 300,
+                            ),
                           ),
                         ),
                         Animate(
@@ -75,20 +77,26 @@ class RecipePage extends ConsumerWidget {
                               end: Offset(0, 0),
                             )
                           ],
-                          child: Text(
-                            'This can happen if the web page actually doesn\'t contain a recipe, or if the recipe is not in a format we can understand.',
-                            textAlign: TextAlign.center,
-                            style: Theme.of(context).textTheme.bodyMedium,
+                          child: Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Text(
+                              'This can happen if the web page actually doesn\'t contain a recipe, or if the recipe is not in a format we can understand.',
+                              textAlign: TextAlign.center,
+                              style: Theme.of(context).textTheme.bodyMedium,
+                            ),
                           ),
                         ),
                         if (kDebugMode)
-                          Column(
-                            children: [
-                              Text(ref.watch(recipeProvider)?.title ?? ''),
-                              Text(ref.watch(recipeProvider)?.images.toString() ?? ''),
-                              Text(ref.watch(recipeProvider)?.ingredients.toString() ?? ''),
-                              Text(ref.watch(recipeProvider)?.instructions.toString() ?? ''),
-                            ],
+                          Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Column(
+                              children: [
+                                Text(ref.watch(recipeProvider)?.title ?? ''),
+                                Text(ref.watch(recipeProvider)?.images.toString() ?? ''),
+                                Text(ref.watch(recipeProvider)?.ingredients.toString() ?? ''),
+                                Text(ref.watch(recipeProvider)?.instructions.toString() ?? ''),
+                              ],
+                            ),
                           ),
                         if (ref.watch(urlProvider) != null) ...[
                           gap32,
@@ -101,7 +109,7 @@ class RecipePage extends ConsumerWidget {
                             ],
                             child: TextButton(
                               onPressed: () async {
-                                await Clipboard.setData(ClipboardData(text: ref.watch(urlProvider)));
+                                await Clipboard.setData(ClipboardData(text: ref.watch(urlProvider)?? ''));
                                 Navigator.of(context).push(MaterialPageRoute(
                                   builder: (context) => BrowserView(url: ref.watch(urlProvider)!),
                                 ));
