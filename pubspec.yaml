@@ -10,6 +10,7 @@ dependencies:
   flutter:
     sdk: flutter
 
+  amplitude_flutter: ^3.14.0
   beautiful_soup_dart: ^0.3.0
   html: ^0.15.1
   http: ^0.13.5

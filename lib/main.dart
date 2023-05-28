@@ -4,6 +4,7 @@ import 'package:abis_recipes/features/books/models/recipe.dart';
 import 'package:abis_recipes/features/books/ui/recipe_page/recipe_page.dart';
 import 'package:abis_recipes/features/home/providers/loading_provider.dart';
 import 'package:abis_recipes/features/home/ui/home_view.dart';
+import 'package:amplitude_flutter/amplitude.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -14,9 +15,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 late Isar isar;
 
+final Amplitude amplitude = Amplitude.getInstance();
+
 Future<void> main() async {
   // Ensure initialized
   WidgetsFlutterBinding.ensureInitialized();
+  await amplitude.init("ff2f485bec7b3432c7a6ed352cc6420c");
   isar = await Isar.open([
     RecipeSchema,
     BookSchema,

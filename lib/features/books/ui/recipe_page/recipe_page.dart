@@ -407,6 +407,7 @@ Future<void> loadRecipe(WidgetRef ref, url) async {
           (ref.watch(recipeProvider)?.ingredients ?? []).isEmpty ||
           (ref.watch(recipeProvider)?.instructions ?? []).isEmpty) {
         ref.watch(errorProvider.notifier).state = true;
+        amplitude.logEvent('bad recipe', eventProperties: {'url': url});
       } else {
         ref.watch(errorProvider.notifier).state = false;
       }

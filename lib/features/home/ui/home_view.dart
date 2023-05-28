@@ -66,6 +66,7 @@ class HomeView extends HookConsumerWidget {
                             child: Icon(Icons.download_outlined),
                           ),
                           onPressed: () {
+                            amplitude.logEvent('press load recipe button', eventProperties: {'url': urlController.text});
                             if (urlController.text.isEmpty) {
                               ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Please enter a url')));
                               return;
@@ -100,6 +101,7 @@ class HomeView extends HookConsumerWidget {
                   icon: Icon(Icons.paste),
                   style: OutlinedButton.styleFrom(side: BorderSide(color: Colors.white), backgroundColor: Theme.of(context).canvasColor),
                   onPressed: () async {
+                    amplitude.logEvent('press paste from clipboard');
                     // Paste from clipboard
                     ClipboardData? data = await Clipboard.getData(Clipboard.kTextPlain);
 
