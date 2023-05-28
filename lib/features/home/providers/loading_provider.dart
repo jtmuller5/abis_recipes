@@ -11,3 +11,16 @@ final loadingRecipeProvider = StateProvider<bool>((ref) {
 final errorProvider = StateProvider<bool>((ref) {
   return false;
 });
+
+class bakeModeNotifier extends StateNotifier<bool> {
+  bakeModeNotifier() : super(false);
+
+  void toggle() {
+    state = !state;
+  }
+}
+
+final bakeModeProvider = StateNotifierProvider<bakeModeNotifier, bool>((ref) {
+  return bakeModeNotifier();
+});
+

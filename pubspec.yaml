@@ -1,7 +1,7 @@
 name: abis_recipes
 description: Recipe extractor
 publish_to: 'none'
-version: 1.0.7+7
+version: 1.0.9+9
 
 environment:
   sdk: '>=2.19.2 <3.0.0'
@@ -25,6 +25,7 @@ dependencies:
   isar_flutter_libs: ^3.0.5
   recase: ^4.1.0
   shared_preferences: ^2.0.18
+  wakelock: ^0.6.2
 
 dev_dependencies:
   flutter_test:
