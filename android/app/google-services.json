@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "359662441201",
+    "project_id": "abi-s-recipes",
+    "storage_bucket": "abi-s-recipes.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:359662441201:android:df6abd6437a09505c24f50",
+        "android_client_info": {
+          "package_name": "com.mullr.abis_recipes"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "359662441201-v4r78091t6m160r1q79d2fsg2pgv5d5i.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDHm3g8Uz0YP9tZrMX67Fo4DBp7e7w3uIQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "359662441201-v4r78091t6m160r1q79d2fsg2pgv5d5i.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

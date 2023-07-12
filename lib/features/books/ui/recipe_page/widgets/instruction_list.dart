@@ -33,7 +33,7 @@ class InstructionList extends ConsumerWidget {
   }
 }
 
-class InstructionTile extends ConsumerStatefulWidget {
+class InstructionTile extends StatefulWidget {
   const InstructionTile(
       this.instruction,
       this.index, {
@@ -44,10 +44,10 @@ class InstructionTile extends ConsumerStatefulWidget {
   final int index;
 
   @override
-  ConsumerState createState() => _InstructionTileState();
+  State createState() => _InstructionTileState();
 }
 
-class _InstructionTileState extends ConsumerState<InstructionTile> {
+class _InstructionTileState extends State<InstructionTile> {
   bool showShort = false;
 
   @override

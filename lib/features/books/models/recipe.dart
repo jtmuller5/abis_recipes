@@ -14,6 +14,8 @@ class Recipe {
 
   String? title;
 
+  String recipeId;
+
   String? description;
 
   String? coverImage;
@@ -29,6 +31,7 @@ class Recipe {
   List<int> bookIds = [];
 
   Recipe({
+    required this.recipeId,
     this.url,
     this.id=Isar.autoIncrement,
     this.title,
@@ -53,6 +56,7 @@ class Recipe {
     List<int>? bookIds,
   }) {
     return Recipe(
+      recipeId: recipeId,
       id: id ?? this.id,
       url: url ?? this.url,
       title: title ?? this.title,

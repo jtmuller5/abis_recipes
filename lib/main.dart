@@ -1,81 +1,62 @@
 import 'package:abis_recipes/features/books/models/book.dart';
-import 'package:abis_recipes/features/books/models/note.dart';
 import 'package:abis_recipes/features/books/models/recipe.dart';
 import 'package:abis_recipes/features/books/ui/recipe_page/recipe_page.dart';
 import 'package:abis_recipes/features/home/providers/loading_provider.dart';
 import 'package:abis_recipes/features/home/ui/home_view.dart';
+import 'package:abis_recipes/features/shared/ui/app_name.dart';
+import 'package:abis_recipes/firebase_options.dart';
 import 'package:amplitude_flutter/amplitude.dart';
+import 'package:firebase_auth/firebase_auth.dart' hide EmailAuthProvider;
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:isar/isar.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-late Isar isar;
+late Isar oldIsar;
+late SharedPreferences sharedPreferences;
 
 final Amplitude amplitude = Amplitude.getInstance();
 
 Future<void> main() async {
   // Ensure initialized
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await amplitude.init("ff2f485bec7b3432c7a6ed352cc6420c");
-  isar = await Isar.open([
+
+  oldIsar = await Isar.open([
     RecipeSchema,
     BookSchema,
   ]);
 
   // await isar.writeTxn(() async => await isar.clear());
+  sharedPreferences = await SharedPreferences.getInstance();
 
-  await performMigrationIfNeeded(isar);
-
-  runApp(ProviderScope(child: const MyApp()));
-}
-
-Future<void> performMigrationIfNeeded(Isar isar) async {
-  final prefs = await SharedPreferences.getInstance();
-  final currentVersion = prefs.getInt('version') ?? 2;
-  switch(currentVersion) {
-    case 1:
-      await migrateV1ToV2(isar);
-      break;
-    case 2:
-      return;
-    default:
-      await migrateV1ToV2(isar);
-  }
-
-  // Update version
-  await prefs.setInt('version', 2);
-}
-
-Future<void> migrateV1ToV2(Isar isar) async {
-  final recipesCount = await isar.recipes.count();
-
-  // We paginate through the users to avoid loading all users into memory at once
-  for (var i = 0; i < recipesCount; i += 50) {
-    final recipes = await isar.recipes.where().offset(i).limit(50).findAll();
-    await isar.writeTxn((isar) async {
-      await isar.recipes.putAll(recipes);
-    } as Future Function());
-  }
+  runApp(const MyApp());
 }
 
 GlobalObjectKey<NavigatorState> navigatorKey = GlobalObjectKey<NavigatorState>(NavigatorState());
 
-class MyApp extends StatefulHookConsumerWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
   @override
   _MyAppState createState() => _MyAppState();
 }
 
-class _MyAppState extends ConsumerState<MyApp> {
+class _MyAppState extends State<MyApp> {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(statusBarColor: Colors.transparent, statusBarIconBrightness: Brightness.dark));
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.dark,
+    ));
+
+    final providers = [EmailAuthProvider()];
 
     return MaterialApp(
       title: 'Abi\'s Recipes',
@@ -115,7 +96,38 @@ class _MyAppState extends ConsumerState<MyApp> {
           ),
         ),
       ),
-      home: const HomeView(),
+      initialRoute: FirebaseAuth.instance.currentUser == null ? '/sign-in' : '/',
+      routes: {
+        '/': (context) {
+          return HomeView();
+        },
+        '/sign-in': (context) {
+          return SignInScreen(
+            providers: providers,
+            headerBuilder: (context, constraints, shrinkOffset) {
+              return SizedBox(
+                height: 200,
+                child:  AppName(),
+              );
+            },
+            actions: [
+              AuthStateChangeAction<SignedIn>((context, state) {
+                Navigator.pushReplacementNamed(context, '/');
+              }),
+            ],
+          );
+        },
+        '/profile': (context) {
+          return ProfileScreen(
+            providers: providers,
+            actions: [
+              SignedOutAction((context) {
+                Navigator.pushReplacementNamed(context, '/sign-in');
+              }),
+            ],
+          );
+        },
+      },
     );
   }
 

@@ -6,19 +6,19 @@ import 'package:abis_recipes/features/books/ui/recipe_page/recipe_page.dart';
 import 'package:abis_recipes/features/books/ui/search/ui/search_view.dart';
 import 'package:abis_recipes/features/home/providers/loading_provider.dart';
 import 'package:abis_recipes/features/home/providers/recipe_provider.dart';
+import 'package:abis_recipes/features/shared/ui/app_name.dart';
 import 'package:abis_recipes/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:flutter/services.dart';
 import 'package:wakelock/wakelock.dart';
 
-class HomeView extends HookConsumerWidget {
+class HomeView extends StatelessWidget {
   const HomeView({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     TextEditingController urlController = useTextEditingController();
 
     return Scaffold(
@@ -46,18 +46,22 @@ class HomeView extends HookConsumerWidget {
               },
               title: Text('Recipe Books'),
             ),
+            ListTile(
+              leading: Icon(Icons.account_circle_outlined),
+              onTap: () async {
+                Navigator.of(context).pushNamed('/profile');
+              },
+              title: Text('Account'),
+            ),
           ],
         ),
       ),
       body: Stack(
         children: [
-          Image.asset(
-            'assets/baking-min.png',
-            fit: BoxFit.cover,
-            height: double.infinity,
-            width: double.infinity,
-            alignment: Alignment.center,
-          ),
+          SizedBox(
+              height: MediaQuery.of(context).size.height,
+              width: MediaQuery.of(context).size.width,
+              child: ColoredBox(color: Theme.of(context).colorScheme.primaryContainer)),
           Positioned(
               child: SizedBox(
             width: double.infinity,
@@ -69,15 +73,7 @@ class HomeView extends HookConsumerWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               gap32,
-              Center(
-                child: Text(
-                  'Abi\'s Recipes',
-                  style: Theme.of(context)
-                      .textTheme
-                      .headlineMedium!
-                      .copyWith(fontSize: 32, fontWeight: FontWeight.w600, color: Theme.of(context).colorScheme.primary),
-                ).animate(onPlay: (controller) => controller.repeat()).shimmer(delay: Duration(seconds: 5)),
-              ),
+              AppName(),
               gap32,
               Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -154,7 +150,7 @@ class HomeView extends HookConsumerWidget {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: ref.watch(bakeModeProvider) ? Colors.green : Colors.white,
+        backgroundColor: sharedPreferences.getBool('bake_mode') ?? false ? Colors.green : Colors.white,
         onPressed: () {
           ref.read(bakeModeProvider.notifier).toggle();
 

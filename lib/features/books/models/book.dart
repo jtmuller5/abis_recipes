@@ -8,6 +8,7 @@ part 'book.g.dart';
 class Book {
   String? url;
   String title;
+  String bookId;
 
   String? description;
 
@@ -17,6 +18,7 @@ class Book {
 
   Book({
     required this.title,
+    required this.bookId,
     this.id = Isar.autoIncrement,
     this.url,
     this.description,

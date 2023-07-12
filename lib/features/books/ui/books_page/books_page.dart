@@ -1,60 +1,105 @@
 import 'package:abis_recipes/app/constants.dart';
 import 'package:abis_recipes/features/books/models/book.dart';
-import 'package:abis_recipes/features/books/models/recipe.dart';
 import 'package:abis_recipes/features/books/providers/books_provider.dart';
 import 'package:abis_recipes/features/books/ui/book_page/book_page.dart';
-import 'package:abis_recipes/main.dart';
-import 'package:beautiful_soup_dart/beautiful_soup.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:isar/isar.dart';
 
-class BooksPage extends HookConsumerWidget {
+class BooksPage extends StatelessWidget {
   const BooksPage({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     TextEditingController bookTitleController = useTextEditingController();
     return Scaffold(
       body: CustomScrollView(
         slivers: [
-          SliverAppBar(
-            title: Text('My Recipe Books'),
-          ),
-          SliverList(
-            delegate: SliverChildBuilderDelegate(
-              (BuildContext context, int index) {
-                Book book = ref.watch(booksProvider)[index];
-                return ListTile(
-                  leading: Hero(
-                    tag: 'recipe-${ref.watch(bookRecipesProvider(book.id)).firstOrNull?.id ?? book.title}',
-                    child: SizedBox(
-                        height: 64,
-                        width: 64,
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(8),
-                          child: ref.watch(bookRecipesProvider(book.id)).firstOrNull?.images?.firstOrNull != null
-                              ? FadeInImage(
-                                  placeholder: AssetImage('assets/transparent.png'),
-                                  image: NetworkImage(
-                                    ref.watch(bookRecipesProvider(book.id)).firstOrNull?.images?.first ?? '',
-                                  ),
-                                  fit: BoxFit.cover,
-                                )
-                              : ColoredBox(color: Theme.of(context).colorScheme.secondary, child: Icon(Icons.book)),
-                        )),
-                  ),
-                  title: Text(book.title),
-                  subtitle: Text('${ref.watch(bookRecipesProvider(book.id)).length} recipes'),
-                  onTap: () {
-                    Navigator.of(context).push(MaterialPageRoute(builder: (context) => BookPage(bookId: book.id)));
-                  },
-                );
-              },
-              childCount: (ref.watch(booksProvider) ?? []).length,
-            ),
-          ),
+          SliverAppBar(title: Text('My Recipe Books')),
+          StreamBuilder<List<Book>>(
+              stream: FirebaseFirestore.instance
+                  .collection('users')
+                  .doc(FirebaseAuth.instance.currentUser?.uid)
+                  .collection('books')
+                  .snapshots()
+                  .map((event) {
+                return event.docs.map((e) => Book.fromJson(e.data())).toList();
+              }),
+              builder: (context, snapshot) {
+                if (snapshot.hasData && snapshot.data != null) {
+                  if(snapshot.data!.isNotEmpty) {
+                    return SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                            (BuildContext context, int index) {
+                          Book book = snapshot.data![index];
+                          return ListTile(
+                            leading: Hero(
+                              tag: 'recipe-${ref
+                                  .watch(bookRecipesProvider(book.id))
+                                  .firstOrNull
+                                  ?.id ?? book.title}',
+                              child: SizedBox(
+                                  height: 64,
+                                  width: 64,
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(8),
+                                    child: ref
+                                        .watch(bookRecipesProvider(book.id))
+                                        .firstOrNull
+                                        ?.images
+                                        ?.firstOrNull != null
+                                        ? FadeInImage(
+                                      placeholder: AssetImage('assets/transparent.png'),
+                                      image: NetworkImage(
+                                        ref
+                                            .watch(bookRecipesProvider(book.id))
+                                            .firstOrNull
+                                            ?.images
+                                            ?.first ?? '',
+                                      ),
+                                      fit: BoxFit.cover,
+                                    )
+                                        : ColoredBox(color: Theme
+                                        .of(context)
+                                        .colorScheme
+                                        .secondary, child: Icon(Icons.book)),
+                                  )),
+                            ),
+                            title: Text(book.title),
+                            subtitle: Text('${ref
+                                .watch(bookRecipesProvider(book.id))
+                                .length} recipes'),
+                            onTap: () {
+                              Navigator.of(context).push(MaterialPageRoute(builder: (context) => BookPage(bookId: book.id)));
+                            },
+                          );
+                        },
+                        childCount: (ref.watch(booksProvider) ?? []).length,
+                      ),
+                    );
+                  } else{
+                    return SliverFillRemaining(
+                      child: Center(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.book, size: 64, color: Theme.of(context).colorScheme.secondary,),
+                            Text('No Recipe Books', style: Theme.of(context).textTheme.headline6,),
+                            Text('Create a new recipe book to get started', style: Theme.of(context).textTheme.subtitle1,),
+                          ],
+                        ),
+                      ),
+                    );
+                  }
+                } else {
+                  return SliverFillRemaining(
+                    child: Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                  );
+                }
+              }),
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
@@ -99,6 +144,12 @@ class BooksPage extends HookConsumerWidget {
                                 OutlinedButton(
                                     onPressed: () async {
                                       ref.read(booksProvider.notifier).addBook(Book(
+                                            bookId: FirebaseFirestore.instance
+                                                .collection('users')
+                                                .doc(FirebaseAuth.instance.currentUser?.uid)
+                                                .collection('books')
+                                                .doc()
+                                                .id,
                                             title: bookTitleController.text,
                                             dateCreated: DateTime.now(),
                                             description: null,

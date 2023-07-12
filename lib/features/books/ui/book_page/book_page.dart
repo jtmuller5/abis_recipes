@@ -2,13 +2,11 @@ import 'package:abis_recipes/app/constants.dart';
 import 'package:abis_recipes/features/books/models/book.dart';
 import 'package:abis_recipes/features/books/models/recipe.dart';
 import 'package:abis_recipes/features/books/providers/books_provider.dart';
-import 'package:abis_recipes/features/books/ui/recipe_page/recipe_page.dart';
 import 'package:abis_recipes/features/home/providers/recipe_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:collection/collection.dart';
-import 'package:recase/recase.dart';
 
 class BookPage extends ConsumerWidget {
   const BookPage({Key? key, required this.bookId}) : super(key: key);
@@ -79,6 +77,7 @@ class BookPage extends ConsumerWidget {
                                     debugPrint('updatedBook.id: ' + updatedBook.id.toString());
 
                                     Book newBook = Book(
+                                      bookId: updatedBook.bookId,
                                       id: updatedBook.id,
                                       title: bookTitleController.text,
                                       dateCreated: updatedBook.dateCreated,

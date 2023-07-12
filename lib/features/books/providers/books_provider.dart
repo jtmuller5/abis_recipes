@@ -2,6 +2,8 @@ import 'package:abis_recipes/features/books/models/book.dart';
 import 'package:abis_recipes/features/books/models/recipe.dart';
 import 'package:abis_recipes/features/home/providers/recipe_provider.dart';
 import 'package:abis_recipes/main.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:isar/isar.dart';
@@ -11,9 +13,13 @@ class BooksNotifier extends StateNotifier<List<Book>> {
   BooksNotifier() : super(isar.books.buildQuery<Book>().findAllSync());
 
   Future<void> addBook(Book book) async {
+
+    FirebaseFirestore.instance.collection('users').doc(FirebaseAuth.instance.currentUser?.uid).collection('books').doc(book.bookId).set(book.toJson());
+
     await isar.writeTxn(() async {
       await isar.books.put(book);
     });
+
     state = isar.books.buildQuery<Book>().findAllSync();
   }
 
@@ -57,7 +63,7 @@ class BookRecipesNotifier extends StateNotifier<List<Recipe>> {
   BookRecipesNotifier(this.bookId, this.ref)
       : super(isar.recipes.filter().anyOf([bookId], (q, element) => q.bookIdsElementEqualTo(element)).findAllSync()) {
     ref.listen(recipeProvider, (previous, next) {
-      state = isar.recipes.filter().anyOf([bookId], (q, element) =>q.bookIdsElementEqualTo(bookId)).findAllSync();
+      state = isar.recipes.filter().anyOf([bookId], (q, element) => q.bookIdsElementEqualTo(bookId)).findAllSync();
       debugPrint('state: ' + state.toString());
     });
   }
@@ -91,4 +97,3 @@ final saveToBookProvider = StateProvider<int?>((ref) {
 final checkedBooksProvider = StateProvider<List<int>>((ref) {
   return [];
 });
-

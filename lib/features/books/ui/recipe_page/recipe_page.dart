@@ -22,7 +22,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:html/dom.dart' as dom;
 import 'package:html/parser.dart' as parser;
 import 'package:http/http.dart' as http;
@@ -30,11 +29,11 @@ import 'package:isar/isar.dart';
 
 import '../../../shared/ui/browser/browser_view.dart';
 
-class RecipePage extends ConsumerWidget {
+class RecipePage extends StatelessWidget {
   const RecipePage({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     return Scaffold(
       body: AnimatedSwitcher(
         duration: const Duration(milliseconds: 500),
@@ -259,6 +258,7 @@ class RecipePage extends ConsumerWidget {
                                                                   ref.watch(bookRecipesProvider(bookId).notifier).addRecipe(newRecipe);
                                                                 });
 
+
                                                                 await isar.writeTxn(() async {
                                                                   await isar.recipes.put(newRecipe);
                                                                 });
@@ -383,40 +383,4 @@ class RecipePage extends ConsumerWidget {
 
 void setRecipe(WidgetRef ref, Recipe recipe) {
   ref.read(recipeProvider.notifier).updateRecipe(recipe);
-}
-
-Future<void> loadRecipe(WidgetRef ref, url) async {
-  ref.read(loadingRecipeProvider.notifier).state = true;
-  ref.read(recipeProvider.notifier).clearRecipe();
-  final response = await http.Client().get(Uri.parse(url));
-
-  if (response.statusCode == 200) {
-    //Getting the html document from the response
-    dom.Document document = parser.parse(response.body);
-    try {
-      BeautifulSoup bs = BeautifulSoup(document.outerHtml);
-
-      ref.watch(recipeProvider.notifier).createRecipe(url);
-      getTitle(bs, ref, url);
-      getImage(bs, ref, url);
-      getIngredients(bs, ref, url);
-      getInstructions(bs, ref, url);
-
-      if (ref.watch(recipeProvider)?.title == null ||
-          ref.watch(recipeProvider)?.images == null ||
-          (ref.watch(recipeProvider)?.ingredients ?? []).isEmpty ||
-          (ref.watch(recipeProvider)?.instructions ?? []).isEmpty) {
-        ref.watch(errorProvider.notifier).state = true;
-        amplitude.logEvent('bad recipe', eventProperties: {'url': url});
-      } else {
-        ref.watch(errorProvider.notifier).state = false;
-      }
-    } catch (e) {
-      debugPrint('Top Error: ' + e.toString());
-      ref.watch(errorProvider.notifier).state = true;
-    }
-  } else {
-    debugPrint('Error: ' + response.statusCode.toString());
-  }
-  ref.read(loadingRecipeProvider.notifier).state = false;
 }

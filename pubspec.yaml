@@ -10,29 +10,38 @@ dependencies:
   flutter:
     sdk: flutter
 
-  amplitude_flutter: ^3.14.0
+  amplitude_flutter: ^3.15.0
   beautiful_soup_dart: ^0.3.0
+  cloud_firestore: ^4.8.2
   html: ^0.15.1
   http: ^0.13.5
   json_annotation: ^4.8.0
+  firebase_auth: ^4.6.3
+  firebase_core: ^2.14.0
+  firebase_ui_auth: ^1.5.0
   flutter_animate: ^4.1.0
   flutter_hooks: ^0.18.6
   flutter_inappwebview: ^6.0.0-beta.22
   receive_sharing_intent: ^1.4.5
+  get_it: ^7.6.0
+  get_it_mixin: ^4.2.0
   google_fonts: ^4.0.3
-  hooks_riverpod: ^2.3.0
+  injectable: ^2.1.2
   isar: ^3.0.5
   isar_flutter_libs: ^3.0.5
   recase: ^4.1.0
-  shared_preferences: ^2.0.18
+  shared_preferences: ^2.2.0
   wakelock: ^0.6.2
 
+# build command
+# flutter pub run build_runner build --delete-conflicting-outputs
 dev_dependencies:
   flutter_test:
     sdk: flutter
 
   build_runner: ^2.3.3
   flutter_launcher_icons: ^0.12.0
+  injectable_generator: ^2.1.6
   isar_generator: ^3.0.5
   json_serializable: ^6.6.1
 
