@@ -1,21 +1,20 @@
+import 'package:abis_recipes/app/services.dart';
 import 'package:abis_recipes/features/books/models/ingredient.dart';
 import 'package:abis_recipes/features/books/models/note.dart';
-import 'package:abis_recipes/features/home/providers/recipe_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class IngredientList extends ConsumerWidget {
+class IngredientList extends StatelessWidget {
   const IngredientList({
     Key? key,
   }) : super(key: key);
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     return SliverList(
       delegate: SliverChildBuilderDelegate(
         (BuildContext context, int index) {
-          Ingredient? ingredient = ref.watch(recipeProvider)?.ingredients?[index];
+          Ingredient? ingredient = currentRecipeService.recipe.value?.ingredients?[index];
           return Animate(
             effects: [
               ScaleEffect(delay: Duration(milliseconds: 50 * index)),
@@ -108,11 +107,11 @@ class IngredientList extends ConsumerWidget {
                               if (noteText != null && noteText.isNotEmpty) {
                                 Note note = Note(
                                   text: noteText,
-                                  recipeId: ref.watch(recipeProvider)!.id,
+                                  recipeId: currentRecipeService.recipe.value!.recipeId!,
                                   createdAt: DateTime.now(),
                                 );
 
-                                await ref.read(recipeProvider.notifier).updateIngredient(ingredient!.copyWith(note: note));
+                                await currentRecipeService.updateIngredient(ingredient!.copyWith(note: note));
                               }
                             }
                           }
@@ -123,7 +122,7 @@ class IngredientList extends ConsumerWidget {
                   }
                 ),
                 // Divider
-                if (index != (ref.watch(recipeProvider)?.ingredients ?? []).length - 1)
+                if (index != (currentRecipeService.recipe.value?.ingredients ?? []).length - 1)
                   Divider(
                     height: 4,
                     color: Theme.of(context).colorScheme.secondaryContainer,
@@ -132,7 +131,7 @@ class IngredientList extends ConsumerWidget {
             ),
           );
         },
-        childCount: (ref.watch(recipeProvider)?.ingredients ?? []).length,
+        childCount: (currentRecipeService.recipe.value?.ingredients ?? []).length,
       ),
     );
   }

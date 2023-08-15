@@ -1,31 +1,24 @@
-import 'package:isar/isar.dart';
-import 'package:json_annotation/json_annotation.dart';
+import 'package:abis_recipes/features/books/models/recipe.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:flutter/foundation.dart';
+
+part 'book.freezed.dart';
 
 part 'book.g.dart';
 
-@Collection()
-@JsonSerializable(explicitToJson: true)
-class Book {
-  String? url;
-  String title;
-  String bookId;
+@freezed
+class Book with _$Book {
+  const factory Book({
+    required String? url,
+    required String title,
+    required String bookId,
+    required String? description,
+    required DateTime dateCreated,
+    required Recipe? lastRecipe
+  }) = _Book;
 
-  String? description;
 
-  DateTime? dateCreated;
+  const Book._();
 
-  Id id = Isar.autoIncrement;
-
-  Book({
-    required this.title,
-    required this.bookId,
-    this.id = Isar.autoIncrement,
-    this.url,
-    this.description,
-    this.dateCreated,
-  });
-
-  factory Book.fromJson(Map<String, dynamic> json) => _$BookFromJson(json);
-
-  Map<String, dynamic> toJson() => _$BookToJson(this);
+  factory Book.fromJson(Map<String, Object?> json) => _$BookFromJson(json);
 }

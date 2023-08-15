@@ -1,10 +1,9 @@
 import 'package:abis_recipes/app/constants.dart';
 import 'package:abis_recipes/features/shared/ui/browser/browser_view.dart';
 import 'package:flutter/material.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:flutter/services.dart';
 
-class RecipeHeader extends ConsumerWidget {
+class RecipeHeader extends StatelessWidget {
   const RecipeHeader(
     this.title,
     this.image,
@@ -17,7 +16,7 @@ class RecipeHeader extends ConsumerWidget {
   final String url;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Row(

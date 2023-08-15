@@ -1,11 +1,9 @@
-import 'package:isar/isar.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 import 'note.dart';
 
 part 'ingredient.g.dart';
 
-@embedded
 @JsonSerializable(explicitToJson: true)
 class Ingredient {
   String? name;

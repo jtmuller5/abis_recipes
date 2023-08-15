@@ -1,13 +1,11 @@
-import 'package:isar/isar.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'note.g.dart';
 
-@embedded
 @JsonSerializable(explicitToJson: true)
 class Note {
   String? text;
-  int? recipeId;
+  String? recipeId;
   DateTime? createdAt;
   DateTime? updatedAt;
 

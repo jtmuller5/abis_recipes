@@ -1,7 +1,6 @@
-import 'package:abis_recipes/features/books/models/book.dart';
-import 'package:abis_recipes/features/books/models/recipe.dart';
-import 'package:abis_recipes/features/books/ui/recipe_page/recipe_page.dart';
-import 'package:abis_recipes/features/home/providers/loading_provider.dart';
+import 'package:abis_recipes/app/get_it.dart';
+import 'package:abis_recipes/app/services.dart';
+import 'package:abis_recipes/features/books/ui/recipe_page/recipe_view.dart';
 import 'package:abis_recipes/features/home/ui/home_view.dart';
 import 'package:abis_recipes/features/shared/ui/app_name.dart';
 import 'package:abis_recipes/firebase_options.dart';
@@ -12,11 +11,9 @@ import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:isar/isar.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-late Isar oldIsar;
 late SharedPreferences sharedPreferences;
 
 final Amplitude amplitude = Amplitude.getInstance();
@@ -26,12 +23,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await amplitude.init("ff2f485bec7b3432c7a6ed352cc6420c");
-
-  oldIsar = await Isar.open([
-    RecipeSchema,
-    BookSchema,
-  ]);
-
+await configureDependencies();
   // await isar.writeTxn(() async => await isar.clear());
   sharedPreferences = await SharedPreferences.getInstance();
 
@@ -107,7 +99,7 @@ class _MyAppState extends State<MyApp> {
             headerBuilder: (context, constraints, shrinkOffset) {
               return SizedBox(
                 height: 200,
-                child:  AppName(),
+                child: AppName(),
               );
             },
             actions: [
@@ -139,9 +131,9 @@ class _MyAppState extends State<MyApp> {
       print("Shared: getInitialTextAsUri ${value?.toString()}");
 
       if (value != null && checkValidUrl(value.toString())) {
-        ref.watch(urlProvider.notifier).state = value.toString();
-        loadRecipe(ref, value.toString());
-        Navigator.of(navigatorKey.currentContext!).push(MaterialPageRoute(builder: (context) => RecipePage()));
+        searchService.setUrl(value.toString());
+        recipesService.loadRecipe(value.toString());
+        Navigator.of(navigatorKey.currentContext!).push(MaterialPageRoute(builder: (context) => RecipeView()));
       }
     }).onError((error, stackTrace) {
       print("getInitialSharing error: $error");
@@ -153,9 +145,9 @@ class _MyAppState extends State<MyApp> {
 
       debugPrint('value.path: ' + value.path);
       if (value.path.isNotEmpty && checkValidUrl(value.toString())) {
-        ref.watch(urlProvider.notifier).state = value.toString();
-        loadRecipe(ref, value.toString());
-        Navigator.of(navigatorKey.currentContext!).push(MaterialPageRoute(builder: (context) => RecipePage()));
+        searchService.setUrl(value.toString());
+        recipesService.loadRecipe(value.toString());
+        Navigator.of(navigatorKey.currentContext!).push(MaterialPageRoute(builder: (context) => RecipeView()));
       }
     }, onError: (err) {
       print("getTextStreamAsUri error: $err");

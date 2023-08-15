@@ -1,75 +1,25 @@
 import 'package:abis_recipes/features/books/models/ingredient.dart';
 import 'package:abis_recipes/features/books/models/instruction.dart';
-import 'package:abis_recipes/features/books/models/note.dart';
-import 'package:isar/isar.dart';
-import 'package:json_annotation/json_annotation.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
+
+part 'recipe.freezed.dart';
 
 part 'recipe.g.dart';
 
-@Collection()
-@JsonSerializable(explicitToJson: true)
-class Recipe {
+@freezed
+class Recipe with _$Recipe{
 
-  String? url;
+  const factory Recipe({
+    required String recipeId,
+    required String? url,
+    required String? title,
+    required String? coverImage,
+    required String? description,
+    required List<String>? images,
+    required List<Ingredient>? ingredients,
+    required List<Instruction>? instructions,
+    required List<String> bookIds,
+  }) = _Recipe;
 
-  String? title;
-
-  String recipeId;
-
-  String? description;
-
-  String? coverImage;
-
-  List<String>? images;
-
-  Id id = Isar.autoIncrement;
-
-  List<Ingredient>? ingredients;
-
-  List<Instruction>? instructions;
-
-  List<int> bookIds = [];
-
-  Recipe({
-    required this.recipeId,
-    this.url,
-    this.id=Isar.autoIncrement,
-    this.title,
-    this.coverImage,
-    this.description,
-    this.images,
-    this.ingredients,
-    this.instructions,
-    this.bookIds = const [],
-  });
-
-  // Copy with
-  Recipe copyWith({
-    int? id,
-    String? url,
-    String? title,
-    String? description,
-    String? coverImage,
-    List<String>? images,
-    List<Ingredient>? ingredients,
-    List<Instruction>? instructions,
-    List<int>? bookIds,
-  }) {
-    return Recipe(
-      recipeId: recipeId,
-      id: id ?? this.id,
-      url: url ?? this.url,
-      title: title ?? this.title,
-      coverImage: coverImage ?? this.coverImage,
-      description: description ?? this.description,
-      images: images ?? this.images,
-      ingredients: ingredients ?? this.ingredients,
-      instructions: instructions ?? this.instructions,
-      bookIds: bookIds ?? this.bookIds,
-    );
-  }
-
-  factory Recipe.fromJson(Map<String, dynamic> json) => _$RecipeFromJson(json);
-
-  Map<String, dynamic> toJson() => _$RecipeToJson(this);
+  factory Recipe.fromJson(Map<String, Object?> json) => _$RecipeFromJson(json);
 }

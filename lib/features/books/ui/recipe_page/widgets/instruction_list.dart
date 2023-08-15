@@ -1,33 +1,29 @@
+import 'package:abis_recipes/app/services.dart';
 import 'package:abis_recipes/features/books/models/gpt_message.dart';
 import 'package:abis_recipes/features/books/models/instruction.dart';
 import 'package:abis_recipes/features/books/models/note.dart';
 import 'package:abis_recipes/features/books/services/chat_gpt_service.dart';
-import 'package:abis_recipes/features/home/providers/recipe_provider.dart';
-import 'package:abis_recipes/main.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class InstructionList extends ConsumerWidget {
+class InstructionList extends StatelessWidget {
   const InstructionList({
     Key? key,
   }) : super(key: key);
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     return SliverList(
       delegate: SliverChildBuilderDelegate(
             (BuildContext context, int index) {
-          Instruction instruction = (ref.watch(recipeProvider)?.instructions ?? [])[index];
+          Instruction instruction = (currentRecipeService.recipe.value?.instructions ?? [])[index];
 
           return InstructionTile(
             instruction,
             index,
           );
         },
-        childCount: (ref.watch(recipeProvider)?.instructions ?? []).length,
+        childCount: (currentRecipeService.recipe.value?.instructions ?? []).length,
       ),
     );
   }
@@ -96,7 +92,7 @@ class _InstructionTileState extends State<InstructionTile> {
                           shortened: true,
                         );
 
-                        ref.read(recipeProvider.notifier).updateInstruction(newInstruction);
+                        currentRecipeService.updateInstruction(newInstruction);
 
                         setState(() {
                           showShort = true;
@@ -137,11 +133,11 @@ class _InstructionTileState extends State<InstructionTile> {
 
                         Note note = Note(
                           text: noteText,
-                          recipeId: ref.watch(recipeProvider)!.id,
+                          recipeId: currentRecipeService.recipe.value!.recipeId,
                           createdAt: DateTime.now(),
                         );
 
-                        await ref.read(recipeProvider.notifier).updateInstruction(widget.instruction.copyWith(note: note));
+                        await currentRecipeService.updateInstruction(widget.instruction.copyWith(note: note));
                       }
                     }
                   }

@@ -1,10 +1,25 @@
+import 'dart:convert';
+import 'dart:developer';
+
+import 'package:abis_recipes/app/services.dart';
+import 'package:abis_recipes/features/books/models/ingredient.dart';
+import 'package:abis_recipes/features/books/models/instruction.dart';
+import 'package:abis_recipes/features/books/models/recipe.dart';
+import 'package:abis_recipes/features/books/services/html_processor.dart';
+import 'package:abis_recipes/features/books/ui/recipe_page/recipe_view.dart';
 import 'package:abis_recipes/main.dart';
 import 'package:beautiful_soup_dart/beautiful_soup.dart';
 import 'package:flutter/material.dart';
 import 'package:injectable/injectable.dart';
+import 'package:http/http.dart' as http;
+import 'package:html/dom.dart' as dom;
+import 'package:html/parser.dart' as parser;
+import 'package:recase/recase.dart';
 
 @lazySingleton
 class RecipesService {
+
+  ValueNotifier<Recipe?> recipe = ValueNotifier(null);
 
   ValueNotifier<bool> loadingRecipe = ValueNotifier(false);
 
@@ -18,9 +33,25 @@ class RecipesService {
     loadingRecipe.value = val;
   }
 
+  void setRecipe(Recipe val){
+    recipe.value = val;
+  }
+
+  void clearRecipe(){
+    recipe.value = null;
+  }
+
+  static void navigateToRecipe(Recipe recipe, BuildContext context) {
+    appService.setHasError(false);
+    appService.setCurrentUrl(recipe.url);
+    currentRecipeService.setRecipe(recipe);
+    bookService.checkedBooks.value = recipe.bookIds;
+    Navigator.of(context).push(MaterialPageRoute(builder: (context) => RecipeView()));
+  }
+
   Future<void> loadRecipe(url) async {
     loadingRecipe.value = true;
-    ref.read(recipeProvider.notifier).clearRecipe();
+    clearRecipe();
     final response = await http.Client().get(Uri.parse(url));
 
     if (response.statusCode == 200) {
@@ -29,16 +60,16 @@ class RecipesService {
       try {
         BeautifulSoup bs = BeautifulSoup(document.outerHtml);
 
-        ref.watch(recipeProvider.notifier).createRecipe(url);
-        getTitle(bs, ref, url);
-        getImage(bs, ref, url);
-        getIngredients(bs, ref, url);
-        getInstructions(bs, ref, url);
+        currentRecipeService.createRecipe(url);
+        getTitle(bs, url);
+        getImage(bs,  url);
+        getIngredients(bs,  url);
+        getInstructions(bs,  url);
 
-        if (ref.watch(recipeProvider)?.title == null ||
-            ref.watch(recipeProvider)?.images == null ||
-            (ref.watch(recipeProvider)?.ingredients ?? []).isEmpty ||
-            (ref.watch(recipeProvider)?.instructions ?? []).isEmpty) {
+        if (currentRecipeService.recipe.value?.title == null ||
+            currentRecipeService.recipe.value?.images == null ||
+            (currentRecipeService.recipe.value?.ingredients ?? []).isEmpty ||
+            (currentRecipeService.recipe.value?.instructions ?? []).isEmpty) {
           errorLoadingRecipe.value = true;
           amplitude.logEvent('bad recipe', eventProperties: {'url': url});
         } else {
@@ -54,7 +85,7 @@ class RecipesService {
     loadingRecipe.value = false;
   }
 
-  void getImage(BeautifulSoup bs, WidgetRef ref,String url, {bool print = false}) {
+  void getImage(BeautifulSoup bs, String url, {bool print = false}) {
     Bs4Element? image = bs.img;
 
     String? imageUrl;
@@ -92,7 +123,7 @@ class RecipesService {
             // debugPrint('image: ' + element.toString());
 
             if (element.attributes['alt'] != null &&
-                element.attributes['alt']?.toLowerCase().contains(ref.watch(recipeProvider)?.title?.toLowerCase() ?? '') != '') {
+                element.attributes['alt']?.toLowerCase().contains(recipe.value?.title?.toLowerCase() ?? '') != '') {
               imageUrl = element.attributes['src'];
               debugPrint('img image: ' + imageUrl.toString());
             }
@@ -110,13 +141,13 @@ class RecipesService {
       }
 
       if (print) debugPrint('image: ' + imageUrl.toString());
-      ref.read(recipeProvider.notifier).updateRecipeImage(imageUrl);
+      currentRecipeService.updateRecipeImage(imageUrl);
     } catch (e) {
       debugPrint('getImage error: ' + e.toString());
     }
   }
 
-  void getIngredients(BeautifulSoup bs, WidgetRef ref, String url, {bool print = false}) {
+  void getIngredients(BeautifulSoup bs, String url, {bool print = false}) {
     List<Bs4Element>? ingredients = [];
     Bs4Element? ingredientSection;
 
@@ -137,7 +168,7 @@ class RecipesService {
       // Combine amounts and items
       for (int i = 0; i < (amounts ?? []).length; i++) {
         String ingredient = amounts![i].text + ' ' + items![i].text;
-        ref.read(recipeProvider.notifier).addIngredient(Ingredient(name: HtmlProcessor.capitalize(ingredient.trim())));
+        currentRecipeService.addIngredient(Ingredient(name: HtmlProcessor.capitalize(ingredient.trim())));
       }
     }
 
@@ -183,7 +214,7 @@ class RecipesService {
       List<String> ingredientsList = recipeMap['recipeIngredient'].cast<String>();
 
       ingredientsList.forEach((element) {
-        ref.read(recipeProvider.notifier).addIngredient(Ingredient(name: HtmlProcessor.capitalize(element)));
+        currentRecipeService.addIngredient(Ingredient(name: HtmlProcessor.capitalize(element)));
       });
 
       return;
@@ -201,11 +232,11 @@ class RecipesService {
       String ingredient = HtmlProcessor.removeNewLines(element.text);
       ingredient = HtmlProcessor.removeHtmlTags(ingredient);
       ingredient = HtmlProcessor.removeTabs(ingredient);
-      ref.read(recipeProvider.notifier).addIngredient(Ingredient(name: HtmlProcessor.capitalize(ingredient.trim())));
+      currentRecipeService.addIngredient(Ingredient(name: HtmlProcessor.capitalize(ingredient.trim())));
     });
   }
 
-  void getInstructions(BeautifulSoup bs, WidgetRef ref, String url, {bool print = false}) {
+  void getInstructions(BeautifulSoup bs, String url, {bool print = false}) {
     List<Bs4Element>? listItems = [];
 
     /// Handle special cases
@@ -245,7 +276,7 @@ class RecipesService {
         List<String> ingredientsList = recipeMap['recipeInstructions'].map((e) => e['text']).cast<String>().toList();
 
         ingredientsList.forEach((element) {
-          ref.read(recipeProvider.notifier).addInstruction(Instruction(text: ReCase(element.trim()).sentenceCase + '.'));
+          currentRecipeService.addInstruction(Instruction(text: ReCase(element.trim()).sentenceCase + '.'));
         });
 
         return;
@@ -292,7 +323,7 @@ class RecipesService {
 
       if (print) debugPrint('Instructions: ' + instruction);
 
-      ref.read(recipeProvider.notifier).addInstruction(Instruction(text: ReCase(instruction.trim()).sentenceCase + '.'));
+      currentRecipeService.addInstruction(Instruction(text: ReCase(instruction.trim()).sentenceCase + '.'));
     });
   }
 
@@ -303,7 +334,7 @@ class RecipesService {
     return instructions?.findAll('li') ?? [];
   }
 
-  void getTitle(BeautifulSoup bs, WidgetRef ref,String url, {bool print = false}) {
+  void getTitle(BeautifulSoup bs,String url, {bool print = false}) {
     Bs4Element? title = bs.title;
 
     if(print)debugPrint('title: ' + title.toString());
@@ -312,6 +343,6 @@ class RecipesService {
     recipeTitle = recipeTitle.replaceAll('Recipe', '');
     recipeTitle = recipeTitle.replaceAll('recipe', '');
 
-    ref.read(recipeProvider.notifier).updateRecipeTitle(recipeTitle.trim());
+    currentRecipeService.updateRecipeTitle(recipeTitle.trim());
   }
 }

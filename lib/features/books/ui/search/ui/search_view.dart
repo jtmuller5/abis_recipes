@@ -1,27 +1,26 @@
 import 'package:abis_recipes/features/books/models/recipe.dart';
-import 'package:abis_recipes/features/home/providers/recipe_provider.dart';
+import 'package:abis_recipes/features/recipes/services/recipes_service.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:collection/collection.dart';
 
-class SearchView extends HookConsumerWidget {
+class SearchView extends StatelessWidget {
   const SearchView({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    TextEditingController searchController = useTextEditingController();
+  Widget build(BuildContext context) {
     return Scaffold(
       body: CustomScrollView(
         slivers: [
-          SliverAppBar(title: Text('Search')),
-          SliverToBoxAdapter(
+          SliverAppBar(title: Text('All Recipes')),
+          /*SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.all(16.0),
               child: TextField(
                 controller: searchController,
                 onChanged: (value) {
-                  ref.watch(searchProvider.notifier).state = value;
+                  searchService.setSearch(value);
                 },
                 decoration: InputDecoration(
                   labelText: 'Search',
@@ -29,35 +28,50 @@ class SearchView extends HookConsumerWidget {
                 ),
               ),
             ),
-          ),
-          SliverList(
-            delegate: SliverChildBuilderDelegate(
-              (BuildContext context, int index) {
-                Recipe recipe = ref.watch(recipesProvider)[index];
-                return ListTile(
-                  leading: SizedBox(
-                      height: 64,
-                      width: 64,
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: recipe.images?.firstOrNull != null
-                            ? FadeInImage(
-                                placeholder: AssetImage('assets/transparent.png'),
-                                image: NetworkImage(recipe.images!.first),
-                                fit: BoxFit.cover,
-                              )
-                            : ColoredBox(color: Theme.of(context).colorScheme.secondary, child: Icon(Icons.book)),
-                      )),
-                  title: Text(recipe.title ?? ''),
-                  subtitle: Text(''),
-                  onTap: () {
-                    RecipeNotifier.navigateToRecipe(recipe, ref, context);
-                  },
+          ),*/
+          StreamBuilder<List<Recipe>>(
+              stream: FirebaseFirestore.instance.collection('users').doc(FirebaseAuth.instance.currentUser?.uid).collection('recipes').snapshots().map((event) {
+                return event.docs.map((e) => Recipe.fromJson(e.data())).toList();
+              }),
+              builder: (context, snapshot) {
+                if (snapshot.hasError) {
+                  return SliverToBoxAdapter(child: Text(snapshot.error.toString()));
+                }
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return SliverToBoxAdapter(child: Center(child: CircularProgressIndicator()));
+                }
+                if (!snapshot.hasData || snapshot.data == null) {
+                  return SliverToBoxAdapter(child: Text('No data'));
+                }
+                return SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (BuildContext context, int index) {
+                      Recipe recipe = snapshot.data![index];
+                      return ListTile(
+                        leading: SizedBox(
+                            height: 64,
+                            width: 64,
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: recipe.images?.firstOrNull != null
+                                  ? FadeInImage(
+                                      placeholder: AssetImage('assets/transparent.png'),
+                                      image: NetworkImage(recipe.images!.first),
+                                      fit: BoxFit.cover,
+                                    )
+                                  : ColoredBox(color: Theme.of(context).colorScheme.secondary, child: Icon(Icons.book)),
+                            )),
+                        title: Text(recipe.title ?? ''),
+                        subtitle: Text(''),
+                        onTap: () {
+                          RecipesService.navigateToRecipe(recipe, context);
+                        },
+                      );
+                    },
+                    childCount: snapshot.data!.length,
+                  ),
                 );
-              },
-              childCount: ref.watch(recipesProvider).length,
-            ),
-          ),
+              }),
         ],
       ),
     );

@@ -5,30 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class FirestoreDatabaseService extends DatabaseService {
-  @override
-  void createBook(Book book) {
-    FirebaseFirestore.instance
-        .collection('users')
-        .doc(FirebaseAuth.instance.currentUser?.uid)
-        .collection('books')
-        .doc(book.bookId)
-        .set(book.toJson());
-  }
 
-  @override
-  void updateBook(Book book) {
-    FirebaseFirestore.instance
-        .collection('users')
-        .doc(FirebaseAuth.instance.currentUser?.uid)
-        .collection('books')
-        .doc(book.bookId)
-        .update(book.toJson());
-  }
-
-  @override
-  void deleteBook(Book book) {
-    FirebaseFirestore.instance.collection('users').doc(FirebaseAuth.instance.currentUser?.uid).collection('books').doc(book.bookId).delete();
-  }
 
   @override
   void createRecipe(Recipe recipe) {
