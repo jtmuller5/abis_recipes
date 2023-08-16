@@ -1,8 +1,8 @@
-import 'package:abis_recipes/app/constants.dart';
-import 'package:abis_recipes/app/services.dart';
-import 'package:abis_recipes/features/books/models/book.dart';
 import 'package:abis_recipes/features/books/models/recipe.dart';
+import 'package:abis_recipes/features/books/ui/recipe_preview_view/recipe_preview_view_model.dart';
+import 'package:abis_recipes/features/books/ui/recipe_view/recipe_view.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:code_on_the_rocks/code_on_the_rocks.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -11,8 +11,10 @@ class SaveButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    RecipePreviewViewModel model = getModel<RecipePreviewViewModel>(context);
     return ValueListenableBuilder(
-      valueListenable: appService.hasError,
+      valueListenable: model.errorLoadingRecipe,
       builder: (context, error, child) {
         return Container(
           child: error
@@ -20,7 +22,27 @@ class SaveButton extends StatelessWidget {
               : FloatingActionButton.extended(
                   key: const Key('action_button_save'),
                   onPressed: () async {
-                    bool save = await showModalBottomSheet<bool>(
+                    DocumentReference ref = FirebaseFirestore.instance.collection('users').doc(FirebaseAuth.instance.currentUser?.uid).collection('recipes').doc();
+
+                    Recipe newRecipe = model.recipe.value!.copyWith(
+                      recipeId: ref.id,
+                      url: model.url,
+                    );
+
+                    await ref.set(newRecipe.toJson());
+
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Recipe saved!')),
+                    );
+
+                    Navigator.of(context).pushReplacement(MaterialPageRoute(
+                      builder: (context) {
+                        return RecipeView(
+                          id: ref.id
+                        );
+                      },
+                    ));
+                    /* bool save = await showModalBottomSheet<bool>(
                           context: context,
                           builder: (context) {
                             return StatefulBuilder(
@@ -109,7 +131,7 @@ class SaveButton extends StatelessWidget {
                             );
                           },
                         ) ??
-                        false;
+                        false;*/
                   },
                   label: Text('Save'),
                   icon: const Icon(Icons.bookmark_border),

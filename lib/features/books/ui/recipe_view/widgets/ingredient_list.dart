@@ -1,20 +1,26 @@
-import 'package:abis_recipes/app/services.dart';
 import 'package:abis_recipes/features/books/models/ingredient.dart';
 import 'package:abis_recipes/features/books/models/note.dart';
+import 'package:abis_recipes/features/books/models/recipe.dart';
+import 'package:abis_recipes/features/books/ui/recipe_view/recipe_view_model.dart';
+import 'package:code_on_the_rocks/code_on_the_rocks.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
-class IngredientList extends StatelessWidget {
-  const IngredientList({
-    Key? key,
+class IngredientList extends StatelessWidget  {
+   IngredientList({
+    Key? key, required this.recipe,
   }) : super(key: key);
+
+   final Recipe recipe;
 
   @override
   Widget build(BuildContext context) {
+
+    RecipeViewModel model = getModel<RecipeViewModel>(context);
     return SliverList(
       delegate: SliverChildBuilderDelegate(
         (BuildContext context, int index) {
-          Ingredient? ingredient = currentRecipeService.recipe.value?.ingredients?[index];
+          Ingredient? ingredient = recipe.ingredients?[index];
           return Animate(
             effects: [
               ScaleEffect(delay: Duration(milliseconds: 50 * index)),
@@ -107,11 +113,11 @@ class IngredientList extends StatelessWidget {
                               if (noteText != null && noteText.isNotEmpty) {
                                 Note note = Note(
                                   text: noteText,
-                                  recipeId: currentRecipeService.recipe.value!.recipeId!,
+                                  recipeId: recipe.recipeId,
                                   createdAt: DateTime.now(),
                                 );
 
-                                await currentRecipeService.updateIngredient(ingredient!.copyWith(note: note));
+                                await model.updateIngredient(ingredient!.copyWith(note: note), recipe);
                               }
                             }
                           }
@@ -122,7 +128,7 @@ class IngredientList extends StatelessWidget {
                   }
                 ),
                 // Divider
-                if (index != (currentRecipeService.recipe.value?.ingredients ?? []).length - 1)
+                if (index != (recipe.ingredients ?? []).length - 1)
                   Divider(
                     height: 4,
                     color: Theme.of(context).colorScheme.secondaryContainer,
@@ -131,7 +137,7 @@ class IngredientList extends StatelessWidget {
             ),
           );
         },
-        childCount: (currentRecipeService.recipe.value?.ingredients ?? []).length,
+        childCount: (recipe.ingredients ?? []).length,
       ),
     );
   }

@@ -2,28 +2,35 @@ import 'package:abis_recipes/app/services.dart';
 import 'package:abis_recipes/features/books/models/gpt_message.dart';
 import 'package:abis_recipes/features/books/models/instruction.dart';
 import 'package:abis_recipes/features/books/models/note.dart';
+import 'package:abis_recipes/features/books/models/recipe.dart';
 import 'package:abis_recipes/features/books/services/chat_gpt_service.dart';
+import 'package:abis_recipes/features/books/ui/recipe_view/recipe_view_model.dart';
+import 'package:code_on_the_rocks/code_on_the_rocks.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
 class InstructionList extends StatelessWidget {
-  const InstructionList({
-    Key? key,
+  InstructionList({
+    Key? key, required this.recipe,
   }) : super(key: key);
+
+  final Recipe recipe;
 
   @override
   Widget build(BuildContext context) {
+
     return SliverList(
       delegate: SliverChildBuilderDelegate(
             (BuildContext context, int index) {
-          Instruction instruction = (currentRecipeService.recipe.value?.instructions ?? [])[index];
+          Instruction instruction = (recipe.instructions ?? [])[index];
 
           return InstructionTile(
             instruction,
             index,
+            recipe: recipe,
           );
         },
-        childCount: (currentRecipeService.recipe.value?.instructions ?? []).length,
+        childCount: (recipe.instructions ?? []).length,
       ),
     );
   }
@@ -33,9 +40,10 @@ class InstructionTile extends StatefulWidget {
   const InstructionTile(
       this.instruction,
       this.index, {
-        Key? key,
+        Key? key, required this.recipe,
       }) : super(key: key);
 
+  final Recipe recipe;
   final Instruction instruction;
   final int index;
 
@@ -48,6 +56,9 @@ class _InstructionTileState extends State<InstructionTile> {
 
   @override
   Widget build(BuildContext context) {
+
+    RecipeViewModel model = getModel<RecipeViewModel>(context);
+
     return Animate(
       effects: [
         ScaleEffect(delay: Duration(milliseconds: 50 * widget.index)),
@@ -92,7 +103,7 @@ class _InstructionTileState extends State<InstructionTile> {
                           shortened: true,
                         );
 
-                        currentRecipeService.updateInstruction(newInstruction);
+                        model.updateInstruction(newInstruction, widget.recipe);
 
                         setState(() {
                           showShort = true;
@@ -133,11 +144,11 @@ class _InstructionTileState extends State<InstructionTile> {
 
                         Note note = Note(
                           text: noteText,
-                          recipeId: currentRecipeService.recipe.value!.recipeId,
+                          recipeId: widget.recipe.recipeId,
                           createdAt: DateTime.now(),
                         );
 
-                        await currentRecipeService.updateInstruction(widget.instruction.copyWith(note: note));
+                        await model.updateInstruction(widget.instruction.copyWith(note: note), widget.recipe);
                       }
                     }
                   }

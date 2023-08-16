@@ -15,6 +15,7 @@ _$_Book _$$_BookFromJson(Map<String, dynamic> json) => _$_Book(
       lastRecipe: json['lastRecipe'] == null
           ? null
           : Recipe.fromJson(json['lastRecipe'] as Map<String, dynamic>),
+      recipeCount: json['recipeCount'] as int?,
     );
 
 Map<String, dynamic> _$$_BookToJson(_$_Book instance) => <String, dynamic>{
@@ -24,4 +25,5 @@ Map<String, dynamic> _$$_BookToJson(_$_Book instance) => <String, dynamic>{
       'description': instance.description,
       'dateCreated': instance.dateCreated.toIso8601String(),
       'lastRecipe': instance.lastRecipe?.toJson(),
+      'recipeCount': instance.recipeCount,
     };

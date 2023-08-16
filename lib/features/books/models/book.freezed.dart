@@ -26,6 +26,7 @@ mixin _$Book {
   String? get description => throw _privateConstructorUsedError;
   DateTime get dateCreated => throw _privateConstructorUsedError;
   Recipe? get lastRecipe => throw _privateConstructorUsedError;
+  int? get recipeCount => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -43,7 +44,8 @@ abstract class $BookCopyWith<$Res> {
       String bookId,
       String? description,
       DateTime dateCreated,
-      Recipe? lastRecipe});
+      Recipe? lastRecipe,
+      int? recipeCount});
 
   $RecipeCopyWith<$Res>? get lastRecipe;
 }
@@ -67,6 +69,7 @@ class _$BookCopyWithImpl<$Res, $Val extends Book>
     Object? description = freezed,
     Object? dateCreated = null,
     Object? lastRecipe = freezed,
+    Object? recipeCount = freezed,
   }) {
     return _then(_value.copyWith(
       url: freezed == url
@@ -93,6 +96,10 @@ class _$BookCopyWithImpl<$Res, $Val extends Book>
           ? _value.lastRecipe
           : lastRecipe // ignore: cast_nullable_to_non_nullable
               as Recipe?,
+      recipeCount: freezed == recipeCount
+          ? _value.recipeCount
+          : recipeCount // ignore: cast_nullable_to_non_nullable
+              as int?,
     ) as $Val);
   }
 
@@ -121,7 +128,8 @@ abstract class _$$_BookCopyWith<$Res> implements $BookCopyWith<$Res> {
       String bookId,
       String? description,
       DateTime dateCreated,
-      Recipe? lastRecipe});
+      Recipe? lastRecipe,
+      int? recipeCount});
 
   @override
   $RecipeCopyWith<$Res>? get lastRecipe;
@@ -142,6 +150,7 @@ class __$$_BookCopyWithImpl<$Res> extends _$BookCopyWithImpl<$Res, _$_Book>
     Object? description = freezed,
     Object? dateCreated = null,
     Object? lastRecipe = freezed,
+    Object? recipeCount = freezed,
   }) {
     return _then(_$_Book(
       url: freezed == url
@@ -168,6 +177,10 @@ class __$$_BookCopyWithImpl<$Res> extends _$BookCopyWithImpl<$Res, _$_Book>
           ? _value.lastRecipe
           : lastRecipe // ignore: cast_nullable_to_non_nullable
               as Recipe?,
+      recipeCount: freezed == recipeCount
+          ? _value.recipeCount
+          : recipeCount // ignore: cast_nullable_to_non_nullable
+              as int?,
     ));
   }
 }
@@ -181,7 +194,8 @@ class _$_Book extends _Book with DiagnosticableTreeMixin {
       required this.bookId,
       required this.description,
       required this.dateCreated,
-      required this.lastRecipe})
+      required this.lastRecipe,
+      required this.recipeCount})
       : super._();
 
   factory _$_Book.fromJson(Map<String, dynamic> json) => _$$_BookFromJson(json);
@@ -198,10 +212,12 @@ class _$_Book extends _Book with DiagnosticableTreeMixin {
   final DateTime dateCreated;
   @override
   final Recipe? lastRecipe;
+  @override
+  final int? recipeCount;
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'Book(url: $url, title: $title, bookId: $bookId, description: $description, dateCreated: $dateCreated, lastRecipe: $lastRecipe)';
+    return 'Book(url: $url, title: $title, bookId: $bookId, description: $description, dateCreated: $dateCreated, lastRecipe: $lastRecipe, recipeCount: $recipeCount)';
   }
 
   @override
@@ -214,7 +230,8 @@ class _$_Book extends _Book with DiagnosticableTreeMixin {
       ..add(DiagnosticsProperty('bookId', bookId))
       ..add(DiagnosticsProperty('description', description))
       ..add(DiagnosticsProperty('dateCreated', dateCreated))
-      ..add(DiagnosticsProperty('lastRecipe', lastRecipe));
+      ..add(DiagnosticsProperty('lastRecipe', lastRecipe))
+      ..add(DiagnosticsProperty('recipeCount', recipeCount));
   }
 
   @override
@@ -230,13 +247,15 @@ class _$_Book extends _Book with DiagnosticableTreeMixin {
             (identical(other.dateCreated, dateCreated) ||
                 other.dateCreated == dateCreated) &&
             (identical(other.lastRecipe, lastRecipe) ||
-                other.lastRecipe == lastRecipe));
+                other.lastRecipe == lastRecipe) &&
+            (identical(other.recipeCount, recipeCount) ||
+                other.recipeCount == recipeCount));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(
-      runtimeType, url, title, bookId, description, dateCreated, lastRecipe);
+  int get hashCode => Object.hash(runtimeType, url, title, bookId, description,
+      dateCreated, lastRecipe, recipeCount);
 
   @JsonKey(ignore: true)
   @override
@@ -259,7 +278,8 @@ abstract class _Book extends Book {
       required final String bookId,
       required final String? description,
       required final DateTime dateCreated,
-      required final Recipe? lastRecipe}) = _$_Book;
+      required final Recipe? lastRecipe,
+      required final int? recipeCount}) = _$_Book;
   const _Book._() : super._();
 
   factory _Book.fromJson(Map<String, dynamic> json) = _$_Book.fromJson;
@@ -276,6 +296,8 @@ abstract class _Book extends Book {
   DateTime get dateCreated;
   @override
   Recipe? get lastRecipe;
+  @override
+  int? get recipeCount;
   @override
   @JsonKey(ignore: true)
   _$$_BookCopyWith<_$_Book> get copyWith => throw _privateConstructorUsedError;

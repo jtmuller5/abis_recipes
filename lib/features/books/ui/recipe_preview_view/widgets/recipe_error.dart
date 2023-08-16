@@ -1,6 +1,7 @@
 import 'package:abis_recipes/app/constants.dart';
-import 'package:abis_recipes/app/services.dart';
-import 'package:abis_recipes/features/books/ui/recipe_page/widgets/url_button.dart';
+import 'package:abis_recipes/features/books/ui/recipe_preview_view/recipe_preview_view_model.dart';
+import 'package:abis_recipes/features/books/ui/recipe_preview_view/widgets/url_button.dart';
+import 'package:code_on_the_rocks/code_on_the_rocks.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -10,6 +11,8 @@ class RecipeError extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    RecipePreviewViewModel model = getModel<RecipePreviewViewModel>(context);
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -57,14 +60,14 @@ class RecipeError extends StatelessWidget {
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 children: [
-                  Text(currentRecipeService.recipe.value?.title ?? ''),
-                  Text(currentRecipeService.recipe.value?.images.toString() ?? ''),
-                  Text(currentRecipeService.recipe.value?.ingredients.toString() ?? ''),
-                  Text(currentRecipeService.recipe.value?.instructions.toString() ?? ''),
+                  Text(model.recipe.value?.title ?? ''),
+                  Text(model.recipe.value?.images.toString() ?? ''),
+                  Text(model.recipe.value?.ingredients.toString() ?? ''),
+                  Text(model.recipe.value?.instructions.toString() ?? ''),
                 ],
               ),
             ),
-          UrlButton(),
+          UrlButton(url: model.url),
           Animate(
             effects: [
               SlideEffect(

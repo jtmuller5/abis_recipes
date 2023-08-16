@@ -1,7 +1,6 @@
 import 'package:abis_recipes/app/constants.dart';
 import 'package:abis_recipes/app/services.dart';
 import 'package:abis_recipes/features/books/ui/books_page/books_view.dart';
-import 'package:abis_recipes/features/books/ui/recipe_page/recipe_view.dart';
 import 'package:abis_recipes/features/books/ui/recipe_preview_view/recipe_preview_view.dart';
 import 'package:abis_recipes/features/books/ui/search/ui/search_view.dart';
 import 'package:abis_recipes/features/home/ui/widgets/bake_mode_button.dart';
@@ -33,6 +32,7 @@ class HomeView extends StatelessWidget {
                   leading: Icon(Icons.search),
                   onTap: () async {
                     searchService.setSearch('');
+                    Navigator.of(context).pop();
                     Navigator.of(context).push(MaterialPageRoute(builder: (context) => SearchView()));
                   },
                   title: Text('All Recipes'),
@@ -40,6 +40,7 @@ class HomeView extends StatelessWidget {
                 ListTile(
                   leading: Icon(Icons.menu_book_outlined),
                   onTap: () async {
+                    Navigator.of(context).pop();
                     Navigator.of(context).push(MaterialPageRoute(builder: (context) => BooksView()));
                   },
                   title: Text('Recipe Books'),
@@ -47,6 +48,7 @@ class HomeView extends StatelessWidget {
                 ListTile(
                   leading: Icon(Icons.account_circle_outlined),
                   onTap: () async {
+                    Navigator.of(context).pop();
                     Navigator.of(context).pushNamed('/profile');
                   },
                   title: Text('Account'),
@@ -109,11 +111,11 @@ class HomeView extends StatelessWidget {
                               // Unfocus keyboard
                               FocusScope.of(context).unfocus();
                               String url = model.urlController.text;
-                              recipesService.loadRecipe(url);
                               searchService.setUrl(url);
-                              recipesService.setErrorLoadingRecipe(false);
                               Navigator.of(context).push(MaterialPageRoute(
-                                builder: (context) => RecipePreviewView(),
+                                builder: (context) => RecipePreviewView(
+                                  url: url,
+                                ),
                               ));
                             },
                           )),
@@ -132,7 +134,6 @@ class HomeView extends StatelessWidget {
                             String url = data.text!;
                             model.urlController.text = url;
                             searchService.setUrl(url);
-                            recipesService.setErrorLoadingRecipe(false);
                           }
                         },
                         label: Text(

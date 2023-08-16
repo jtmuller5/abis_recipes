@@ -15,10 +15,8 @@ import 'package:injectable/injectable.dart' as _i2;
 import '../features/books/services/book_service.dart' as _i4;
 import '../features/books/services/current_recipe_service.dart' as _i6;
 import '../features/books/services/firestore_book_service.dart' as _i5;
-import '../features/books/ui/recipe_page/recipe_view_model.dart' as _i7;
 import '../features/home/services/app_service.dart' as _i3;
-import '../features/home/services/search_service.dart' as _i9;
-import '../features/recipes/services/recipes_service.dart' as _i8;
+import '../features/home/services/search_service.dart' as _i7;
 
 // ignore_for_file: unnecessary_lambdas
 // ignore_for_file: lines_longer_than_80_chars
@@ -36,8 +34,6 @@ _i1.GetIt $initGetIt(
   gh.singleton<_i3.AppService>(_i3.AppService());
   gh.lazySingleton<_i4.BookService>(() => _i5.FirestoreBookService());
   gh.lazySingleton<_i6.CurrentRecipeService>(() => _i6.CurrentRecipeService());
-  gh.lazySingleton<_i7.RecipeViewModel>(() => _i7.RecipeViewModel());
-  gh.lazySingleton<_i8.RecipesService>(() => _i8.RecipesService());
-  gh.lazySingleton<_i9.SearchService>(() => _i9.SearchService());
+  gh.lazySingleton<_i7.SearchService>(() => _i7.SearchService());
   return getIt;
 }

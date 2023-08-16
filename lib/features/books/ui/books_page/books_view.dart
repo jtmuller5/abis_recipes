@@ -49,7 +49,7 @@ class BooksView extends StatelessWidget {
                                       )),
                                 ),
                                 title: Text(book.title),
-                                subtitle: Text('${snapshot.data!.length} recipes'),
+                                subtitle: Text('${book.recipeCount ?? 0} recipes'),
                                 onTap: () {
                                   Navigator.of(context).push(MaterialPageRoute(builder: (context) => BookView(bookId: book.bookId)));
                                 },
@@ -140,6 +140,7 @@ class BooksView extends StatelessWidget {
                                                 description: null,
                                                 url: null,
                                                 lastRecipe: null,
+                                                recipeCount: 0,
                                               ));
 
                                               Navigator.of(context).pop();

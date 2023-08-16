@@ -48,7 +48,7 @@ class RecipeHeader extends StatelessWidget {
               GestureDetector(
                 onTap: () async {
                   // Copy to clipboard
-                  await Clipboard.setData(ClipboardData(text: url));
+                 //  await Clipboard.setData(ClipboardData(text: url));
                   Navigator.of(context).push(MaterialPageRoute(builder: (context) => BrowserView(url: url),));
                 },
                 child: SingleChildScrollView(

@@ -14,7 +14,8 @@ class Book with _$Book {
     required String bookId,
     required String? description,
     required DateTime dateCreated,
-    required Recipe? lastRecipe
+    required Recipe? lastRecipe,
+    required int? recipeCount,
   }) = _Book;
 
 

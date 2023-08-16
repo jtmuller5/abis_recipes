@@ -2,7 +2,7 @@ import 'package:abis_recipes/app/constants.dart';
 import 'package:abis_recipes/app/services.dart';
 import 'package:abis_recipes/features/books/models/book.dart';
 import 'package:abis_recipes/features/books/models/recipe.dart';
-import 'package:abis_recipes/features/recipes/services/recipes_service.dart';
+import 'package:abis_recipes/features/books/ui/recipe_view/recipe_view_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -91,6 +91,7 @@ class BookView extends StatelessWidget with GetItMixin {
                                           url: updatedBook.url,
                                           description: '',
                                           lastRecipe: updatedBook.lastRecipe,
+                                          recipeCount: updatedBook.recipeCount,
                                         );
                                         bookService.updateBook(newBook);
 
@@ -169,7 +170,7 @@ class BookView extends StatelessWidget with GetItMixin {
                               title: Text(recipe.title ?? 'No title'),
                               subtitle: Text(recipe.description ?? ''),
                               onTap: () {
-                                RecipesService.navigateToRecipe(recipe, context);
+                                RecipeViewModel.navigateToRecipe(recipe, context);
                               },
                               onLongPress: () async {
                                 Rect? rect;
@@ -198,8 +199,7 @@ class BookView extends StatelessWidget with GetItMixin {
                                       await bookService.removeRecipeFromBook(recipe, bookId);
                                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Recipe removed from book')));
                                     } else if (value == 'delete') {
-                                      currentRecipeService.updateRecipe(recipe);
-                                      await currentRecipeService.deleteRecipe(recipe.recipeId);
+                                      await RecipeViewModel.deleteRecipe(recipe.recipeId);
                                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Recipe deleted')));
                                     }
                                   }

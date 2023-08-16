@@ -1,6 +1,6 @@
 import 'package:abis_recipes/app/get_it.dart';
 import 'package:abis_recipes/app/services.dart';
-import 'package:abis_recipes/features/books/ui/recipe_page/recipe_view.dart';
+import 'package:abis_recipes/features/books/ui/recipe_preview_view/recipe_preview_view.dart';
 import 'package:abis_recipes/features/home/ui/home_view.dart';
 import 'package:abis_recipes/features/shared/ui/app_name.dart';
 import 'package:abis_recipes/firebase_options.dart';
@@ -132,8 +132,9 @@ class _MyAppState extends State<MyApp> {
 
       if (value != null && checkValidUrl(value.toString())) {
         searchService.setUrl(value.toString());
-        recipesService.loadRecipe(value.toString());
-        Navigator.of(navigatorKey.currentContext!).push(MaterialPageRoute(builder: (context) => RecipeView()));
+        Navigator.of(navigatorKey.currentContext!).push(MaterialPageRoute(builder: (context) => RecipePreviewView(
+          url: value.toString(),
+        )));
       }
     }).onError((error, stackTrace) {
       print("getInitialSharing error: $error");
@@ -146,8 +147,9 @@ class _MyAppState extends State<MyApp> {
       debugPrint('value.path: ' + value.path);
       if (value.path.isNotEmpty && checkValidUrl(value.toString())) {
         searchService.setUrl(value.toString());
-        recipesService.loadRecipe(value.toString());
-        Navigator.of(navigatorKey.currentContext!).push(MaterialPageRoute(builder: (context) => RecipeView()));
+        Navigator.of(navigatorKey.currentContext!).push(MaterialPageRoute(builder: (context) => RecipePreviewView(
+          url: value.toString(),
+        )));
       }
     }, onError: (err) {
       print("getTextStreamAsUri error: $err");

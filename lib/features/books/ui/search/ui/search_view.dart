@@ -1,5 +1,5 @@
 import 'package:abis_recipes/features/books/models/recipe.dart';
-import 'package:abis_recipes/features/recipes/services/recipes_service.dart';
+import 'package:abis_recipes/features/books/ui/recipe_view/recipe_view_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -29,6 +29,7 @@ class SearchView extends StatelessWidget {
               ),
             ),
           ),*/
+          //https://addapinch.com/the-best-chocolate-cake-recipe-ever/
           StreamBuilder<List<Recipe>>(
               stream: FirebaseFirestore.instance.collection('users').doc(FirebaseAuth.instance.currentUser?.uid).collection('recipes').snapshots().map((event) {
                 return event.docs.map((e) => Recipe.fromJson(e.data())).toList();
@@ -64,7 +65,7 @@ class SearchView extends StatelessWidget {
                         title: Text(recipe.title ?? ''),
                         subtitle: Text(''),
                         onTap: () {
-                          RecipesService.navigateToRecipe(recipe, context);
+                          RecipeViewModel.navigateToRecipe(recipe, context);
                         },
                       );
                     },
