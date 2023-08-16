@@ -1,4 +1,5 @@
 import 'package:abis_recipes/app/constants.dart';
+import 'package:abis_recipes/app/router.dart';
 import 'package:abis_recipes/app/services.dart';
 import 'package:abis_recipes/features/books/models/book.dart';
 import 'package:abis_recipes/features/books/models/recipe.dart';
@@ -71,7 +72,7 @@ class BookView extends StatelessWidget with GetItMixin {
                                   actions: [
                                     TextButton(
                                       onPressed: () {
-                                        Navigator.of(context).pop(false);
+                                        router.pop(false);
                                       },
                                       child: Text('Cancel'),
                                     ),
@@ -96,7 +97,7 @@ class BookView extends StatelessWidget with GetItMixin {
                                         bookService.updateBook(newBook);
 
                                         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Book renamed')));
-                                        Navigator.of(context).pop(true);
+                                        router.pop(true);
                                       },
                                       child: Text('Rename'),
                                     ),
@@ -114,7 +115,7 @@ class BookView extends StatelessWidget with GetItMixin {
                                   actions: [
                                     TextButton(
                                       onPressed: () {
-                                        Navigator.of(context).pop();
+                                        router.pop();
                                       },
                                       child: Text('Cancel'),
                                     ),
@@ -122,8 +123,8 @@ class BookView extends StatelessWidget with GetItMixin {
                                       onPressed: () async {
                                         bookService.deleteBook(book!);
                                         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Book deleted')));
-                                        Navigator.of(context).pop();
-                                        Navigator.of(context).pop();
+                                        router.pop();
+                                        router.pop();
                                       },
                                       child: Text('Delete'),
                                     ),

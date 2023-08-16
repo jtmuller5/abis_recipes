@@ -1,4 +1,5 @@
 import 'package:abis_recipes/app/get_it.dart';
+import 'package:abis_recipes/app/router.dart';
 import 'package:abis_recipes/app/services.dart';
 import 'package:abis_recipes/features/books/ui/recipe_preview_view/recipe_preview_view.dart';
 import 'package:abis_recipes/features/home/ui/home_view.dart';
@@ -30,8 +31,6 @@ await configureDependencies();
   runApp(const MyApp());
 }
 
-GlobalObjectKey<NavigatorState> navigatorKey = GlobalObjectKey<NavigatorState>(NavigatorState());
-
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
@@ -48,12 +47,10 @@ class _MyAppState extends State<MyApp> {
       statusBarIconBrightness: Brightness.dark,
     ));
 
-    final providers = [EmailAuthProvider()];
-
-    return MaterialApp(
+    return MaterialApp.router(
       title: 'Abi\'s Recipes',
       debugShowCheckedModeBanner: false,
-      navigatorKey: navigatorKey,
+      routerConfig: router,
       theme: ThemeData(
         useMaterial3: true,
         colorScheme: flexSchemeLight,
@@ -88,38 +85,6 @@ class _MyAppState extends State<MyApp> {
           ),
         ),
       ),
-      initialRoute: FirebaseAuth.instance.currentUser == null ? '/sign-in' : '/',
-      routes: {
-        '/': (context) {
-          return HomeView();
-        },
-        '/sign-in': (context) {
-          return SignInScreen(
-            providers: providers,
-            headerBuilder: (context, constraints, shrinkOffset) {
-              return SizedBox(
-                height: 200,
-                child: AppName(),
-              );
-            },
-            actions: [
-              AuthStateChangeAction<SignedIn>((context, state) {
-                Navigator.pushReplacementNamed(context, '/');
-              }),
-            ],
-          );
-        },
-        '/profile': (context) {
-          return ProfileScreen(
-            providers: providers,
-            actions: [
-              SignedOutAction((context) {
-                Navigator.pushReplacementNamed(context, '/sign-in');
-              }),
-            ],
-          );
-        },
-      },
     );
   }
 
@@ -132,9 +97,7 @@ class _MyAppState extends State<MyApp> {
 
       if (value != null && checkValidUrl(value.toString())) {
         searchService.setUrl(value.toString());
-        Navigator.of(navigatorKey.currentContext!).push(MaterialPageRoute(builder: (context) => RecipePreviewView(
-          url: value.toString(),
-        )));
+        router.push(Uri(path: '/recipe-preview', queryParameters: {'url': value.toString()}).toString());
       }
     }).onError((error, stackTrace) {
       print("getInitialSharing error: $error");
@@ -147,9 +110,8 @@ class _MyAppState extends State<MyApp> {
       debugPrint('value.path: ' + value.path);
       if (value.path.isNotEmpty && checkValidUrl(value.toString())) {
         searchService.setUrl(value.toString());
-        Navigator.of(navigatorKey.currentContext!).push(MaterialPageRoute(builder: (context) => RecipePreviewView(
-          url: value.toString(),
-        )));
+        router.push(Uri(path: '/recipe-preview', queryParameters: {'url': value.toString()}).toString());
+
       }
     }, onError: (err) {
       print("getTextStreamAsUri error: $err");

@@ -29,6 +29,8 @@ mixin _$Recipe {
   List<Ingredient>? get ingredients => throw _privateConstructorUsedError;
   List<Instruction>? get instructions => throw _privateConstructorUsedError;
   List<String> get bookIds => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: getDateTimeFromTimestamp, toJson: getTimestampFromDateTime)
+  DateTime? get createdAt => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -49,7 +51,10 @@ abstract class $RecipeCopyWith<$Res> {
       List<String>? images,
       List<Ingredient>? ingredients,
       List<Instruction>? instructions,
-      List<String> bookIds});
+      List<String> bookIds,
+      @JsonKey(
+          fromJson: getDateTimeFromTimestamp, toJson: getTimestampFromDateTime)
+      DateTime? createdAt});
 }
 
 /// @nodoc
@@ -74,6 +79,7 @@ class _$RecipeCopyWithImpl<$Res, $Val extends Recipe>
     Object? ingredients = freezed,
     Object? instructions = freezed,
     Object? bookIds = null,
+    Object? createdAt = freezed,
   }) {
     return _then(_value.copyWith(
       recipeId: null == recipeId
@@ -112,6 +118,10 @@ class _$RecipeCopyWithImpl<$Res, $Val extends Recipe>
           ? _value.bookIds
           : bookIds // ignore: cast_nullable_to_non_nullable
               as List<String>,
+      createdAt: freezed == createdAt
+          ? _value.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
     ) as $Val);
   }
 }
@@ -131,7 +141,10 @@ abstract class _$$_RecipeCopyWith<$Res> implements $RecipeCopyWith<$Res> {
       List<String>? images,
       List<Ingredient>? ingredients,
       List<Instruction>? instructions,
-      List<String> bookIds});
+      List<String> bookIds,
+      @JsonKey(
+          fromJson: getDateTimeFromTimestamp, toJson: getTimestampFromDateTime)
+      DateTime? createdAt});
 }
 
 /// @nodoc
@@ -153,6 +166,7 @@ class __$$_RecipeCopyWithImpl<$Res>
     Object? ingredients = freezed,
     Object? instructions = freezed,
     Object? bookIds = null,
+    Object? createdAt = freezed,
   }) {
     return _then(_$_Recipe(
       recipeId: null == recipeId
@@ -191,6 +205,10 @@ class __$$_RecipeCopyWithImpl<$Res>
           ? _value._bookIds
           : bookIds // ignore: cast_nullable_to_non_nullable
               as List<String>,
+      createdAt: freezed == createdAt
+          ? _value.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
     ));
   }
 }
@@ -207,7 +225,10 @@ class _$_Recipe implements _Recipe {
       required final List<String>? images,
       required final List<Ingredient>? ingredients,
       required final List<Instruction>? instructions,
-      required final List<String> bookIds})
+      required final List<String> bookIds,
+      @JsonKey(
+          fromJson: getDateTimeFromTimestamp, toJson: getTimestampFromDateTime)
+      required this.createdAt})
       : _images = images,
         _ingredients = ingredients,
         _instructions = instructions,
@@ -265,8 +286,12 @@ class _$_Recipe implements _Recipe {
   }
 
   @override
+  @JsonKey(fromJson: getDateTimeFromTimestamp, toJson: getTimestampFromDateTime)
+  final DateTime? createdAt;
+
+  @override
   String toString() {
-    return 'Recipe(recipeId: $recipeId, url: $url, title: $title, coverImage: $coverImage, description: $description, images: $images, ingredients: $ingredients, instructions: $instructions, bookIds: $bookIds)';
+    return 'Recipe(recipeId: $recipeId, url: $url, title: $title, coverImage: $coverImage, description: $description, images: $images, ingredients: $ingredients, instructions: $instructions, bookIds: $bookIds, createdAt: $createdAt)';
   }
 
   @override
@@ -287,7 +312,9 @@ class _$_Recipe implements _Recipe {
                 .equals(other._ingredients, _ingredients) &&
             const DeepCollectionEquality()
                 .equals(other._instructions, _instructions) &&
-            const DeepCollectionEquality().equals(other._bookIds, _bookIds));
+            const DeepCollectionEquality().equals(other._bookIds, _bookIds) &&
+            (identical(other.createdAt, createdAt) ||
+                other.createdAt == createdAt));
   }
 
   @JsonKey(ignore: true)
@@ -302,7 +329,8 @@ class _$_Recipe implements _Recipe {
       const DeepCollectionEquality().hash(_images),
       const DeepCollectionEquality().hash(_ingredients),
       const DeepCollectionEquality().hash(_instructions),
-      const DeepCollectionEquality().hash(_bookIds));
+      const DeepCollectionEquality().hash(_bookIds),
+      createdAt);
 
   @JsonKey(ignore: true)
   @override
@@ -328,7 +356,10 @@ abstract class _Recipe implements Recipe {
       required final List<String>? images,
       required final List<Ingredient>? ingredients,
       required final List<Instruction>? instructions,
-      required final List<String> bookIds}) = _$_Recipe;
+      required final List<String> bookIds,
+      @JsonKey(
+          fromJson: getDateTimeFromTimestamp, toJson: getTimestampFromDateTime)
+      required final DateTime? createdAt}) = _$_Recipe;
 
   factory _Recipe.fromJson(Map<String, dynamic> json) = _$_Recipe.fromJson;
 
@@ -350,6 +381,9 @@ abstract class _Recipe implements Recipe {
   List<Instruction>? get instructions;
   @override
   List<String> get bookIds;
+  @override
+  @JsonKey(fromJson: getDateTimeFromTimestamp, toJson: getTimestampFromDateTime)
+  DateTime? get createdAt;
   @override
   @JsonKey(ignore: true)
   _$$_RecipeCopyWith<_$_Recipe> get copyWith =>

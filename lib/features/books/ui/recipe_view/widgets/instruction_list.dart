@@ -1,4 +1,4 @@
-import 'package:abis_recipes/app/services.dart';
+import 'package:abis_recipes/app/router.dart';
 import 'package:abis_recipes/features/books/models/gpt_message.dart';
 import 'package:abis_recipes/features/books/models/instruction.dart';
 import 'package:abis_recipes/features/books/models/note.dart';
@@ -129,11 +129,11 @@ class _InstructionTileState extends State<InstructionTile> {
                             actions: [
                               TextButton(
                                 child: Text('Cancel'),
-                                onPressed: () => Navigator.of(context).pop(),
+                                onPressed: () => router.pop(),
                               ),
                               TextButton(
                                 child: Text('Save'),
-                                onPressed: () => Navigator.of(context).pop(noteController.text),
+                                onPressed: () => router.pop(noteController.text),
                               ),
                             ],
                           );
@@ -191,7 +191,7 @@ class _InstructionTileState extends State<InstructionTile> {
                                     actions: [
                                       TextButton(
                                         onPressed: (){
-                                          Navigator.of(context).pop();
+                                          router.pop();
                                         },
                                         child: Text('Close'),
                                       )

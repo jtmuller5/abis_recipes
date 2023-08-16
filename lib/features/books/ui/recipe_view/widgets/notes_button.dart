@@ -1,3 +1,4 @@
+import 'package:abis_recipes/app/router.dart';
 import 'package:abis_recipes/app/services.dart';
 import 'package:abis_recipes/features/books/models/ingredient.dart';
 import 'package:abis_recipes/features/books/models/instruction.dart';
@@ -66,7 +67,7 @@ class NotesButton extends StatelessWidget {
 
                                   model.updateIngredient(updatedIngredient, recipe!);
 
-                                  Navigator.pop(context);
+                                  router.pop(context);
                                 },
                               ),
                             );
@@ -98,7 +99,7 @@ class NotesButton extends StatelessWidget {
 
                                   model.updateInstruction(updatedInstruction, recipe);
 
-                                  Navigator.pop(context);
+                                  router.pop(context);
                                 },
                               ),
                             );

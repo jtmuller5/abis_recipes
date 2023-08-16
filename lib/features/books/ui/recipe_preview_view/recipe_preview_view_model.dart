@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 
+import 'package:abis_recipes/app/router.dart';
 import 'package:abis_recipes/features/books/models/ingredient.dart';
 import 'package:abis_recipes/features/books/models/instruction.dart';
 import 'package:abis_recipes/features/books/models/note.dart';
@@ -37,7 +38,16 @@ class RecipePreviewViewModel extends ViewModel<RecipePreviewViewModel> {
 
   @override
   void initState() {
-    loadRecipe(url);
+    loadingRecipe.value = true;
+
+    FirebaseFirestore.instance.collection('users').doc(FirebaseAuth.instance.currentUser?.uid).collection('recipes').where('url', isEqualTo: url).get().then((value) {
+      if (value.docs.isNotEmpty) {
+        router.replace('/recipe/${value.docs.first.id}');
+        loadingRecipe.value = false;
+      } else {
+        loadRecipe(url);
+      }
+    });
     super.initState();
   }
 
@@ -82,8 +92,7 @@ class RecipePreviewViewModel extends ViewModel<RecipePreviewViewModel> {
   }
 
   static List<Ingredient> getIngredientsWithNotes(Recipe? recipe) {
-
-    if(recipe == null) return [];
+    if (recipe == null) return [];
     List<Ingredient> ingredients = [];
 
     recipe.ingredients?.forEach((ingredient) {
@@ -96,8 +105,7 @@ class RecipePreviewViewModel extends ViewModel<RecipePreviewViewModel> {
   }
 
   static List<Instruction> getInstructionsWithNotes(Recipe? recipe) {
-
-    if(recipe == null) return [];
+    if (recipe == null) return [];
     List<Instruction> instructions = [];
 
     recipe.instructions?.forEach((instruction) {
@@ -121,6 +129,7 @@ class RecipePreviewViewModel extends ViewModel<RecipePreviewViewModel> {
       description: null,
       images: [],
       title: null,
+      createdAt: DateTime.now(),
     ));
   }
 
@@ -146,7 +155,6 @@ class RecipePreviewViewModel extends ViewModel<RecipePreviewViewModel> {
   }
 
   void removeIngredient(Ingredient ingredient) => setRecipe(recipe.value!.copyWith(ingredients: [...recipe.value!.ingredients!]..remove(ingredient)));
-
 
   Future<void> loadRecipe(url) async {
     loadingRecipe.value = true;

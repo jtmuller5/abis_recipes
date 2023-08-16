@@ -24,7 +24,8 @@ mixin _$Book {
   String get title => throw _privateConstructorUsedError;
   String get bookId => throw _privateConstructorUsedError;
   String? get description => throw _privateConstructorUsedError;
-  DateTime get dateCreated => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: getDateTimeFromTimestamp, toJson: getTimestampFromDateTime)
+  DateTime? get dateCreated => throw _privateConstructorUsedError;
   Recipe? get lastRecipe => throw _privateConstructorUsedError;
   int? get recipeCount => throw _privateConstructorUsedError;
 
@@ -43,7 +44,9 @@ abstract class $BookCopyWith<$Res> {
       String title,
       String bookId,
       String? description,
-      DateTime dateCreated,
+      @JsonKey(
+          fromJson: getDateTimeFromTimestamp, toJson: getTimestampFromDateTime)
+      DateTime? dateCreated,
       Recipe? lastRecipe,
       int? recipeCount});
 
@@ -67,7 +70,7 @@ class _$BookCopyWithImpl<$Res, $Val extends Book>
     Object? title = null,
     Object? bookId = null,
     Object? description = freezed,
-    Object? dateCreated = null,
+    Object? dateCreated = freezed,
     Object? lastRecipe = freezed,
     Object? recipeCount = freezed,
   }) {
@@ -88,10 +91,10 @@ class _$BookCopyWithImpl<$Res, $Val extends Book>
           ? _value.description
           : description // ignore: cast_nullable_to_non_nullable
               as String?,
-      dateCreated: null == dateCreated
+      dateCreated: freezed == dateCreated
           ? _value.dateCreated
           : dateCreated // ignore: cast_nullable_to_non_nullable
-              as DateTime,
+              as DateTime?,
       lastRecipe: freezed == lastRecipe
           ? _value.lastRecipe
           : lastRecipe // ignore: cast_nullable_to_non_nullable
@@ -127,7 +130,9 @@ abstract class _$$_BookCopyWith<$Res> implements $BookCopyWith<$Res> {
       String title,
       String bookId,
       String? description,
-      DateTime dateCreated,
+      @JsonKey(
+          fromJson: getDateTimeFromTimestamp, toJson: getTimestampFromDateTime)
+      DateTime? dateCreated,
       Recipe? lastRecipe,
       int? recipeCount});
 
@@ -148,7 +153,7 @@ class __$$_BookCopyWithImpl<$Res> extends _$BookCopyWithImpl<$Res, _$_Book>
     Object? title = null,
     Object? bookId = null,
     Object? description = freezed,
-    Object? dateCreated = null,
+    Object? dateCreated = freezed,
     Object? lastRecipe = freezed,
     Object? recipeCount = freezed,
   }) {
@@ -169,10 +174,10 @@ class __$$_BookCopyWithImpl<$Res> extends _$BookCopyWithImpl<$Res, _$_Book>
           ? _value.description
           : description // ignore: cast_nullable_to_non_nullable
               as String?,
-      dateCreated: null == dateCreated
+      dateCreated: freezed == dateCreated
           ? _value.dateCreated
           : dateCreated // ignore: cast_nullable_to_non_nullable
-              as DateTime,
+              as DateTime?,
       lastRecipe: freezed == lastRecipe
           ? _value.lastRecipe
           : lastRecipe // ignore: cast_nullable_to_non_nullable
@@ -193,6 +198,8 @@ class _$_Book extends _Book with DiagnosticableTreeMixin {
       required this.title,
       required this.bookId,
       required this.description,
+      @JsonKey(
+          fromJson: getDateTimeFromTimestamp, toJson: getTimestampFromDateTime)
       required this.dateCreated,
       required this.lastRecipe,
       required this.recipeCount})
@@ -209,7 +216,8 @@ class _$_Book extends _Book with DiagnosticableTreeMixin {
   @override
   final String? description;
   @override
-  final DateTime dateCreated;
+  @JsonKey(fromJson: getDateTimeFromTimestamp, toJson: getTimestampFromDateTime)
+  final DateTime? dateCreated;
   @override
   final Recipe? lastRecipe;
   @override
@@ -277,7 +285,9 @@ abstract class _Book extends Book {
       required final String title,
       required final String bookId,
       required final String? description,
-      required final DateTime dateCreated,
+      @JsonKey(
+          fromJson: getDateTimeFromTimestamp, toJson: getTimestampFromDateTime)
+      required final DateTime? dateCreated,
       required final Recipe? lastRecipe,
       required final int? recipeCount}) = _$_Book;
   const _Book._() : super._();
@@ -293,7 +303,8 @@ abstract class _Book extends Book {
   @override
   String? get description;
   @override
-  DateTime get dateCreated;
+  @JsonKey(fromJson: getDateTimeFromTimestamp, toJson: getTimestampFromDateTime)
+  DateTime? get dateCreated;
   @override
   Recipe? get lastRecipe;
   @override

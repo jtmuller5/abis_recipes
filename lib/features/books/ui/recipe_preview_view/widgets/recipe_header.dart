@@ -1,7 +1,6 @@
 import 'package:abis_recipes/app/constants.dart';
-import 'package:abis_recipes/features/shared/ui/browser/browser_view.dart';
+import 'package:abis_recipes/app/router.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 class RecipeHeader extends StatelessWidget {
   const RecipeHeader(
@@ -49,7 +48,7 @@ class RecipeHeader extends StatelessWidget {
                 onTap: () async {
                   // Copy to clipboard
                  //  await Clipboard.setData(ClipboardData(text: url));
-                  Navigator.of(context).push(MaterialPageRoute(builder: (context) => BrowserView(url: url),));
+                  router.push('/browser?url=$url');
                 },
                 child: SingleChildScrollView(
                   scrollDirection: Axis.horizontal,

@@ -1,4 +1,5 @@
 import 'package:abis_recipes/features/books/models/recipe.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:flutter/foundation.dart';
 
@@ -13,7 +14,10 @@ class Book with _$Book {
     required String title,
     required String bookId,
     required String? description,
-    required DateTime dateCreated,
+
+
+    @JsonKey(fromJson: getDateTimeFromTimestamp, toJson: getTimestampFromDateTime)
+    required DateTime? dateCreated,
     required Recipe? lastRecipe,
     required int? recipeCount,
   }) = _Book;

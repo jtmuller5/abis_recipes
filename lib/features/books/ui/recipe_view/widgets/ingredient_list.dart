@@ -1,3 +1,4 @@
+import 'package:abis_recipes/app/router.dart';
 import 'package:abis_recipes/features/books/models/ingredient.dart';
 import 'package:abis_recipes/features/books/models/note.dart';
 import 'package:abis_recipes/features/books/models/recipe.dart';
@@ -52,7 +53,7 @@ class IngredientList extends StatelessWidget  {
                               actions: [
                                 TextButton(
                                   onPressed: (){
-                                    Navigator.of(context).pop();
+                                    router.pop();
                                   },
                                   child: Text('Close'),
                                 )
@@ -99,11 +100,11 @@ class IngredientList extends StatelessWidget  {
                                     actions: [
                                       TextButton(
                                         child: Text('Cancel'),
-                                        onPressed: () => Navigator.of(context).pop(),
+                                        onPressed: () => router.pop(),
                                       ),
                                       TextButton(
                                         child: Text('Save'),
-                                        onPressed: () => Navigator.of(context).pop(noteController.text),
+                                        onPressed: () => router.pop(noteController.text),
                                       ),
                                     ],
                                   );

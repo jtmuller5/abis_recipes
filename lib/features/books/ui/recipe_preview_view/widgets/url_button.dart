@@ -1,3 +1,4 @@
+import 'package:abis_recipes/app/router.dart';
 import 'package:abis_recipes/app/services.dart';
 import 'package:abis_recipes/features/shared/ui/browser/browser_view.dart';
 import 'package:flutter/material.dart';
@@ -23,9 +24,7 @@ class UrlButton extends StatelessWidget {
         child: TextButton(
           onPressed: () async {
             await Clipboard.setData(ClipboardData(text: url));
-            Navigator.of(context).push(MaterialPageRoute(
-              builder: (context) => BrowserView(url:url),
-            ));
+            router.push('/browser?url=$url');
           },
           child: Text('See the page'),
         ),

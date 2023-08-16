@@ -22,6 +22,7 @@ _$_Recipe _$$_RecipeFromJson(Map<String, dynamic> json) => _$_Recipe(
           .toList(),
       bookIds:
           (json['bookIds'] as List<dynamic>).map((e) => e as String).toList(),
+      createdAt: getDateTimeFromTimestamp(json['createdAt'] as Timestamp?),
     );
 
 Map<String, dynamic> _$$_RecipeToJson(_$_Recipe instance) => <String, dynamic>{
@@ -34,4 +35,5 @@ Map<String, dynamic> _$$_RecipeToJson(_$_Recipe instance) => <String, dynamic>{
       'ingredients': instance.ingredients?.map((e) => e.toJson()).toList(),
       'instructions': instance.instructions?.map((e) => e.toJson()).toList(),
       'bookIds': instance.bookIds,
+      'createdAt': getTimestampFromDateTime(instance.createdAt),
     };

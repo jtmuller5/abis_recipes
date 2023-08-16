@@ -1,11 +1,10 @@
 import 'package:abis_recipes/app/constants.dart';
+import 'package:abis_recipes/app/router.dart';
 import 'package:abis_recipes/app/services.dart';
 import 'package:abis_recipes/features/books/models/book.dart';
 import 'package:abis_recipes/features/books/models/ingredient.dart';
 import 'package:abis_recipes/features/books/models/instruction.dart';
 import 'package:abis_recipes/features/books/models/recipe.dart';
-import 'package:abis_recipes/features/books/ui/recipe_preview_view/widgets/preview_ingredient_list.dart';
-import 'package:abis_recipes/features/books/ui/recipe_preview_view/widgets/preview_instruction_list.dart';
 import 'package:abis_recipes/features/books/ui/recipe_view/widgets/ingredient_list.dart';
 import 'package:abis_recipes/features/books/ui/recipe_view/widgets/instruction_list.dart';
 import 'package:abis_recipes/features/books/ui/recipe_view/widgets/notes_button.dart';
@@ -128,7 +127,7 @@ class RecipeView extends StatelessWidget {
                                                           children: [
                                                             TextButton(
                                                                 onPressed: () {
-                                                                  Navigator.of(context).pop();
+                                                                  router.pop();
                                                                 },
                                                                 child: Text('Cancel')),
                                                             gap16,
@@ -145,6 +144,7 @@ class RecipeView extends StatelessWidget {
                                                                       instructions: recipe?.instructions?.map((e) => Instruction(text: e.text)).toList(),
                                                                       url: recipe?.url,
                                                                       recipeId: recipe!.recipeId,
+                                                                      createdAt: recipe.createdAt ?? DateTime.now(),
                                                                     );
 
                                                                     bookService.checkedBooks.value.forEach((bookId) {
@@ -153,7 +153,7 @@ class RecipeView extends StatelessWidget {
 
                                                                     model.updateRecipe(newRecipe);
                                                                   }
-                                                                  Navigator.of(context).pop();
+                                                                  router.pop();
                                                                 },
                                                                 child: Text('Save'))
                                                           ],
@@ -195,9 +195,9 @@ class RecipeView extends StatelessWidget {
                                               if (value == 'delete') {
                                                 if (recipe != null) {
                                                   await RecipeViewModel.deleteRecipe(recipe.recipeId);
-                                                  Navigator.pop(context);
+                                                  router.pop();
                                                 }
-                                                Navigator.of(context).pop();
+                                                router.pop();
                                               }
                                             }
                                           }

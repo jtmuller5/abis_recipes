@@ -1,8 +1,8 @@
 import 'package:abis_recipes/app/constants.dart';
+import 'package:abis_recipes/app/router.dart';
 import 'package:abis_recipes/app/services.dart';
 import 'package:abis_recipes/features/books/models/book.dart';
-import 'package:abis_recipes/features/books/ui/book_view/book_view.dart';
-import 'package:abis_recipes/features/books/ui/books_page/books_view_model.dart';
+import 'package:abis_recipes/features/books/ui/books_view/books_view_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -51,7 +51,7 @@ class BooksView extends StatelessWidget {
                                 title: Text(book.title),
                                 subtitle: Text('${book.recipeCount ?? 0} recipes'),
                                 onTap: () {
-                                  Navigator.of(context).push(MaterialPageRoute(builder: (context) => BookView(bookId: book.bookId)));
+                                  router.push('/book/${book.bookId}');
                                 },
                               );
                             },
@@ -127,7 +127,7 @@ class BooksView extends StatelessWidget {
                                       children: [
                                         TextButton(
                                             onPressed: () {
-                                              Navigator.of(context).pop();
+                                              router.pop();
                                             },
                                             child: Text('Cancel')),
                                         gap16,
@@ -143,7 +143,7 @@ class BooksView extends StatelessWidget {
                                                 recipeCount: 0,
                                               ));
 
-                                              Navigator.of(context).pop();
+                                              router.pop();
                                             },
                                             child: Text('Save'))
                                       ],

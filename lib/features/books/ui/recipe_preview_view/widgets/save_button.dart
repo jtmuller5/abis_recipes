@@ -1,6 +1,6 @@
+import 'package:abis_recipes/app/router.dart';
 import 'package:abis_recipes/features/books/models/recipe.dart';
 import 'package:abis_recipes/features/books/ui/recipe_preview_view/recipe_preview_view_model.dart';
-import 'package:abis_recipes/features/books/ui/recipe_view/recipe_view.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:code_on_the_rocks/code_on_the_rocks.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -11,7 +11,6 @@ class SaveButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     RecipePreviewViewModel model = getModel<RecipePreviewViewModel>(context);
     return ValueListenableBuilder(
       valueListenable: model.errorLoadingRecipe,
@@ -35,13 +34,8 @@ class SaveButton extends StatelessWidget {
                       SnackBar(content: Text('Recipe saved!')),
                     );
 
-                    Navigator.of(context).pushReplacement(MaterialPageRoute(
-                      builder: (context) {
-                        return RecipeView(
-                          id: ref.id
-                        );
-                      },
-                    ));
+                    router.pushReplacement('/recipe/${ref.id}');
+
                     /* bool save = await showModalBottomSheet<bool>(
                           context: context,
                           builder: (context) {

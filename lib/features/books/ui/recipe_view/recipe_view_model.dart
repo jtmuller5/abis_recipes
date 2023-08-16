@@ -1,3 +1,4 @@
+import 'package:abis_recipes/app/router.dart';
 import 'package:abis_recipes/features/books/models/ingredient.dart';
 import 'package:abis_recipes/features/books/models/instruction.dart';
 import 'package:abis_recipes/features/books/models/recipe.dart';
@@ -28,7 +29,7 @@ class RecipeViewModel extends ViewModel<RecipeViewModel> {
   }
 
   static void navigateToRecipe(Recipe recipe, BuildContext context) {
-    Navigator.of(context).push(MaterialPageRoute(builder: (context) => RecipeView(id: recipe.recipeId,)));
+    router.push(Uri.parse('/recipe/${recipe.recipeId}').toString());
   }
 
   Future<void> updateInstruction(Instruction instruction, Recipe? recipe) async {

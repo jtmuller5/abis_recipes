@@ -1,4 +1,5 @@
 import 'package:abis_recipes/app/constants.dart';
+import 'package:abis_recipes/app/router.dart';
 import 'package:abis_recipes/features/books/ui/recipe_preview_view/recipe_preview_view_model.dart';
 import 'package:abis_recipes/features/books/ui/recipe_preview_view/widgets/url_button.dart';
 import 'package:code_on_the_rocks/code_on_the_rocks.dart';
@@ -77,7 +78,7 @@ class RecipeError extends StatelessWidget {
             ],
             child: TextButton(
               onPressed: () async {
-                Navigator.of(context).pop();
+                router.pop();
               },
               child: Text(
                 'Go back',

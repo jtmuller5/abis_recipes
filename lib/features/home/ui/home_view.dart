@@ -1,14 +1,13 @@
 import 'package:abis_recipes/app/constants.dart';
 import 'package:abis_recipes/app/services.dart';
-import 'package:abis_recipes/features/books/ui/books_page/books_view.dart';
-import 'package:abis_recipes/features/books/ui/recipe_preview_view/recipe_preview_view.dart';
-import 'package:abis_recipes/features/books/ui/search/ui/search_view.dart';
 import 'package:abis_recipes/features/home/ui/widgets/bake_mode_button.dart';
+import 'package:abis_recipes/features/home/ui/widgets/recent_recipes.dart';
 import 'package:abis_recipes/features/shared/ui/app_name.dart';
 import 'package:abis_recipes/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
 import 'home_view_model.dart';
 
 class HomeView extends StatelessWidget {
@@ -32,24 +31,24 @@ class HomeView extends StatelessWidget {
                   leading: Icon(Icons.search),
                   onTap: () async {
                     searchService.setSearch('');
-                    Navigator.of(context).pop();
-                    Navigator.of(context).push(MaterialPageRoute(builder: (context) => SearchView()));
+                    context.pop();
+                    context.push('/recipes');
                   },
                   title: Text('All Recipes'),
                 ),
                 ListTile(
                   leading: Icon(Icons.menu_book_outlined),
                   onTap: () async {
-                    Navigator.of(context).pop();
-                    Navigator.of(context).push(MaterialPageRoute(builder: (context) => BooksView()));
+                    context.pop();
+                    context.push('/books');
                   },
                   title: Text('Recipe Books'),
                 ),
                 ListTile(
                   leading: Icon(Icons.account_circle_outlined),
                   onTap: () async {
-                    Navigator.of(context).pop();
-                    Navigator.of(context).pushNamed('/profile');
+                    context.pop();
+                    context.push('/profile');
                   },
                   title: Text('Account'),
                 ),
@@ -57,6 +56,7 @@ class HomeView extends StatelessWidget {
             ),
           ),
           body: Stack(
+            alignment: Alignment.topCenter,
             children: [
               SizedBox(
                   height: MediaQuery.of(context).size.height,
@@ -85,6 +85,25 @@ class HomeView extends StatelessWidget {
                           border: OutlineInputBorder(),
                           fillColor: Colors.white,
                           filled: true,
+
+                          prefixIcon: IconButton(
+                            icon: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Icon(Icons.paste),
+                            ),
+                            onPressed: () async {
+                              amplitude.logEvent('press paste from clipboard');
+                              // Paste from clipboard
+                              ClipboardData? data = await Clipboard.getData(Clipboard.kTextPlain);
+
+                              if (data != null) {
+                                String url = data.text!;
+                                model.urlController.text = url;
+                                searchService.setUrl(url);
+                              }
+                            },
+                          ) .animate(/*onPlay: (controller) => controller.repeat()*/)
+                              .shake(delay: Duration(seconds: 1), duration: Duration(milliseconds: 1000), offset: Offset(0, .1), hz: 2),
                           suffixIcon: IconButton(
                             icon: Padding(
                               padding: const EdgeInsets.all(8.0),
@@ -112,38 +131,13 @@ class HomeView extends StatelessWidget {
                               FocusScope.of(context).unfocus();
                               String url = model.urlController.text;
                               searchService.setUrl(url);
-                              Navigator.of(context).push(MaterialPageRoute(
-                                builder: (context) => RecipePreviewView(
-                                  url: url,
-                                ),
-                              ));
+                              context.push(Uri(path: '/recipe-preview', queryParameters: {'url': url}).toString());
                             },
                           )),
                     ),
                   ),
-                  Center(
-                      child: ElevatedButton.icon(
-                        icon: Icon(Icons.paste),
-                        style: OutlinedButton.styleFrom(side: BorderSide(color: Colors.white), backgroundColor: Theme.of(context).canvasColor),
-                        onPressed: () async {
-                          amplitude.logEvent('press paste from clipboard');
-                          // Paste from clipboard
-                          ClipboardData? data = await Clipboard.getData(Clipboard.kTextPlain);
-
-                          if (data != null) {
-                            String url = data.text!;
-                            model.urlController.text = url;
-                            searchService.setUrl(url);
-                          }
-                        },
-                        label: Text(
-                          'Paste from Clipboard',
-                          style: Theme.of(context).textTheme.bodySmall!,
-                        ),
-                      )
-                          .animate(/*onPlay: (controller) => controller.repeat()*/)
-                          .shake(delay: Duration(seconds: 1), duration: Duration(milliseconds: 1000), offset: Offset(0, .1), hz: 2)),
-                  gap32,
+                  gap16,
+                  Expanded(child: RecentRecipes()),
                 ],
               ),
             ],

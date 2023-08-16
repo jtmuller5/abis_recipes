@@ -11,7 +11,7 @@ _$_Book _$$_BookFromJson(Map<String, dynamic> json) => _$_Book(
       title: json['title'] as String,
       bookId: json['bookId'] as String,
       description: json['description'] as String?,
-      dateCreated: DateTime.parse(json['dateCreated'] as String),
+      dateCreated: getDateTimeFromTimestamp(json['dateCreated'] as Timestamp?),
       lastRecipe: json['lastRecipe'] == null
           ? null
           : Recipe.fromJson(json['lastRecipe'] as Map<String, dynamic>),
@@ -23,7 +23,7 @@ Map<String, dynamic> _$$_BookToJson(_$_Book instance) => <String, dynamic>{
       'title': instance.title,
       'bookId': instance.bookId,
       'description': instance.description,
-      'dateCreated': instance.dateCreated.toIso8601String(),
+      'dateCreated': getTimestampFromDateTime(instance.dateCreated),
       'lastRecipe': instance.lastRecipe?.toJson(),
       'recipeCount': instance.recipeCount,
     };
