@@ -24,6 +24,7 @@ mixin _$Book {
   String get title => throw _privateConstructorUsedError;
   String get bookId => throw _privateConstructorUsedError;
   String? get description => throw _privateConstructorUsedError;
+  Pastry get pastry => throw _privateConstructorUsedError;
   @JsonKey(fromJson: getDateTimeFromTimestamp, toJson: getTimestampFromDateTime)
   DateTime? get dateCreated => throw _privateConstructorUsedError;
   Recipe? get lastRecipe => throw _privateConstructorUsedError;
@@ -44,6 +45,7 @@ abstract class $BookCopyWith<$Res> {
       String title,
       String bookId,
       String? description,
+      Pastry pastry,
       @JsonKey(
           fromJson: getDateTimeFromTimestamp, toJson: getTimestampFromDateTime)
       DateTime? dateCreated,
@@ -70,6 +72,7 @@ class _$BookCopyWithImpl<$Res, $Val extends Book>
     Object? title = null,
     Object? bookId = null,
     Object? description = freezed,
+    Object? pastry = null,
     Object? dateCreated = freezed,
     Object? lastRecipe = freezed,
     Object? recipeCount = freezed,
@@ -91,6 +94,10 @@ class _$BookCopyWithImpl<$Res, $Val extends Book>
           ? _value.description
           : description // ignore: cast_nullable_to_non_nullable
               as String?,
+      pastry: null == pastry
+          ? _value.pastry
+          : pastry // ignore: cast_nullable_to_non_nullable
+              as Pastry,
       dateCreated: freezed == dateCreated
           ? _value.dateCreated
           : dateCreated // ignore: cast_nullable_to_non_nullable
@@ -130,6 +137,7 @@ abstract class _$$_BookCopyWith<$Res> implements $BookCopyWith<$Res> {
       String title,
       String bookId,
       String? description,
+      Pastry pastry,
       @JsonKey(
           fromJson: getDateTimeFromTimestamp, toJson: getTimestampFromDateTime)
       DateTime? dateCreated,
@@ -153,6 +161,7 @@ class __$$_BookCopyWithImpl<$Res> extends _$BookCopyWithImpl<$Res, _$_Book>
     Object? title = null,
     Object? bookId = null,
     Object? description = freezed,
+    Object? pastry = null,
     Object? dateCreated = freezed,
     Object? lastRecipe = freezed,
     Object? recipeCount = freezed,
@@ -174,6 +183,10 @@ class __$$_BookCopyWithImpl<$Res> extends _$BookCopyWithImpl<$Res, _$_Book>
           ? _value.description
           : description // ignore: cast_nullable_to_non_nullable
               as String?,
+      pastry: null == pastry
+          ? _value.pastry
+          : pastry // ignore: cast_nullable_to_non_nullable
+              as Pastry,
       dateCreated: freezed == dateCreated
           ? _value.dateCreated
           : dateCreated // ignore: cast_nullable_to_non_nullable
@@ -198,6 +211,7 @@ class _$_Book extends _Book with DiagnosticableTreeMixin {
       required this.title,
       required this.bookId,
       required this.description,
+      required this.pastry,
       @JsonKey(
           fromJson: getDateTimeFromTimestamp, toJson: getTimestampFromDateTime)
       required this.dateCreated,
@@ -216,6 +230,8 @@ class _$_Book extends _Book with DiagnosticableTreeMixin {
   @override
   final String? description;
   @override
+  final Pastry pastry;
+  @override
   @JsonKey(fromJson: getDateTimeFromTimestamp, toJson: getTimestampFromDateTime)
   final DateTime? dateCreated;
   @override
@@ -225,7 +241,7 @@ class _$_Book extends _Book with DiagnosticableTreeMixin {
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'Book(url: $url, title: $title, bookId: $bookId, description: $description, dateCreated: $dateCreated, lastRecipe: $lastRecipe, recipeCount: $recipeCount)';
+    return 'Book(url: $url, title: $title, bookId: $bookId, description: $description, pastry: $pastry, dateCreated: $dateCreated, lastRecipe: $lastRecipe, recipeCount: $recipeCount)';
   }
 
   @override
@@ -237,6 +253,7 @@ class _$_Book extends _Book with DiagnosticableTreeMixin {
       ..add(DiagnosticsProperty('title', title))
       ..add(DiagnosticsProperty('bookId', bookId))
       ..add(DiagnosticsProperty('description', description))
+      ..add(DiagnosticsProperty('pastry', pastry))
       ..add(DiagnosticsProperty('dateCreated', dateCreated))
       ..add(DiagnosticsProperty('lastRecipe', lastRecipe))
       ..add(DiagnosticsProperty('recipeCount', recipeCount));
@@ -252,6 +269,7 @@ class _$_Book extends _Book with DiagnosticableTreeMixin {
             (identical(other.bookId, bookId) || other.bookId == bookId) &&
             (identical(other.description, description) ||
                 other.description == description) &&
+            (identical(other.pastry, pastry) || other.pastry == pastry) &&
             (identical(other.dateCreated, dateCreated) ||
                 other.dateCreated == dateCreated) &&
             (identical(other.lastRecipe, lastRecipe) ||
@@ -263,7 +281,7 @@ class _$_Book extends _Book with DiagnosticableTreeMixin {
   @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(runtimeType, url, title, bookId, description,
-      dateCreated, lastRecipe, recipeCount);
+      pastry, dateCreated, lastRecipe, recipeCount);
 
   @JsonKey(ignore: true)
   @override
@@ -285,6 +303,7 @@ abstract class _Book extends Book {
       required final String title,
       required final String bookId,
       required final String? description,
+      required final Pastry pastry,
       @JsonKey(
           fromJson: getDateTimeFromTimestamp, toJson: getTimestampFromDateTime)
       required final DateTime? dateCreated,
@@ -302,6 +321,8 @@ abstract class _Book extends Book {
   String get bookId;
   @override
   String? get description;
+  @override
+  Pastry get pastry;
   @override
   @JsonKey(fromJson: getDateTimeFromTimestamp, toJson: getTimestampFromDateTime)
   DateTime? get dateCreated;

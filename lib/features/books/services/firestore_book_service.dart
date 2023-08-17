@@ -27,12 +27,20 @@ class FirestoreBookService extends BookService {
     FirebaseFirestore.instance.collection('users').doc(FirebaseAuth.instance.currentUser?.uid).collection('recipes').doc(recipe.recipeId).update({
       'bookIds': FieldValue.arrayUnion([bookId])
     });
+
+    FirebaseFirestore.instance.collection('users').doc(FirebaseAuth.instance.currentUser?.uid).collection('books').doc(bookId).update({
+      'recipeCount': FieldValue.increment(1)
+    });
   }
 
   @override
   Future<void> removeRecipeFromBook(Recipe recipe, String bookId) async{
     FirebaseFirestore.instance.collection('users').doc(FirebaseAuth.instance.currentUser?.uid).collection('recipes').doc(recipe.recipeId).update({
       'bookIds': FieldValue.arrayRemove([bookId])
+    });
+
+    FirebaseFirestore.instance.collection('users').doc(FirebaseAuth.instance.currentUser?.uid).collection('books').doc(bookId).update({
+      'recipeCount': FieldValue.increment(-1)
     });
   }
 }

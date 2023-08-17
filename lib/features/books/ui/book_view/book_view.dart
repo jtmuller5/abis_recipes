@@ -28,7 +28,7 @@ class BookView extends StatelessWidget with GetItMixin {
             body: CustomScrollView(
           slivers: [
             SliverAppBar(
-              title: Text(book?.title ?? 'No title'),
+              title: Text(book?.title ?? ''),
               actions: [
                 Builder(builder: (context) {
                   return IconButton(
@@ -93,6 +93,7 @@ class BookView extends StatelessWidget with GetItMixin {
                                           description: '',
                                           lastRecipe: updatedBook.lastRecipe,
                                           recipeCount: updatedBook.recipeCount,
+                                          pastry: updatedBook.pastry,
                                         );
                                         bookService.updateBook(newBook);
 
@@ -200,7 +201,7 @@ class BookView extends StatelessWidget with GetItMixin {
                                       await bookService.removeRecipeFromBook(recipe, bookId);
                                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Recipe removed from book')));
                                     } else if (value == 'delete') {
-                                      await RecipeViewModel.deleteRecipe(recipe.recipeId);
+                                      await FirebaseFirestore.instance.collection('users').doc(FirebaseAuth.instance.currentUser?.uid).collection('recipes').doc(recipe.recipeId).delete();
                                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Recipe deleted')));
                                     }
                                   }

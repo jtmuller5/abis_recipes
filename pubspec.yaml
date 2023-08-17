@@ -55,13 +55,13 @@ flutter:
 # flutter pub run flutter_launcher_icons
 flutter_icons:
   android: "logo"
-  adaptive_icon_background: "#8DC4C0"
+  adaptive_icon_background: "#ffffff"
   ios: true
   remove_alpha_ios: true
-  image_path: "assets/logo.png"
-  image_path_ios: "assets/logo.jpg"
+  image_path: "assets/cheesecake.png"
+  image_path_ios: "assets/cheesecake.png"
   min_sdk_android: 21 # android min sdk min:16, default 21
   web:
     generate: true
-    image_path: "assets/logo.png"
+    image_path: "assets/cheesecake.png"
     background_color: "#ffffff"

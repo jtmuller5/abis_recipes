@@ -31,7 +31,7 @@ class RecipeView extends StatelessWidget {
                 return Scaffold(
                   body: Builder(
                     builder:(context) {
-                      if (snapshot.hasError) {
+                      if (snapshot.hasError || model.deleting) {
                         return Center(child: Text(snapshot.error.toString()));
                       }
 
@@ -57,115 +57,7 @@ class RecipeView extends StatelessWidget {
                                 actions: [
                                   IconButton(
                                       onPressed: () {
-                                        showModalBottomSheet(
-                                          context: context,
-                                          builder: (context) {
-                                            return StatefulBuilder(
-                                              builder: (context, setState) => DecoratedBox(
-                                                decoration: const BoxDecoration(borderRadius: BorderRadius.vertical(top: Radius.circular(8))),
-                                                child: ClipRRect(
-                                                  borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
-                                                  child: Column(
-                                                    children: [
-                                                      ListTile(
-                                                        title: Text(
-                                                          'Select Recipe Books',
-                                                          style: Theme.of(context).textTheme.headlineMedium,
-                                                        ),
-                                                      ),
-                                                      Expanded(
-                                                          child: StreamBuilder<List<Book>>(
-                                                              stream: FirebaseFirestore.instance
-                                                                  .collection('users')
-                                                                  .doc(FirebaseAuth.instance.currentUser?.uid)
-                                                                  .collection('books')
-                                                                  .snapshots()
-                                                                  .map((event) => event.docs.map((e) => Book.fromJson(e.data())).toList()),
-                                                              builder: (context, snapshot) {
-                                                                if (snapshot.hasError) {
-                                                                  return Center(
-                                                                    child: Text('Error loading books'),
-                                                                  );
-                                                                }
-
-                                                                if (!snapshot.hasData || snapshot.data == null) {
-                                                                  return Center(
-                                                                    child: CircularProgressIndicator(
-                                                                      color: Theme.of(context).colorScheme.primary,
-                                                                    ),
-                                                                  );
-                                                                }
-
-                                                                return ListView.builder(
-                                                                  itemCount: snapshot.data!.length,
-                                                                  itemBuilder: (context, index) {
-                                                                    Book book = snapshot.data![index];
-
-                                                                    return CheckboxListTile(
-                                                                      controlAffinity: ListTileControlAffinity.leading,
-                                                                      title: Text(
-                                                                        book.title,
-                                                                      ),
-                                                                      value: bookService.checkedBooks.value.contains(book.bookId),
-                                                                      onChanged: (value) {
-                                                                        setState(() {
-                                                                          if (value!) {
-                                                                            bookService.setCheckedBooks([...bookService.checkedBooks.value, book.bookId]);
-                                                                          } else {
-                                                                            bookService.setCheckedBooks(bookService.checkedBooks.value.where((element) => element != book.bookId).toList());
-                                                                          }
-                                                                        });
-                                                                      },
-                                                                    );
-                                                                  },
-                                                                );
-                                                              })),
-                                                      Padding(
-                                                        padding: const EdgeInsets.all(8.0),
-                                                        child: Row(
-                                                          mainAxisAlignment: MainAxisAlignment.end,
-                                                          children: [
-                                                            TextButton(
-                                                                onPressed: () {
-                                                                  router.pop();
-                                                                },
-                                                                child: Text('Cancel')),
-                                                            gap16,
-                                                            OutlinedButton(
-                                                                onPressed: () async {
-                                                                  if (recipe?.recipeId != null) {
-                                                                    Recipe newRecipe = Recipe(
-                                                                      coverImage: null,
-                                                                      description: null,
-                                                                      bookIds: bookService.checkedBooks.value,
-                                                                      title: recipe?.title,
-                                                                      images: recipe?.images != null ? recipe!.images! : [],
-                                                                      ingredients: recipe?.ingredients?.map((e) => Ingredient(name: e.name)).toList(),
-                                                                      instructions: recipe?.instructions?.map((e) => Instruction(text: e.text)).toList(),
-                                                                      url: recipe?.url,
-                                                                      recipeId: recipe!.recipeId,
-                                                                      createdAt: recipe.createdAt ?? DateTime.now(),
-                                                                    );
-
-                                                                    bookService.checkedBooks.value.forEach((bookId) {
-                                                                      bookService.addRecipeToBook(newRecipe, bookId);
-                                                                    });
-
-                                                                    model.updateRecipe(newRecipe);
-                                                                  }
-                                                                  router.pop();
-                                                                },
-                                                                child: Text('Save'))
-                                                          ],
-                                                        ),
-                                                      )
-                                                    ],
-                                                  ),
-                                                ),
-                                              ),
-                                            );
-                                          },
-                                        );
+                                       router.push(Uri(path: '/add-recipe-to-book').toString(),extra: recipe);
                                       },
                                       icon: Icon(Icons.book)),
                                   Builder(builder: (context) {
@@ -194,7 +86,7 @@ class RecipeView extends StatelessWidget {
                                               debugPrint(value);
                                               if (value == 'delete') {
                                                 if (recipe != null) {
-                                                  await RecipeViewModel.deleteRecipe(recipe.recipeId);
+                                                  await model.deleteRecipe(recipe.recipeId);
                                                   router.pop();
                                                 }
                                                 router.pop();

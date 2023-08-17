@@ -1,11 +1,12 @@
 import 'package:abis_recipes/app/constants.dart';
 import 'package:abis_recipes/app/router.dart';
-import 'package:abis_recipes/app/services.dart';
 import 'package:abis_recipes/features/books/models/book.dart';
 import 'package:abis_recipes/features/books/ui/books_view/books_view_model.dart';
+import 'package:abis_recipes/features/shared/ui/pastry_icon.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
 class BooksView extends StatelessWidget {
   const BooksView({Key? key}) : super(key: key);
@@ -17,12 +18,23 @@ class BooksView extends StatelessWidget {
         return Scaffold(
           body: CustomScrollView(
             slivers: [
-              SliverAppBar(title: Text('My Recipe Books')),
+              SliverAppBar(title: Text('My Recipe Books'), actions: [Padding(
+                padding: const EdgeInsets.only(right: 8.0, top: 16),
+                child: PastryIcon(pastry: Pastry.eclair, asset: 'assets/book.png',),
+              )],),
               StreamBuilder<List<Book>>(
                   stream: FirebaseFirestore.instance.collection('users').doc(FirebaseAuth.instance.currentUser?.uid).collection('books').snapshots().map((event) {
                     return event.docs.map((e) => Book.fromJson(e.data())).toList();
                   }),
                   builder: (context, snapshot) {
+                    
+                    if(snapshot.connectionState == ConnectionState.waiting){
+                      return SliverFillRemaining(
+                        child: Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                      );
+                    }
                     if (snapshot.hasData && snapshot.data != null) {
                       if (snapshot.data!.isNotEmpty) {
                         return SliverList(
@@ -30,26 +42,26 @@ class BooksView extends StatelessWidget {
                                 (BuildContext context, int index) {
                               Book book = snapshot.data![index];
                               return ListTile(
-                                leading: Hero(
-                                  tag: 'recipe-${book.lastRecipe?.recipeId ?? book.title}',
-                                  child: SizedBox(
-                                      height: 64,
-                                      width: 64,
-                                      child: ClipRRect(
-                                        borderRadius: BorderRadius.circular(8),
-                                        child: book.lastRecipe?.images?.firstOrNull != null
-                                            ? FadeInImage(
-                                          placeholder: AssetImage('assets/transparent.png'),
-                                          image: NetworkImage(
-                                            book.lastRecipe?.images?.first ?? '',
-                                          ),
-                                          fit: BoxFit.cover,
-                                        )
-                                            : ColoredBox(color: Theme.of(context).colorScheme.secondary, child: Icon(Icons.book)),
-                                      )),
-                                ),
+                                leading: PastryIcon(pastry: book.pastry),
                                 title: Text(book.title),
-                                subtitle: Text('${book.recipeCount ?? 0} recipes'),
+                                subtitle: FutureBuilder(
+                                  future: FirebaseFirestore.instance.collection('users').doc(FirebaseAuth.instance.currentUser?.uid).collection('recipes').where('bookIds', arrayContains: book.bookId).count().get(),
+                                  builder: (context, snapshot) {
+                                     switch(snapshot.connectionState){
+                                        case ConnectionState.waiting:
+                                          return Align(
+                                            alignment: Alignment.centerLeft,
+                                            child: SizedBox(height: 16,width: 50,
+                                            child: ColoredBox(color: Colors.grey.shade200,),).animate(onPlay: (controller) => controller.repeat()).shimmer(),
+                                          );
+                                        default:
+                                          if(snapshot.hasError){
+                                            return Text('Error loading recipes');
+                                          } else {
+                                            return Text('${snapshot.data!.count} recipes');
+                                     }
+                                  }}
+                                ),
                                 onTap: () {
                                   router.push('/book/${book.bookId}');
                                 },
@@ -85,81 +97,27 @@ class BooksView extends StatelessWidget {
                     } else {
                       return SliverFillRemaining(
                         child: Center(
-                          child: CircularProgressIndicator(),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text('Add a book to get started', style: Theme.of(context).textTheme.titleLarge),
+                              PastryIcon(pastry: Pastry.eclair,
+                              asset: 'assets/book.png',
+                              sideLength: 200,)
+                            ],
+                          ),
                         ),
                       );
                     }
                   }),
             ],
           ),
-          floatingActionButton: FloatingActionButton.extended(
+          floatingActionButton: FloatingActionButton(
             onPressed: () {
-              showModalBottomSheet(
-                context: context,
-                builder: (context) {
-                  return DecoratedBox(
-                    decoration: const BoxDecoration(borderRadius: BorderRadius.vertical(top: Radius.circular(8))),
-                    child: ClipRRect(
-                      borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
-                      child: Column(
-                        children: [
-                          ListTile(
-                            title: Text(
-                              'New Recipe Book',
-                              style: Theme.of(context).textTheme.headlineSmall,
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: TextField(
-                              controller: model.bookTitleController,
-                              decoration: InputDecoration(hintText: 'Name'),
-                            ),
-                          ),
-                          Expanded(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.end,
-                                      children: [
-                                        TextButton(
-                                            onPressed: () {
-                                              router.pop();
-                                            },
-                                            child: Text('Cancel')),
-                                        gap16,
-                                        OutlinedButton(
-                                            onPressed: () async {
-                                              bookService.createBook(Book(
-                                                bookId: FirebaseFirestore.instance.collection('users').doc(FirebaseAuth.instance.currentUser?.uid).collection('books').doc().id,
-                                                title: model.bookTitleController.text,
-                                                dateCreated: DateTime.now(),
-                                                description: null,
-                                                url: null,
-                                                lastRecipe: null,
-                                                recipeCount: 0,
-                                              ));
-
-                                              router.pop();
-                                            },
-                                            child: Text('Save'))
-                                      ],
-                                    ),
-                                  )
-                                ],
-                              ))
-                        ],
-                      ),
-                    ),
-                  );
-                },
-              );
+             router.push('/new-book');
             },
-            label: Text('New'),
-            icon: Icon(Icons.add),
+            child
+                : Icon(Icons.add),
           ),
         );
       },

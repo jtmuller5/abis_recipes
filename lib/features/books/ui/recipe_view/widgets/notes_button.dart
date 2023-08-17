@@ -1,10 +1,11 @@
+import 'package:abis_recipes/app/constants.dart';
 import 'package:abis_recipes/app/router.dart';
-import 'package:abis_recipes/app/services.dart';
 import 'package:abis_recipes/features/books/models/ingredient.dart';
 import 'package:abis_recipes/features/books/models/instruction.dart';
 import 'package:abis_recipes/features/books/models/recipe.dart';
 import 'package:abis_recipes/features/books/ui/recipe_preview_view/recipe_preview_view_model.dart';
 import 'package:abis_recipes/features/books/ui/recipe_view/recipe_view_model.dart';
+import 'package:abis_recipes/features/shared/ui/pastry_icon.dart';
 import 'package:code_on_the_rocks/code_on_the_rocks.dart';
 import 'package:flutter/material.dart';
 
@@ -27,7 +28,8 @@ class NotesButton extends StatelessWidget {
           context: context,
           builder: (context) {
             return DecoratedBox(
-              decoration: const BoxDecoration(borderRadius: BorderRadius.vertical(top: Radius.circular(8))),
+              decoration: const BoxDecoration(borderRadius: BorderRadius.vertical(top: Radius.circular(8)),
+              color: Colors.white),
               child: ClipRRect(
                 borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
                 child: CustomScrollView(
@@ -38,10 +40,8 @@ class NotesButton extends StatelessWidget {
                           'Notes',
                           style: Theme.of(context).textTheme.headlineMedium,
                         ),
+                        trailing: PastryIcon(pastry: Pastry.eclair, asset: 'assets/pin.png',)
                       ),
-                    ),
-                    SliverToBoxAdapter(
-                      child: Divider(),
                     ),
                     if (RecipePreviewViewModel.getIngredientsWithNotes(recipe).isNotEmpty) ...[
                       SliverToBoxAdapter(
@@ -115,7 +115,7 @@ class NotesButton extends StatelessWidget {
           },
         );
       },
-      label: Text('Notes'),
+      label: Text('Notes', style: Theme.of(context).textTheme.titleLarge),
       icon: Icon(Icons.sticky_note_2_outlined),
     );
   }

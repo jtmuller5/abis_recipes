@@ -48,6 +48,8 @@ class IngredientList extends StatelessWidget  {
                           showDialog(
                             context: context,
                             builder: (context) => AlertDialog(
+                              backgroundColor: Colors.white,
+                              surfaceTintColor: Colors.transparent,
                               title: Text('Note'),
                               content: Text(ingredient?.note!.text ?? ''),
                               actions: [
@@ -79,7 +81,7 @@ class IngredientList extends StatelessWidget  {
                               Offset.zero & overlay.size,
                             ),
                             items: [
-                              const PopupMenuItem(value: 'note', child: Text('Note')),
+                               PopupMenuItem(value: 'note', child: Text(ingredient?.note != null ?'Edit Note' : 'Add Note')),
                             ],
                           );
                           if (value != null) {
@@ -90,12 +92,16 @@ class IngredientList extends StatelessWidget  {
                                 context: context,
                                 builder: (BuildContext context) {
                                   TextEditingController noteController = TextEditingController();
-                                  return AlertDialog(
+                                  return AlertDialog.adaptive(
+                                    backgroundColor: Colors.white,
+                                    surfaceTintColor: Colors.transparent,
                                     title: Text('New Note'),
                                     content: TextField(
                                       controller: noteController,
                                       autofocus: true,
                                       decoration: InputDecoration(hintText: 'Enter your note here'),
+                                      maxLines: 5,
+                                      minLines: 4,
                                     ),
                                     actions: [
                                       TextButton(

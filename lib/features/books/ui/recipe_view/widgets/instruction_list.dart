@@ -53,6 +53,7 @@ class InstructionTile extends StatefulWidget {
 
 class _InstructionTileState extends State<InstructionTile> {
   bool showShort = false;
+  bool shortening = false;
 
   @override
   Widget build(BuildContext context) {
@@ -95,7 +96,11 @@ class _InstructionTileState extends State<InstructionTile> {
                   );
                   if (value != null) {
                     if (value == 'shorten') {
+
                       if (!(widget.instruction.shortened ?? false) && (widget.instruction.text ?? '').length > 80) {
+                        setState(() {
+                          shortening = true;
+                        });
                         GptMessage message = await ChatGptService.shortenContent(widget.instruction.text!);
 
                         Instruction newInstruction = widget.instruction.copyWith(
@@ -106,6 +111,7 @@ class _InstructionTileState extends State<InstructionTile> {
                         model.updateInstruction(newInstruction, widget.recipe);
 
                         setState(() {
+                          shortening = false;
                           showShort = true;
                         });
                       } else {
@@ -120,6 +126,8 @@ class _InstructionTileState extends State<InstructionTile> {
 
                           TextEditingController noteController = TextEditingController();
                           return AlertDialog(
+                            backgroundColor: Colors.white,
+                            surfaceTintColor: Colors.transparent,
                             title: Text('New Note'),
                             content: TextField(
                               controller: noteController,
@@ -168,7 +176,7 @@ class _InstructionTileState extends State<InstructionTile> {
                         children: [
                           CircleAvatar(
                             backgroundColor: Theme.of(context).colorScheme.primary,
-                            child: Center(
+                            child: shortening ? CircularProgressIndicator(color: Colors.white,):Center(
                               child: Text('${widget.index + 1}',
                                   style: Theme.of(context).textTheme.titleMedium!.copyWith(color: Theme.of(context).colorScheme.onPrimary)),
                             ),
@@ -186,6 +194,8 @@ class _InstructionTileState extends State<InstructionTile> {
                                 showDialog(
                                   context: context,
                                   builder: (context) => AlertDialog(
+                                    backgroundColor: Colors.white,
+                                    surfaceTintColor: Colors.transparent,
                                     title: Text('Note'),
                                     content: Text(widget.instruction.note!.text ?? ''),
                                     actions: [
@@ -199,7 +209,20 @@ class _InstructionTileState extends State<InstructionTile> {
                                   ),
                                 );
                               },
-                            ) else SizedBox(height: 40,width: 40,),
+                            ),
+                          if(widget.instruction.shortened ?? false)
+                            IconButton(
+                              constraints: BoxConstraints.tightFor(width: 40, height: 40),
+                              icon: Icon(
+                                showShort ? Icons.expand: Icons.compress,
+                                color: Theme.of(context).colorScheme.primary,
+
+                              ),
+                              onPressed: (){
+                                setState(() {
+                                  showShort = !showShort;
+                                });
+                              }),
                         ],
                       ),
                     ),

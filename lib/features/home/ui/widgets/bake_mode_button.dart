@@ -9,32 +9,29 @@ class BakeModeButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder(
-       valueListenable: appService.bakeMode,
-      builder: (context, value, child) {
-        return FloatingActionButton(
-          backgroundColor: sharedPreferences.getBool('bake_mode') ?? false ? Colors.green : Colors.white,
-          onPressed: () {
-            appService.setBakeMode(!appService.bakeMode.value);
+        valueListenable: appService.bakeMode,
+        builder: (context, value, child) {
+          return FloatingActionButton(
+            backgroundColor: value ? Colors.green : Colors.white,
+            onPressed: () {
+              appService.setBakeMode(!appService.bakeMode.value);
 
-            if(value){
-              amplitude.logEvent('press bake mode on');
-              Wakelock.enable();
-            } else {
-              amplitude.logEvent('press bake mode off');
-              Wakelock.disable();
-            }
+              if (!value) {
+                amplitude.logEvent('press bake mode on');
+                Wakelock.enable();
+              } else {
+                amplitude.logEvent('press bake mode off');
+                Wakelock.disable();
+              }
 
-            ScaffoldMessenger.of(context).hideCurrentSnackBar();
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                backgroundColor: value? Colors.green : Colors.black,
-                content: Text(value ? 'Bake Mode On' : 'Bake Mode Off')));
-          },
-          child: Icon(
-            value ? Icons.cake : Icons.cake_outlined,
-            color: value ? Colors.white: Colors.black,
-          ),
-        );
-      }
-    );
+              ScaffoldMessenger.of(context).hideCurrentSnackBar();
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(backgroundColor: !value ? Colors.green : Colors.black, content: Text(!value ? 'Bake Mode On' : 'Bake Mode Off')));
+            },
+            child: Icon(
+              value ? Icons.cake : Icons.cake_outlined,
+              color: value ? Colors.white : Colors.black,
+            ),
+          );
+        });
   }
 }

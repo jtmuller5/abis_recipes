@@ -127,7 +127,7 @@ class SaveButton extends StatelessWidget {
                         ) ??
                         false;*/
                   },
-                  label: Text('Save'),
+                  label: Text('Save', style: Theme.of(context).textTheme.titleLarge),
                   icon: const Icon(Icons.bookmark_border),
                 ),
         );

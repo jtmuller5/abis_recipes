@@ -22,7 +22,7 @@ class RecipeError extends StatelessWidget {
             child: Animate(
               effects: [ScaleEffect()],
               child: Image.asset(
-                'assets/splash.png',
+                'assets/burnt.png',
                 height: 300,
               ),
             ),

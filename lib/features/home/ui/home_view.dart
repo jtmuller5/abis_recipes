@@ -3,6 +3,7 @@ import 'package:abis_recipes/app/services.dart';
 import 'package:abis_recipes/features/home/ui/widgets/bake_mode_button.dart';
 import 'package:abis_recipes/features/home/ui/widgets/recent_recipes.dart';
 import 'package:abis_recipes/features/shared/ui/app_name.dart';
+import 'package:abis_recipes/features/shared/ui/pastry_icon.dart';
 import 'package:abis_recipes/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -15,7 +16,7 @@ class HomeView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return  HomeViewModelBuilder(
+    return HomeViewModelBuilder(
       builder: (context, model) {
         return Scaffold(
           extendBodyBehindAppBar: true,
@@ -28,7 +29,7 @@ class HomeView extends StatelessWidget {
             child: ListView(
               children: [
                 ListTile(
-                  leading: Icon(Icons.search),
+                  leading: PastryIcon(pastry: Pastry.eclair, asset: 'assets/ingredients.png'),
                   onTap: () async {
                     searchService.setSearch('');
                     context.pop();
@@ -37,7 +38,7 @@ class HomeView extends StatelessWidget {
                   title: Text('All Recipes'),
                 ),
                 ListTile(
-                  leading: Icon(Icons.menu_book_outlined),
+                  leading: PastryIcon(pastry: Pastry.eclair, asset: 'assets/book.png'),
                   onTap: () async {
                     context.pop();
                     context.push('/books');
@@ -45,7 +46,7 @@ class HomeView extends StatelessWidget {
                   title: Text('Recipe Books'),
                 ),
                 ListTile(
-                  leading: Icon(Icons.account_circle_outlined),
+                  leading: PastryIcon(pastry: Pastry.eclair, asset: 'assets/chef.png'),
                   onTap: () async {
                     context.pop();
                     context.push('/profile');
@@ -59,21 +60,31 @@ class HomeView extends StatelessWidget {
             alignment: Alignment.topCenter,
             children: [
               SizedBox(
-                  height: MediaQuery.of(context).size.height,
-                  width: MediaQuery.of(context).size.width,
-                  child: ColoredBox(color: Theme.of(context).colorScheme.primaryContainer)),
+                height: MediaQuery.of(context).size.height,
+                width: MediaQuery.of(context).size.width,
+                child: ColoredBox(color: Colors.white),
+              ),
               Positioned(
                   child: SizedBox(
-                    width: double.infinity,
-                    height: 150,
-                    child: ColoredBox(color: Colors.white),
-                  )),
+                width: double.infinity,
+                height: 150,
+                child: ColoredBox(color: Theme.of(context).colorScheme.inversePrimary),
+              )),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   gap32,
-                  AppName(),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      gap32,
+                      AppName(),
+                      PastryIcon(
+                        pastry: Pastry.cupCake,
+                      )
+                    ],
+                  ),
                   gap32,
                   Padding(
                     padding: const EdgeInsets.all(8.0),
@@ -85,7 +96,6 @@ class HomeView extends StatelessWidget {
                           border: OutlineInputBorder(),
                           fillColor: Colors.white,
                           filled: true,
-
                           prefixIcon: IconButton(
                             icon: Padding(
                               padding: const EdgeInsets.all(8.0),
@@ -102,8 +112,7 @@ class HomeView extends StatelessWidget {
                                 searchService.setUrl(url);
                               }
                             },
-                          ) .animate(/*onPlay: (controller) => controller.repeat()*/)
-                              .shake(delay: Duration(seconds: 1), duration: Duration(milliseconds: 1000), offset: Offset(0, .1), hz: 2),
+                          ).animate(/*onPlay: (controller) => controller.repeat()*/).shake(delay: Duration(seconds: 1), duration: Duration(milliseconds: 1000), offset: Offset(0, .1), hz: 2),
                           suffixIcon: IconButton(
                             icon: Padding(
                               padding: const EdgeInsets.all(8.0),

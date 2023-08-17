@@ -24,7 +24,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await amplitude.init("ff2f485bec7b3432c7a6ed352cc6420c");
-await configureDependencies();
+  await configureDependencies();
   // await isar.writeTxn(() async => await isar.clear());
   sharedPreferences = await SharedPreferences.getInstance();
 
@@ -111,7 +111,6 @@ class _MyAppState extends State<MyApp> {
       if (value.path.isNotEmpty && checkValidUrl(value.toString())) {
         searchService.setUrl(value.toString());
         router.push(Uri(path: '/recipe-preview', queryParameters: {'url': value.toString()}).toString());
-
       }
     }, onError: (err) {
       print("getTextStreamAsUri error: $err");

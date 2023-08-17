@@ -2,7 +2,6 @@ import 'package:abis_recipes/app/router.dart';
 import 'package:abis_recipes/features/books/models/ingredient.dart';
 import 'package:abis_recipes/features/books/models/instruction.dart';
 import 'package:abis_recipes/features/books/models/recipe.dart';
-import 'package:abis_recipes/features/books/ui/recipe_view/recipe_view.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:code_on_the_rocks/code_on_the_rocks.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -20,12 +19,17 @@ class RecipeViewModelBuilder extends ViewModelBuilder<RecipeViewModel> {
 
 class RecipeViewModel extends ViewModel<RecipeViewModel> {
 
-  void updateRecipe(Recipe recipe) {
-    FirebaseFirestore.instance.collection('users').doc(FirebaseAuth.instance.currentUser?.uid).collection('recipes').doc(recipe.recipeId).update(recipe.toJson());
-  }
+bool deleting = false;
 
-  static Future<void> deleteRecipe(String recipeId) async {
+  Future<void> deleteRecipe(String recipeId) async {
+    setState(() {
+      deleting = true;
+    });
     await FirebaseFirestore.instance.collection('users').doc(FirebaseAuth.instance.currentUser?.uid).collection('recipes').doc(recipeId).delete();
+
+    setState(() {
+      deleting = false;
+    });
   }
 
   static void navigateToRecipe(Recipe recipe, BuildContext context) {
@@ -34,25 +38,33 @@ class RecipeViewModel extends ViewModel<RecipeViewModel> {
 
   Future<void> updateInstruction(Instruction instruction, Recipe? recipe) async {
     if(recipe == null) return;
-    final index = recipe.instructions!.indexWhere((element) => element.text == instruction.text);
+    try{
+      final index = recipe.instructions!.indexWhere((element) => element.text == instruction.text);
 
-    List<Instruction> instructions = [...recipe.instructions!]..[index] = instruction;
+      List<Instruction> instructions = [...recipe.instructions!]..[index] = instruction;
 
-    await FirebaseFirestore.instance.collection('users').doc(FirebaseAuth.instance.currentUser?.uid).collection('recipes').doc(recipe.recipeId).update({
-      'instructions': instructions,
-    });
-
+      await FirebaseFirestore.instance.collection('users').doc(FirebaseAuth.instance.currentUser?.uid).collection('recipes').doc(recipe.recipeId).update({
+        'instructions': instructions.map((e) => e.toJson()).toList(),
+      });
+    } catch(e){
+      debugPrint('error: ' +e.toString());
+    }
   }
 
   Future<void> updateIngredient(Ingredient ingredient, Recipe recipe) async {
-    final index = recipe.ingredients!.indexWhere((element) => element.name == ingredient.name);
+    try{
+      final index = recipe.ingredients!.indexWhere((element) => element.name == ingredient.name);
 
-    List<Ingredient> ingredients = [...recipe.ingredients!]..[index] = ingredient;
+      List<Ingredient> ingredients = [...recipe.ingredients!]..[index] = ingredient;
 
-    await FirebaseFirestore.instance.collection('users').doc(FirebaseAuth.instance.currentUser?.uid).collection('recipes').doc(recipe.recipeId).update({
-      'ingredients': ingredients,
-    });
+      debugPrint('ingredients: ' + ingredients.toString());
 
+      await FirebaseFirestore.instance.collection('users').doc(FirebaseAuth.instance.currentUser?.uid).collection('recipes').doc(recipe.recipeId).update({
+        'ingredients': ingredients.map((e) => e.toJson()).toList(),
+      });
+    } catch(e){
+      debugPrint('error: ' +e.toString());
+    }
   }
 
 

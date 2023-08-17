@@ -25,92 +25,94 @@ class RecipePreviewView extends StatelessWidget {
               return ValueListenableBuilder(
                   valueListenable: model.loadingRecipe,
                   builder: (context, loading, child) {
-                  return Scaffold(
-                    body: AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 500),
-                      child:  loading
-                          ? Center(
-                          child: CircularProgressIndicator(
-                            color: Theme.of(context).colorScheme.primary,
-                          ))
-                          : ValueListenableBuilder(
-                          valueListenable: model.errorLoadingRecipe,
-                          builder: (context, error, child) {
-                            return error
-                                ? RecipeError()
-                                : Stack(
-                              children: [
-                                /*Image.network(
-                                            ref.watch(recipeImageProvider) ?? '',
-                                            fit: BoxFit.cover,
-                                            height: double.infinity,
-                                            width: double.infinity,
-                                            alignment: Alignment.topCenter,
-                                          ),
-                                          Positioned.fill(
-                                              child: DecoratedBox(
-                                            decoration: BoxDecoration(
-                                              gradient: LinearGradient(
-                                                begin: Alignment.bottomCenter,
-                                                end: Alignment.topCenter,
-                                                stops: [0.8, 1],
-                                                colors: [
-                                                  Colors.white,
-                                                  Colors.transparent,
-                                                ],
+                  return ValueListenableBuilder(
+                    valueListenable: model.errorLoadingRecipe,
+                    builder: (context, error, child) {
+                      return Scaffold(
+                        appBar: error ? AppBar(title: Text('Well I\'ll be...'),): null,
+                        body: AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 500),
+                          child:  loading
+                              ? Center(
+                              child: CircularProgressIndicator(
+                                color: Theme.of(context).colorScheme.primary,
+                              ))
+                              : error
+                              ? RecipeError()
+                              : Stack(
+                            children: [
+                              /*Image.network(
+                                                ref.watch(recipeImageProvider) ?? '',
+                                                fit: BoxFit.cover,
+                                                height: double.infinity,
+                                                width: double.infinity,
+                                                alignment: Alignment.topCenter,
                                               ),
-                                            ),
-                                          )),*/
-                                Animate(
-                                  effects: [FadeEffect()],
-                                  child: CustomScrollView(slivers: [
-                                    SliverAppBar(
-                                      leading: BackButton(
-                                        color: Theme.of(context).colorScheme.primary,
-                                      ),
-                                      elevation: 0,
-                                      backgroundColor: Theme.of(context).colorScheme.background,
+                                              Positioned.fill(
+                                                  child: DecoratedBox(
+                                                decoration: BoxDecoration(
+                                                  gradient: LinearGradient(
+                                                    begin: Alignment.bottomCenter,
+                                                    end: Alignment.topCenter,
+                                                    stops: [0.8, 1],
+                                                    colors: [
+                                                      Colors.white,
+                                                      Colors.transparent,
+                                                    ],
+                                                  ),
+                                                ),
+                                              )),*/
+                              Animate(
+                                effects: [FadeEffect()],
+                                child: CustomScrollView(slivers: [
+                                  SliverAppBar(
+                                    leading: BackButton(
+                                      color: Theme.of(context).colorScheme.primary,
                                     ),
-                                    if (recipe?.title != null && recipe?.images != null)
-                                      SliverToBoxAdapter(
-                                        child: RecipeHeader(
-                                          recipe?.title ?? '',
-                                          recipe?.images?.firstOrNull ?? '',
-                                          searchService.url.value ?? '',
+                                    elevation: 0,
+                                    backgroundColor: Theme.of(context).colorScheme.background,
+                                  ),
+                                  if (recipe?.title != null && recipe?.images != null)
+                                    SliverToBoxAdapter(
+                                      child: RecipeHeader(
+                                        recipe?.title ?? '',
+                                        recipe?.images?.firstOrNull ?? '',
+                                        searchService.url.value ?? '',
+                                      ),
+                                    ),
+                                  SliverToBoxAdapter(child: Divider()),
+                                  if ((recipe?.ingredients ?? []).isNotEmpty)
+                                    SliverToBoxAdapter(
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Text(
+                                          'Ingredients',
+                                          style: Theme.of(context).textTheme.headlineSmall!.copyWith(fontWeight: FontWeight.bold),
                                         ),
                                       ),
-                                    SliverToBoxAdapter(child: Divider()),
-                                    if ((recipe?.ingredients ?? []).isNotEmpty)
-                                      SliverToBoxAdapter(
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: Text(
-                                            'Ingredients',
-                                            style: Theme.of(context).textTheme.headlineSmall!.copyWith(fontWeight: FontWeight.bold),
-                                          ),
+                                    ),
+                                  if (recipe != null) PreviewIngredientList(recipe: recipe),
+                                  SliverToBoxAdapter(child: Divider()),
+                                  if ((recipe?.instructions ?? []).isNotEmpty)
+                                    SliverToBoxAdapter(
+                                      child: ListTile(
+                                        title: Text(
+                                          'Directions',
+                                          style: Theme.of(context).textTheme.headlineSmall!.copyWith(fontWeight: FontWeight.bold),
                                         ),
+                                        subtitle: Text('${recipe?.instructions!.length} steps'),
                                       ),
-                                    if (recipe != null) PreviewIngredientList(recipe: recipe),
-                                    SliverToBoxAdapter(child: Divider()),
-                                    if ((recipe?.instructions ?? []).isNotEmpty)
-                                      SliverToBoxAdapter(
-                                        child: ListTile(
-                                          title: Text(
-                                            'Directions',
-                                            style: Theme.of(context).textTheme.headlineSmall!.copyWith(fontWeight: FontWeight.bold),
-                                          ),
-                                          subtitle: Text('${recipe?.instructions!.length} steps'),
-                                        ),
-                                      ),
-                                    PreviewInstructionList(),
-                                    SliverToBoxAdapter(child: gap64),
-                                  ]),
-                                ),
-                              ],
-                            );
-                          }),
-                    ),
-                    floatingActionButton: loading ?null: SaveButton(),
+                                    ),
+                                  PreviewInstructionList(),
+                                  SliverToBoxAdapter(child: gap64),
+                                ]),
+                              ),
+                            ],
+                          ),
+                        ),
+                        floatingActionButton: loading ?null: SaveButton(),
+                      );
+                    }
                   );
                 }
               );
