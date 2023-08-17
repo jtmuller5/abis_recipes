@@ -12,6 +12,7 @@ class BakeModeButton extends StatelessWidget {
         valueListenable: appService.bakeMode,
         builder: (context, value, child) {
           return FloatingActionButton(
+            heroTag: 'bake_mode',
             backgroundColor: value ? Colors.green : Colors.white,
             onPressed: () {
               appService.setBakeMode(!appService.bakeMode.value);

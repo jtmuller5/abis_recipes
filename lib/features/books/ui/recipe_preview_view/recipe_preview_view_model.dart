@@ -177,6 +177,12 @@ class RecipePreviewViewModel extends ViewModel<RecipePreviewViewModel> {
           errorLoadingRecipe.value = true;
           amplitude.logEvent('bad recipe', eventProperties: {'url': url});
         } else {
+
+          List oldList = [...?sharedPreferences.getStringList('recent_searches')];
+          List<String> newList = [url, ...oldList];
+          // remove duplicates
+          newList = newList.toSet().toList();
+          sharedPreferences.setStringList('recent_searches', newList);
           errorLoadingRecipe.value = false;
         }
       } catch (e) {

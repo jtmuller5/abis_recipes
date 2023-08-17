@@ -6,6 +6,7 @@ import 'package:abis_recipes/features/books/ui/new_book/new_book_view.dart';
 import 'package:abis_recipes/features/books/ui/recipe_preview_view/recipe_preview_view.dart';
 import 'package:abis_recipes/features/books/ui/recipe_view/recipe_view.dart';
 import 'package:abis_recipes/features/books/ui/search/ui/search_view.dart';
+import 'package:abis_recipes/features/chat/ui/chat_view.dart';
 import 'package:abis_recipes/features/home/ui/home_view.dart';
 import 'package:abis_recipes/features/shared/ui/app_name.dart';
 import 'package:abis_recipes/features/shared/ui/browser/browser_view.dart';
@@ -59,6 +60,12 @@ final router = GoRouter(
                 }),
               ],
             )),
+    GoRoute(
+      path: '/chat',
+      builder: (context, state) {
+        return ChatView();
+      },
+    ),
     GoRoute(
       path: '/browser',
       builder: (context, state) {

@@ -1,7 +1,9 @@
 import 'package:abis_recipes/app/constants.dart';
 import 'package:abis_recipes/app/services.dart';
 import 'package:abis_recipes/features/home/ui/widgets/bake_mode_button.dart';
+import 'package:abis_recipes/features/home/ui/widgets/baker_chat.dart';
 import 'package:abis_recipes/features/home/ui/widgets/recent_recipes.dart';
+import 'package:abis_recipes/features/home/ui/widgets/recent_searches.dart';
 import 'package:abis_recipes/features/shared/ui/app_name.dart';
 import 'package:abis_recipes/features/shared/ui/pastry_icon.dart';
 import 'package:abis_recipes/main.dart';
@@ -24,6 +26,7 @@ class HomeView extends StatelessWidget {
           appBar: AppBar(
             elevation: 0,
             backgroundColor: Colors.transparent,
+            scrolledUnderElevation: 0,
           ),
           drawer: Drawer(
             backgroundColor: Colors.white,
@@ -171,7 +174,17 @@ class HomeView extends StatelessWidget {
               ),
             ],
           ),
-          floatingActionButton: BakeModeButton(),
+          floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+          floatingActionButton: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                BakeModeButton(),
+                BakerChat(),
+              ],
+            ),
+          ),
         );
       },
     );
