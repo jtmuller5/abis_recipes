@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'home_view_model.dart';
 
 class HomeView extends StatelessWidget {
@@ -26,8 +27,27 @@ class HomeView extends StatelessWidget {
           ),
           drawer: Drawer(
             backgroundColor: Colors.white,
+
             child: ListView(
               children: [
+                DrawerHeader(child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Flexible(child: Center(child: Image.asset('assets/cheesecake.png'))),
+                    Row(
+                      children: [
+                        Text('Abi\'s Recipes', style: Theme.of(context).textTheme.bodySmall,),
+                        FutureBuilder(future: PackageInfo.fromPlatform(), builder: (context, snapshot) {
+                          return Text(snapshot.hasData ? ' v${(snapshot.data as PackageInfo).version}' : '', style: Theme.of(context).textTheme.bodySmall,);
+                        },)
+                      ],
+                    ),
+                  ],
+                ),
+                padding: EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  border: Border(bottom: BorderSide(color: Theme.of(context).colorScheme.primary, width: 2))
+                ),),
                 ListTile(
                   leading: PastryIcon(pastry: Pastry.eclair, asset: 'assets/ingredients.png'),
                   onTap: () async {

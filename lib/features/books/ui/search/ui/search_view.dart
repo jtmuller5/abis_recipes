@@ -35,6 +35,7 @@ class SearchView extends StatelessWidget {
                 return event.docs.map((e) => Recipe.fromJson(e.data())).toList();
               }),
               builder: (context, snapshot) {
+
                 if (snapshot.hasError) {
                   return SliverToBoxAdapter(child: Text(snapshot.error.toString()));
                 }

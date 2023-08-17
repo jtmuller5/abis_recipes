@@ -62,6 +62,8 @@ class BookView extends StatelessWidget with GetItMixin {
                               builder: (context) {
                                 TextEditingController bookTitleController = TextEditingController(text: book?.title);
                                 return AlertDialog(
+                                  backgroundColor: Colors.white,
+                                  surfaceTintColor: Colors.transparent,
                                   title: Text('Rename Book'),
                                   content: TextField(
                                     controller: bookTitleController,
@@ -97,6 +99,7 @@ class BookView extends StatelessWidget with GetItMixin {
                                         );
                                         bookService.updateBook(newBook);
 
+                                        router.pop(true);
                                         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Book renamed')));
                                         router.pop(true);
                                       },

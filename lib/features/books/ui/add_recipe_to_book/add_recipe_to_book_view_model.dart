@@ -9,22 +9,37 @@ class AddRecipeToBookViewModelBuilder extends ViewModelBuilder<AddRecipeToBookVi
   const AddRecipeToBookViewModelBuilder({
     super.key,
     required super.builder,
+    required this.recipe,
   });
 
+  final Recipe recipe;
+
   @override
-  State<StatefulWidget> createState() => AddRecipeToBookViewModel();
+  State<StatefulWidget> createState() => AddRecipeToBookViewModel(recipe);
 }
 
 class AddRecipeToBookViewModel extends ViewModel<AddRecipeToBookViewModel> {
+
+  final Recipe recipe;
+
+  AddRecipeToBookViewModel(this.recipe);
+
+  ValueNotifier<List<String>> checkedBooks = ValueNotifier([]);
+
+
+  void setCheckedBooks(List<String> val){
+    checkedBooks.value = val;
+  }
+
   void addCheckedBook(String bookId) {
     setState(() {
-      bookService.setCheckedBooks([...bookService.checkedBooks.value, bookId]);
+      setCheckedBooks([...checkedBooks.value, bookId]);
     });
   }
 
   void removeCheckedBook(String bookId) {
     setState(() {
-      bookService.setCheckedBooks(bookService.checkedBooks.value.where((element) => element != bookId).toList());
+      setCheckedBooks(checkedBooks.value.where((element) => element != bookId).toList());
     });
   }
 

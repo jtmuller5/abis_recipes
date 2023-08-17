@@ -30,6 +30,7 @@ dependencies:
   google_fonts: ^4.0.3
   injectable: ^2.1.2
   path_provider: ^2.0.15
+  package_info_plus: ^3.1.2
   recase: ^4.1.0
   shared_preferences: ^2.2.0
   wakelock: ^0.6.2

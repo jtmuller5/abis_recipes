@@ -18,6 +18,7 @@ class AddRecipeToBookView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AddRecipeToBookViewModelBuilder(
+      recipe: recipe,
         builder: (context, model) {
           return Scaffold(
             appBar: AppBar(
@@ -59,7 +60,7 @@ class AddRecipeToBookView extends StatelessWidget {
                               title: Text(
                                 book.title,
                               ),
-                              value: bookService.checkedBooks.value.contains(book.bookId),
+                              value: model.checkedBooks.value.contains(book.bookId),
                               onChanged: (value) {
                                 if(value ?? false){
                                   model.addCheckedBook(book.bookId);
@@ -79,7 +80,7 @@ class AddRecipeToBookView extends StatelessWidget {
                   Recipe newRecipe = Recipe(
                     coverImage: null,
                     description: null,
-                    bookIds: bookService.checkedBooks.value,
+                    bookIds: model.checkedBooks.value,
                     title: recipe.title,
                     images: recipe.images != null ? recipe.images! : [],
                     ingredients: recipe.ingredients?.map((e) => Ingredient(name: e.name)).toList(),
@@ -89,7 +90,7 @@ class AddRecipeToBookView extends StatelessWidget {
                     createdAt: recipe.createdAt ?? DateTime.now(),
                   );
 
-                  bookService.checkedBooks.value.forEach((bookId) {
+                  model.checkedBooks.value.forEach((bookId) {
                     bookService.addRecipeToBook(newRecipe, bookId);
                   });
 

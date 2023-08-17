@@ -1,5 +1,6 @@
 import 'package:abis_recipes/app/constants.dart';
 import 'package:abis_recipes/features/books/models/recipe.dart';
+import 'package:abis_recipes/features/shared/ui/pastry_icon.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -20,7 +21,7 @@ class RecentRecipes extends StatelessWidget {
           .snapshots()
           .map((event) => event.docs.map((e) => Recipe.fromJson(e.data())).toList()),
       builder: (context, snapshot) {
-        if (snapshot.hasData) {
+        if (snapshot.hasData && snapshot.data != null && snapshot.data!.isNotEmpty){
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
 
@@ -87,7 +88,19 @@ class RecentRecipes extends StatelessWidget {
               ),
             ],
           );
-        } else {
+        } else if(snapshot.data?.isEmpty ?? false){
+          return Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                PastryIcon(pastry: Pastry.eclair, asset: 'assets/pin.png',
+                sideLength: 200,),
+                Text('No recipes yet'),
+                gap64
+              ],
+            ),
+          );
+        }else {
           return const Center(
             child: CircularProgressIndicator(),
           );
