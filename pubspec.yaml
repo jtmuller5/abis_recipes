@@ -1,7 +1,7 @@
 name: abis_recipes
 description: Recipe extractor
 publish_to: 'none'
-version: 1.1.0+10
+version: 1.1.1+11
 
 environment:
   sdk: '>=2.19.2 <3.0.0'
@@ -60,7 +60,7 @@ flutter_icons:
   ios: true
   remove_alpha_ios: true
   image_path: "assets/cheesecake.png"
-  image_path_ios: "assets/cheesecake.png"
+  image_path_ios: "assets/cheesecake.jpg"
   min_sdk_android: 21 # android min sdk min:16, default 21
   web:
     generate: true

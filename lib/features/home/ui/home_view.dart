@@ -97,7 +97,7 @@ class HomeView extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  gap32,
+                  SizedBox(height: MediaQuery.viewPaddingOf(context).top),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
