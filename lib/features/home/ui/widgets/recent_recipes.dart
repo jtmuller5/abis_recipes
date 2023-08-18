@@ -23,19 +23,38 @@ class RecentRecipes extends StatelessWidget {
           .map((event) => event.docs.map((e) => Recipe.fromJson(e.data())).toList()),
       builder: (context, snapshot) {
         if (snapshot.hasData && snapshot.data != null && snapshot.data!.isNotEmpty) {
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                flex: 3,
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  padding: const EdgeInsets.all(8),
+          return CustomScrollView(
+            slivers: [
+              SliverMainAxisGroup(slivers: [
+                SliverToBoxAdapter(child:
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Text('Paste your recipe\'s URL into the search box and then click the download button',
+                    style: TextStyle(fontSize: 12),),
+                  ),),
+                /*SliverAppBar(
+                  pinned: true,
+                  title: Text('Saved Recipes'),
+                ),*/
+                SliverPersistentHeader(
+                  pinned: true,
+                  floating: false,
+                  delegate: HeaderDelegate(
+                      Material(
+                        color: Colors.white,
+                        child: ListTile(
+                          tileColor: Colors.white,
+
+                          title: Text('Saved Recipes'),),
+                      )
+                  ),),
+                SliverList.builder(
                   itemCount: snapshot.data!.length,
                   itemBuilder: (context, index) {
+
                     Recipe recipe = snapshot.data![index];
                     return Card(
-                      elevation: 6,
+                        elevation: 6,
                         color: Colors.white,
                         child: DecoratedBox(
                           decoration: BoxDecoration(
@@ -85,24 +104,28 @@ class RecentRecipes extends StatelessWidget {
                           ),
                         )
 
-                        /* ListTile(
+                      /* ListTile(
                         title: Text(recipe.title ?? ''),
                         subtitle: Text(recipe.url ?? ''),
                       ),*/
-                        );
-                  },
+                    );
+                  },)
+              ]),
+              SliverToBoxAdapter(
+                child: Divider(
+                  height: 2,
+                  thickness: 1,
+                  color: Colors.grey.shade300,
                 ),
               ),
-              Divider(
-                height: 2,
-                thickness: 1,
-                color: Colors.grey.shade300,
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
+                  child: Text('Recent Searches', style: Theme.of(context).textTheme.bodySmall),
+                ),
+
               ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
-                child: Text('Recent Searches', style: Theme.of(context).textTheme.bodySmall),
-              ),
-              Expanded(child: ColoredBox(color: Colors.grey.shade200, child: RecentSearches()))
+              RecentSearches()
             ],
           );
         } else if (snapshot.data?.isEmpty ?? false) {
@@ -128,4 +151,25 @@ class RecentRecipes extends StatelessWidget {
       },
     );
   }
+}
+
+
+class HeaderDelegate extends SliverPersistentHeaderDelegate {
+  const HeaderDelegate(this.child);
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
+    return child;
+  }
+
+  @override
+  double get maxExtent => minExtent;
+
+  @override
+  double get minExtent => 48;
+
+  @override
+  bool shouldRebuild(covariant SliverPersistentHeaderDelegate oldDelegate) => false;
 }

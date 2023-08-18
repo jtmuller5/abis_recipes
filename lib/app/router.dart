@@ -1,3 +1,4 @@
+import 'package:abis_recipes/app/constants.dart';
 import 'package:abis_recipes/features/books/models/recipe.dart';
 import 'package:abis_recipes/features/books/ui/add_recipe_to_book/add_recipe_to_book_view.dart';
 import 'package:abis_recipes/features/books/ui/book_view/book_view.dart';
@@ -10,6 +11,7 @@ import 'package:abis_recipes/features/chat/ui/chat_view.dart';
 import 'package:abis_recipes/features/home/ui/home_view.dart';
 import 'package:abis_recipes/features/shared/ui/app_name.dart';
 import 'package:abis_recipes/features/shared/ui/browser/browser_view.dart';
+import 'package:abis_recipes/features/shared/ui/pastry_icon.dart';
 import 'package:firebase_auth/firebase_auth.dart' hide EmailAuthProvider;
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:flutter/material.dart';
@@ -36,17 +38,55 @@ final router = GoRouter(
         builder: (context, state) => SignInScreen(
               providers: providers,
               headerBuilder: (context, constraints, shrinkOffset) {
-                return SizedBox(
-                  height: 200,
-                  child: AppName(),
+                return Column(
+                  children: [
+                    Expanded(
+                        child: PastryIcon(
+                      pastry: Pastry.eclair,
+                      asset: 'assets/cheesecake.png',
+                      sideLength: 100,
+                    )),
+                    Flexible(child: AppName()),
+                  ],
                 );
               },
               actions: [
                 AuthStateChangeAction<SignedIn>((context, state) {
-                  context.pushReplacementNamed('/');
+
+                  debugPrint('state: $state');
+                  context.replace('/');
                 }),
+                AuthStateChangeAction<UserCreated>((context, state) {
+                  debugPrint('state: $state');
+                  context.replace('/');
+                })
               ],
             )),
+    GoRoute(
+        path: '/register',
+        builder: (context, state) => RegisterScreen(
+          providers: providers,
+          headerBuilder: (context, constraints, shrinkOffset) {
+            return Column(
+              children: [
+                Expanded(
+                    child: PastryIcon(
+                      pastry: Pastry.eclair,
+                      asset: 'assets/cheesecake.png',
+                      sideLength: 100,
+                    )),
+                Flexible(child: AppName()),
+              ],
+            );
+          },
+          actions: [
+            AuthStateChangeAction<SignedIn>((context, state) {
+
+              debugPrint('state: $state');
+              context.replace('/');
+            }),
+          ],
+        )),
     GoRoute(
         path: '/profile',
         builder: (context, state) => ProfileScreen(
@@ -56,7 +96,7 @@ final router = GoRouter(
               ),
               actions: [
                 SignedOutAction((context) {
-                  context.pushReplacementNamed('/sign-in');
+                  context.go('/sign-in');
                 }),
               ],
             )),
@@ -81,7 +121,9 @@ final router = GoRouter(
     GoRoute(
       path: '/book/:id',
       builder: (context, state) {
-        return BookView(bookId: state.pathParameters['id']!,);
+        return BookView(
+          bookId: state.pathParameters['id']!,
+        );
       },
     ),
     GoRoute(

@@ -7,8 +7,7 @@ class RecentSearches extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      padding: const EdgeInsets.all(8),
+    return SliverList.list(
       children: (sharedPreferences.getStringList('recent_searches')?? []).map((e) => ListTile(
         onTap: (){
           router.push(Uri(path: '/recipe-preview', queryParameters: {'url': e.toString()}).toString());

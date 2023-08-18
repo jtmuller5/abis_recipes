@@ -110,7 +110,7 @@ class HomeView extends StatelessWidget {
                   ),
                   gap32,
                   Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
                     child: TextField(
                       controller: model.urlController,
                       decoration: InputDecoration(
@@ -168,7 +168,6 @@ class HomeView extends StatelessWidget {
                           )),
                     ),
                   ),
-                  gap16,
                   Expanded(child: RecentRecipes()),
                 ],
               ),
