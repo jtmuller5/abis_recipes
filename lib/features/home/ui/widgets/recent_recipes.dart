@@ -26,16 +26,6 @@ class RecentRecipes extends StatelessWidget {
           return CustomScrollView(
             slivers: [
               SliverMainAxisGroup(slivers: [
-                SliverToBoxAdapter(child:
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Text('Paste your recipe\'s URL into the search box and then click the download button',
-                    style: TextStyle(fontSize: 12),),
-                  ),),
-                /*SliverAppBar(
-                  pinned: true,
-                  title: Text('Saved Recipes'),
-                ),*/
                 SliverPersistentHeader(
                   pinned: true,
                   floating: false,

@@ -16,6 +16,7 @@ dependencies:
   code_on_the_rocks: ^0.0.4
   firebase_auth: ^4.6.3
   firebase_core: ^2.15.0
+  firebase_storage: ^11.2.6
   firebase_ui_auth: ^1.5.0
   flutter_animate: ^4.1.0
   flutter_inappwebview: ^6.0.0-beta.22
@@ -23,6 +24,7 @@ dependencies:
   go_router: ^10.0.0
   html: ^0.15.1
   http: ^0.13.5
+  image_picker: ^1.0.2
   json_annotation: ^4.8.1
   receive_sharing_intent: ^1.4.5
   get_it: ^7.6.0

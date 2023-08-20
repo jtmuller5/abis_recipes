@@ -3,6 +3,7 @@ import 'package:abis_recipes/features/books/models/recipe.dart';
 import 'package:abis_recipes/features/books/ui/add_recipe_to_book/add_recipe_to_book_view.dart';
 import 'package:abis_recipes/features/books/ui/book_view/book_view.dart';
 import 'package:abis_recipes/features/books/ui/books_view/books_view.dart';
+import 'package:abis_recipes/features/books/ui/image_recipe_view/image_recipe_view.dart';
 import 'package:abis_recipes/features/books/ui/new_book/new_book_view.dart';
 import 'package:abis_recipes/features/books/ui/recipe_preview_view/recipe_preview_view.dart';
 import 'package:abis_recipes/features/books/ui/recipe_view/recipe_view.dart';
@@ -142,6 +143,12 @@ final router = GoRouter(
       path: '/recipes',
       builder: (context, state) {
         return SearchView();
+      },
+    ),
+    GoRoute(
+      path: '/image-recipe/:name',
+      builder: (context, state) {
+        return ImageRecipeView(name: state.pathParameters['name']!);
       },
     ),
     GoRoute(

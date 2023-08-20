@@ -91,7 +91,7 @@ class RecipePreviewView extends StatelessWidget {
                                         ),
                                       ),
                                     ),
-                                  if (recipe != null) PreviewIngredientList(recipe: recipe),
+                                  if (recipe != null) PreviewIngredientList(ingredients: recipe.ingredients?.map((e) => e.name!).toList() ?? []),
                                   SliverToBoxAdapter(child: Divider()),
                                   if ((recipe?.instructions ?? []).isNotEmpty)
                                     SliverToBoxAdapter(
@@ -103,7 +103,7 @@ class RecipePreviewView extends StatelessWidget {
                                         subtitle: Text('${recipe?.instructions!.length} steps'),
                                       ),
                                     ),
-                                  PreviewInstructionList(),
+                                  PreviewInstructionList(instructions: recipe?.instructions?.map((e) => e.text!).toList() ?? []),
                                   SliverToBoxAdapter(child: gap64),
                                 ]),
                               ),

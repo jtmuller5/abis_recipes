@@ -89,7 +89,7 @@ class RecipeView extends StatelessWidget {
                                                   await model.deleteRecipe(recipe.recipeId);
                                                   router.pop();
                                                 }
-                                                router.pop();
+                                                if(router.canPop()) router.pop();
                                               }
                                             }
                                           }

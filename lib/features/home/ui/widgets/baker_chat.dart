@@ -9,9 +9,11 @@ class BakerChat extends StatelessWidget {
     return FloatingActionButton(
       heroTag: 'baker_chat',
       onPressed: () {
-router.push('/chat');
+        router.push('/chat');
       },
-      child: Icon(Icons.message_outlined
+      child: Icon(
+        Icons.message_outlined,
+        color: Colors.white,
       ),
     );
   }

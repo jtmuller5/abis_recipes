@@ -1,4 +1,5 @@
 import 'package:abis_recipes/app/constants.dart';
+import 'package:abis_recipes/app/router.dart';
 import 'package:abis_recipes/app/services.dart';
 import 'package:abis_recipes/features/home/ui/widgets/bake_mode_button.dart';
 import 'package:abis_recipes/features/home/ui/widgets/baker_chat.dart';
@@ -11,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'home_view_model.dart';
 
@@ -30,27 +32,35 @@ class HomeView extends StatelessWidget {
           ),
           drawer: Drawer(
             backgroundColor: Colors.white,
-
             child: ListView(
               children: [
-                DrawerHeader(child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Flexible(child: Center(child: Image.asset('assets/cheesecake.png'))),
-                    Row(
-                      children: [
-                        Text('Abi\'s Recipes', style: Theme.of(context).textTheme.bodySmall,),
-                        FutureBuilder(future: PackageInfo.fromPlatform(), builder: (context, snapshot) {
-                          return Text(snapshot.hasData ? ' v${(snapshot.data as PackageInfo).version}' : '', style: Theme.of(context).textTheme.bodySmall,);
-                        },)
-                      ],
-                    ),
-                  ],
+                DrawerHeader(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Flexible(child: Center(child: Image.asset('assets/cheesecake.png'))),
+                      Row(
+                        children: [
+                          Text(
+                            'Abi\'s Recipes',
+                            style: Theme.of(context).textTheme.bodySmall,
+                          ),
+                          FutureBuilder(
+                            future: PackageInfo.fromPlatform(),
+                            builder: (context, snapshot) {
+                              return Text(
+                                snapshot.hasData ? ' v${(snapshot.data as PackageInfo).version}' : '',
+                                style: Theme.of(context).textTheme.bodySmall,
+                              );
+                            },
+                          )
+                        ],
+                      ),
+                    ],
+                  ),
+                  padding: EdgeInsets.all(16),
+                  decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Theme.of(context).colorScheme.primary, width: 2))),
                 ),
-                padding: EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  border: Border(bottom: BorderSide(color: Theme.of(context).colorScheme.primary, width: 2))
-                ),),
                 ListTile(
                   leading: PastryIcon(pastry: Pastry.eclair, asset: 'assets/ingredients.png'),
                   onTap: () async {
@@ -168,6 +178,47 @@ class HomeView extends StatelessWidget {
                           )),
                     ),
                   ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 16.0, top: 16, bottom: 16),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            'Paste your recipe\'s URL into the search box or take a picture of the recipe',
+                            style: TextStyle(fontSize: 12),
+                          ),
+                        ),
+                        gap8,
+                        ValueListenableBuilder(
+                          valueListenable: model.parsingImage,
+                          builder: (context, parsing, _) {
+                            return RawMaterialButton(
+                              constraints: BoxConstraints.tight(Size.square(40)),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                              fillColor: Theme.of(context).colorScheme.primaryContainer,
+                              onPressed: () async {
+                                String? imageName = await model.capturePhoto(ImageSource.camera);
+
+                                if(imageName == null) {
+                                  return;
+                                }
+
+                                router.push('/image-recipe/$imageName');
+                              },
+                              child: parsing ?  SizedBox(
+                                  height: 24, width: 24,child: CircularProgressIndicator(color: Colors.white)):Icon(
+                                Icons.camera_alt_outlined,
+                                color: Colors.white,
+                              ),
+                            );
+                          }
+                        ),
+                        gap8,
+                      ],
+                    ),
+                  ),
+                  Divider(height: 2,
+                  color: Colors.grey.shade300,),
                   Expanded(child: RecentRecipes()),
                 ],
               ),
