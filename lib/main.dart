@@ -1,14 +1,9 @@
 import 'package:abis_recipes/app/get_it.dart';
 import 'package:abis_recipes/app/router.dart';
 import 'package:abis_recipes/app/services.dart';
-import 'package:abis_recipes/features/books/ui/recipe_preview_view/recipe_preview_view.dart';
-import 'package:abis_recipes/features/home/ui/home_view.dart';
-import 'package:abis_recipes/features/shared/ui/app_name.dart';
 import 'package:abis_recipes/firebase_options.dart';
 import 'package:amplitude_flutter/amplitude.dart';
-import 'package:firebase_auth/firebase_auth.dart' hide EmailAuthProvider;
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';

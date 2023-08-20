@@ -44,6 +44,8 @@ app.*.map.json
 /android/app/release
 
 
-/ios/fastlane/.env
+/ios/fastlane/.env.default
+/android/fastlane/.env.default
 
 /lib/firebase_options.dart
+/assets/**.env

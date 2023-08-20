@@ -10,7 +10,7 @@ platform :ios do
     )
     increment_build_number(xcodeproj: "Runner.xcodeproj")
     build_number = get_build_number(xcodeproj: "Runner.xcodeproj")
-    sh("flutter","build","ipa","--build-name", "#{version_number}","--dart-define=chat_key=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")
+    sh("flutter","build","ipa","--build-name", "#{version_number}","--dart-define=chat_key=#{ENV["chat_key"]}")
     upload_to_app_store(ipa: "../build/ios/ipa/abisRecipes.ipa",
       submit_for_review: true,
       automatic_release: true,
@@ -23,7 +23,7 @@ platform :ios do
   lane :beta do
       increment_build_number(xcodeproj: "Runner.xcodeproj")
       build_number = get_build_number(xcodeproj: "Runner.xcodeproj")
-      sh("flutter","build","ipa","--build-number", "#{build_number}","--dart-define=chat_key=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")
+      sh("flutter","build","ipa","--build-number", "#{build_number}","--dart-define=chat_key=#{ENV["chat_key"]}")
       upload_to_testflight(ipa: "../build/ios/ipa/abis_recipes.ipa")
     end
 end
