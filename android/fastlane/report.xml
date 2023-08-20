@@ -5,27 +5,27 @@
     
     
       
-      <testcase classname="fastlane.lanes" name="0: update_fastlane" time="0.074299">
+      <testcase classname="fastlane.lanes" name="0: update_fastlane" time="0.076372">
         
       </testcase>
     
       
-      <testcase classname="fastlane.lanes" name="1: default_platform" time="8.8e-05">
+      <testcase classname="fastlane.lanes" name="1: default_platform" time="9.4e-05">
         
       </testcase>
     
       
-      <testcase classname="fastlane.lanes" name="2: Switch to android bump_version_code lane" time="7.7e-05">
+      <testcase classname="fastlane.lanes" name="2: Switch to android bump_version_code lane" time="8.5e-05">
         
       </testcase>
     
       
-      <testcase classname="fastlane.lanes" name="3: flutter build appbundle --build-number\=15 --dart-define\=chat_key\=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" time="50.639837">
+      <testcase classname="fastlane.lanes" name="3: flutter build appbundle --build-number\=17 --dart-define\=chat_key\=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" time="62.184337">
         
       </testcase>
     
       
-      <testcase classname="fastlane.lanes" name="4: upload_to_play_store" time="66.12965">
+      <testcase classname="fastlane.lanes" name="4: upload_to_play_store" time="72.008212">
         
       </testcase>
     

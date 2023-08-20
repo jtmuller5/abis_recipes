@@ -63,17 +63,16 @@ class ImageRecipeView extends StatelessWidget {
                                   child: FutureBuilder(
                                     future: model.loadImage(snapshot.data!.docs.first.data()['file']),
                                     builder: (context, snapshot) {
-                                      if (snapshot.connectionState == ConnectionState.waiting) {
-                                        return const Center(child: CircularProgressIndicator());
-                                      }
 
-                                      if (snapshot.data != null) {
-                                        return Center(
-                                          child: Image.network(snapshot.data!),
+                                        return AnimatedSwitcher(
+                                          duration: kThemeAnimationDuration,
+                                          child:snapshot.connectionState == ConnectionState.waiting?SizedBox(
+                                              height: 300,
+
+                                              child: ColoredBox(color: Colors.grey.shade200)).animate(onPlay: (controller) => controller.repeat()).shimmer(): Center(
+                                            child: Image.network(snapshot.data!),
+                                          ),
                                         );
-                                      } else {
-                                        return const Center(child: Text('Error loading image'));
-                                      }
                                     },
                                   ),
                                 ),
