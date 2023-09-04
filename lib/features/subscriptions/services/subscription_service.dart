@@ -39,7 +39,14 @@ class SubscriptionService {
     }
 
     await Purchases.configure(configuration..appUserID = FirebaseAuth.instance.currentUser?.uid);
-    await checkSubscription();
+
+    bool vip = isVip();
+
+    if(vip){
+      setPremium(true);
+    } else {
+      await checkSubscription();
+    }
 
     Purchases.addCustomerInfoUpdateListener((purchaserInfo)  {
 
@@ -148,5 +155,16 @@ class SubscriptionService {
         ),
       );
     },);
+  }
+
+  bool isVip(){
+    List<String> vipEmails = [
+      'jmcn1492@gmail.com',
+      'jnobis13@hotmail.com',
+      'abigail.naidoo.03@gmail.com',
+      //'jtmuller5@gmail.com',
+    ];
+
+    return vipEmails.contains(FirebaseAuth.instance.currentUser?.email);
   }
 }

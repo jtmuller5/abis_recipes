@@ -1,4 +1,5 @@
 import 'package:abis_recipes/app/router.dart';
+import 'package:abis_recipes/app/services.dart';
 import 'package:abis_recipes/features/books/models/gpt_message.dart';
 import 'package:abis_recipes/features/books/models/instruction.dart';
 import 'package:abis_recipes/features/books/models/note.dart';
@@ -157,39 +158,43 @@ class _InstructionTileState extends State<InstructionTile> {
                         await model.updateInstruction(widget.instruction.copyWith(note: note), widget.recipe);
                       }
                     } else if (value == 'edit') {
-                      final instructionText = await showDialog<String>(
-                        context: context,
-                        builder: (BuildContext context) {
-                          TextEditingController instructionController = TextEditingController(text: widget.instruction.text);
-                          return AlertDialog(
-                            backgroundColor: Colors.white,
-                            surfaceTintColor: Colors.transparent,
-                            title: Text('Edit Instruction'),
-                            content: TextField(
-                              controller: instructionController,
-                              autofocus: true,
-                              decoration: InputDecoration(hintText: 'Enter your instruction here'),
-                              maxLines: 5,
-                              minLines: 4,
-                            ),
-                            actions: [
-                              TextButton(
-                                child: Text('Cancel'),
-                                onPressed: () => router.pop(),
+                      if (!subscriptionService.premium.value) {
+                        subscriptionService.showPremiumPopup();
+                      } else {
+                        final instructionText = await showDialog<String>(
+                          context: context,
+                          builder: (BuildContext context) {
+                            TextEditingController instructionController = TextEditingController(text: widget.instruction.text);
+                            return AlertDialog(
+                              backgroundColor: Colors.white,
+                              surfaceTintColor: Colors.transparent,
+                              title: Text('Edit Instruction'),
+                              content: TextField(
+                                controller: instructionController,
+                                autofocus: true,
+                                decoration: InputDecoration(hintText: 'Enter your instruction here'),
+                                maxLines: 5,
+                                minLines: 4,
                               ),
-                              TextButton(
-                                child: Text('Save'),
-                                onPressed: () => router.pop(instructionController.text),
-                              ),
-                            ],
-                          );
-                        },
-                      );
+                              actions: [
+                                TextButton(
+                                  child: Text('Cancel'),
+                                  onPressed: () => router.pop(),
+                                ),
+                                TextButton(
+                                  child: Text('Save'),
+                                  onPressed: () => router.pop(instructionController.text),
+                                ),
+                              ],
+                            );
+                          },
+                        );
 
-                      if (instructionText != null && instructionText.isNotEmpty) {
-                        await model.updateInstruction(widget.instruction, widget.recipe, updatedInstruction: instructionText);
-                      } else if (instructionText == '') {
-                        model.deleteInstruction(widget.instruction, widget.recipe);
+                        if (instructionText != null && instructionText.isNotEmpty) {
+                          await model.updateInstruction(widget.instruction, widget.recipe, updatedInstruction: instructionText);
+                        } else if (instructionText == '') {
+                          model.deleteInstruction(widget.instruction, widget.recipe);
+                        }
                       }
                     }
                   }
