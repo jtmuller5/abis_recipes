@@ -108,15 +108,17 @@ class HomeView extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   SizedBox(height: MediaQuery.viewPaddingOf(context).top),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      gap32,
-                      AppName(),
-                      PastryIcon(
-                        pastry: Pastry.cupCake,
-                      )
-                    ],
+                  RepaintBoundary(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        gap32,
+                        AppName(),
+                        PastryIcon(
+                          pastry: Pastry.cupCake,
+                        )
+                      ],
+                    ),
                   ),
                   gap32,
                   Padding(
