@@ -21,6 +21,8 @@ Future<void> main() async {
   await amplitude.init("ff2f485bec7b3432c7a6ed352cc6420c");
   await configureDependencies();
   // await isar.writeTxn(() async => await isar.clear());
+
+  await subscriptionService.initPlatformState();
   sharedPreferences = await SharedPreferences.getInstance();
 
   runApp(const MyApp());

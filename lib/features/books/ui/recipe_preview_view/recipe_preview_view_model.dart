@@ -183,6 +183,7 @@ class RecipePreviewViewModel extends ViewModel<RecipePreviewViewModel> {
           // remove duplicates
           newList = newList.toSet().toList();
           sharedPreferences.setStringList('recent_searches', newList);
+          sharedPreferences.setInt('free_recipes', (sharedPreferences.getInt('free_recipes') ?? 0) + 1);
           errorLoadingRecipe.value = false;
         }
       } catch (e) {

@@ -17,6 +17,7 @@ import '../features/books/services/current_recipe_service.dart' as _i6;
 import '../features/books/services/firestore_book_service.dart' as _i5;
 import '../features/home/services/app_service.dart' as _i3;
 import '../features/home/services/search_service.dart' as _i7;
+import '../features/subscriptions/services/subscription_service.dart' as _i8;
 
 // initializes the registration of main-scope dependencies inside of GetIt
 _i1.GetIt $initGetIt(
@@ -33,5 +34,6 @@ _i1.GetIt $initGetIt(
   gh.lazySingleton<_i4.BookService>(() => _i5.FirestoreBookService());
   gh.lazySingleton<_i6.CurrentRecipeService>(() => _i6.CurrentRecipeService());
   gh.lazySingleton<_i7.SearchService>(() => _i7.SearchService());
+  gh.singleton<_i8.SubscriptionService>(_i8.SubscriptionService());
   return getIt;
 }

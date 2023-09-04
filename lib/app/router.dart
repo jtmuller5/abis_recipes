@@ -13,6 +13,7 @@ import 'package:abis_recipes/features/home/ui/home_view.dart';
 import 'package:abis_recipes/features/shared/ui/app_name.dart';
 import 'package:abis_recipes/features/shared/ui/browser/browser_view.dart';
 import 'package:abis_recipes/features/shared/ui/pastry_icon.dart';
+import 'package:abis_recipes/features/subscriptions/ui/subscription/subscription_view.dart';
 import 'package:firebase_auth/firebase_auth.dart' hide EmailAuthProvider;
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:flutter/material.dart';
@@ -143,6 +144,12 @@ final router = GoRouter(
       path: '/recipes',
       builder: (context, state) {
         return SearchView();
+      },
+    ),
+    GoRoute(
+      path: '/subscriptions',
+      builder: (context, state) {
+        return SubscriptionView();
       },
     ),
     GoRoute(
