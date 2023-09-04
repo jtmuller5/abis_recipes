@@ -50,4 +50,4 @@ app.*.map.json
 /lib/firebase_options.dart
 /assets/**.env
 /assets/config.json
-/android/fastlane/report.xml
+**/fastlane/report.xml
