@@ -36,10 +36,14 @@ bool deleting = false;
     router.push(Uri.parse('/recipe/${recipe.recipeId}').toString());
   }
 
-  Future<void> updateInstruction(Instruction instruction, Recipe? recipe) async {
+  Future<void> updateInstruction(Instruction instruction, Recipe? recipe, {String? updatedInstruction}) async {
     if(recipe == null) return;
     try{
       final index = recipe.instructions!.indexWhere((element) => element.text == instruction.text);
+
+      if(updatedInstruction != null){
+        instruction = instruction.copyWith(text: updatedInstruction);
+      }
 
       List<Instruction> instructions = [...recipe.instructions!]..[index] = instruction;
 
@@ -51,9 +55,25 @@ bool deleting = false;
     }
   }
 
-  Future<void> updateIngredient(Ingredient ingredient, Recipe recipe) async {
+  void deleteInstruction(Instruction instruction, Recipe recipe) async {
+    try{
+      List<Instruction> instructions = [...recipe.instructions!]..remove(instruction);
+
+      await FirebaseFirestore.instance.collection('users').doc(FirebaseAuth.instance.currentUser?.uid).collection('recipes').doc(recipe.recipeId).update({
+        'instructions': instructions.map((e) => e.toJson()).toList(),
+      });
+    } catch(e){
+      debugPrint('error: ' +e.toString());
+    }
+  }
+
+  Future<void> updateIngredient(Ingredient ingredient, Recipe recipe, {String? newText}) async {
     try{
       final index = recipe.ingredients!.indexWhere((element) => element.name == ingredient.name);
+
+      if(newText != null){
+        ingredient = ingredient.copyWith(name: newText);
+      }
 
       List<Ingredient> ingredients = [...recipe.ingredients!]..[index] = ingredient;
 

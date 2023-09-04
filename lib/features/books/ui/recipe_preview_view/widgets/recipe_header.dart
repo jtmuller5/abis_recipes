@@ -56,7 +56,7 @@ class RecipeHeader extends StatelessWidget {
                     url,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: Theme.of(context).textTheme.bodyLarge!.copyWith(fontSize: 16),
+                    style: Theme.of(context).textTheme.bodyLarge!.copyWith(fontSize: 16, color: Colors.blue),
                   ),
                 ),
               ),

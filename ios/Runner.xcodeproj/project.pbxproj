@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */ = {isa = PBXBuildFile; fileRef = 1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */; };
 		1C3F83D77C9BC6648C6160F1 /* Pods_Runner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 044F9B225CBABB03926912BC /* Pods_Runner.framework */; };
+		2D3F69892AA67FCD00D466AD /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2D3F69882AA67FCD00D466AD /* StoreKit.framework */; };
 		2DB070C929AFF990007312B3 /* ShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DB070C829AFF990007312B3 /* ShareViewController.swift */; };
 		2DB070CC29AFF990007312B3 /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2DB070CA29AFF990007312B3 /* MainInterface.storyboard */; };
 		2DB070D029AFF990007312B3 /* Share Extension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 2DB070C629AFF990007312B3 /* Share Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -60,6 +61,7 @@
 		044F9B225CBABB03926912BC /* Pods_Runner.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Runner.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		1498D2321E8E86230040F4C2 /* GeneratedPluginRegistrant.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GeneratedPluginRegistrant.h; sourceTree = "<group>"; };
 		1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GeneratedPluginRegistrant.m; sourceTree = "<group>"; };
+		2D3F69882AA67FCD00D466AD /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		2DB070AB29AFF3B5007312B3 /* Runner.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Runner.entitlements; sourceTree = "<group>"; };
 		2DB070C629AFF990007312B3 /* Share Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Share Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2DB070C829AFF990007312B3 /* ShareViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareViewController.swift; sourceTree = "<group>"; };
@@ -98,6 +100,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				1C3F83D77C9BC6648C6160F1 /* Pods_Runner.framework in Frameworks */,
+				2D3F69892AA67FCD00D466AD /* StoreKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -179,6 +182,7 @@
 		A8B05FA831F233E4BEBC7BD0 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				2D3F69882AA67FCD00D466AD /* StoreKit.framework */,
 				044F9B225CBABB03926912BC /* Pods_Runner.framework */,
 			);
 			name = Frameworks;

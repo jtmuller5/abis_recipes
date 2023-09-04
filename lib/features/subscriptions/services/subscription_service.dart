@@ -1,3 +1,4 @@
+import 'package:abis_recipes/app/constants.dart';
 import 'package:abis_recipes/app/router.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -8,7 +9,7 @@ import 'dart:io' show Platform;
 
 @singleton
 class SubscriptionService {
-  String _premiumId = 'recipes-premium';
+  String _premiumId = 'premium';
 
   ValueNotifier<bool> premium = ValueNotifier(false);
 
@@ -37,14 +38,19 @@ class SubscriptionService {
       configuration = PurchasesConfiguration(const String.fromEnvironment('ios_sdk_key'));
     }
 
-    configuration.appUserID = FirebaseAuth.instance.currentUser?.uid;
-    await Purchases.configure(configuration);
+    await Purchases.configure(configuration..appUserID = FirebaseAuth.instance.currentUser?.uid);
     await checkSubscription();
 
-    Purchases.addCustomerInfoUpdateListener((purchaserInfo) => {
+    Purchases.addCustomerInfoUpdateListener((purchaserInfo)  {
+
+      debugPrint('purchaserInfo.activeSubscriptions: ' + purchaserInfo.activeSubscriptions.toString());
+      debugPrint('purchaserInfo.entitlements.all: ' + purchaserInfo.entitlements.all.toString());
+      debugPrint('purchaserInfo.entitlements.active: ' + purchaserInfo.entitlements.active.toString());
+      debugPrint('purchaserInfo.entitlements.all[_premiumId]: ' + purchaserInfo.entitlements.all[_premiumId].toString());
+      debugPrint('purchaserInfo.allExpirationDates: ' + (purchaserInfo.allExpirationDates.toString()));
       // handle any changes to purchaserInfo
-      if(purchaserInfo.entitlements.all.containsKey(_premiumId)){
-        setPremium(purchaserInfo.entitlements.all[_premiumId]?.isActive ?? false)
+      if(purchaserInfo.entitlements.all[_premiumId]?.isActive ?? false){
+        setPremium(purchaserInfo.entitlements.all[_premiumId]?.isActive ?? false);
       }
     });
   }
@@ -79,9 +85,9 @@ class SubscriptionService {
   Future<void> makePurchase(Package package) async {
     try {
       CustomerInfo customerInfo = await Purchases.purchasePackage(package);
-      var isPro = customerInfo.entitlements.all[_premiumId]?.isActive ?? false;
-      if (isPro) {
-        // Unlock that great "pro" content
+      var isPremium = customerInfo.entitlements.all[_premiumId]?.isActive ?? false;
+      if (isPremium) {
+        setPremium(true);
       }
     } on PlatformException catch (e) {
       var errorCode = PurchasesErrorHelper.getErrorCode(e);
@@ -91,46 +97,54 @@ class SubscriptionService {
     }
   }
 
-  void showPremiumPopup(){
-    showModalBottomSheet(context: router.routerDelegate.navigatorKey.currentContext!,
-      builder: (context) {
-      return DecoratedBox(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: ListView(
-          padding: const EdgeInsets.all(24),
-          children: [
-            SizedBox(
-              height: 350,
-              child: Stack(
-                children: [
+  Future<void> showPremiumPopup() async {
+    await showModalBottomSheet(context: router.routerDelegate.navigatorKey.currentContext!,isScrollControlled: true,
 
-                  Positioned(
-                      top: 0,
-                      left: 0,
-                      child: Image.asset('assets/workstation.png',
-                      height: 300,)),
-                  Positioned(
-                    bottom: 0,
-                    left: 0,
-                    child: Image.asset('assets/feather.png',
-                      height: 200,),
-                  ),
-                  Positioned(
+      builder: (context) {
+      return FractionallySizedBox(
+        heightFactor: .7,
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: ListView(
+            padding: const EdgeInsets.all(24),
+            children: [
+              SizedBox(
+                height: 350,
+                child: Stack(
+                  children: [
+
+                    Positioned(
+                        top: 0,
+                        left: 0,
+                        child: Opacity(
+                          opacity: .7,
+                          child: Image.asset('assets/workstation.png',
+                          height: 300,),
+                        )),
+                    Positioned(
                       bottom: 0,
-                      right: 0,
-                      child: Image.asset('assets/book_stack.png',height: 200,))
-                ],
+                      left: 0,
+                      child: Image.asset('assets/feather.png',
+                        height: 200,),
+                    ),
+                    Positioned(
+                        bottom: 0,
+                        right: 0,
+                        child: Image.asset('assets/book_stack.png',height: 150,))
+                  ],
+                ),
               ),
-            ),
-            Text('You need to be a premium member to access this feature.'),
-            OutlinedButton(onPressed: (){
-              router.pop();
-             router.push('/subscriptions');
-            }, child: const Text('Subscribe'))
-          ],
+              Text('You need to be a premium member to access this feature.'),
+              gap16,
+              OutlinedButton(onPressed: (){
+                router.pop();
+               router.push('/subscriptions');
+              }, child: const Text('Subscribe'))
+            ],
+          ),
         ),
       );
     },);

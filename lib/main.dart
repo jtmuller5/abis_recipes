@@ -70,14 +70,14 @@ class _MyAppState extends State<MyApp> {
         ),
         inputDecorationTheme: InputDecorationTheme(
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.all(Radius.circular(36)),
+            borderRadius: BorderRadius.all(Radius.circular(16)),
           ),
           enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.all(Radius.circular(36)),
+            borderRadius: BorderRadius.all(Radius.circular(16)),
             borderSide: BorderSide(color: Color(0xffa4c4ed)),
           ),
           focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.all(Radius.circular(36)),
+            borderRadius: BorderRadius.all(Radius.circular(16)),
             borderSide: BorderSide(color: Theme.of(context).colorScheme.primary),
           ),
         ),

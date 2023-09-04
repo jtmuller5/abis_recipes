@@ -37,6 +37,7 @@ dependencies:
   purchases_flutter: ^5.6.4
   recase: ^4.1.0
   shared_preferences: ^2.2.1
+  url_launcher: ^6.1.14
   wakelock: ^0.6.2
 
 # build command

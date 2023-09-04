@@ -1,4 +1,5 @@
 import 'package:abis_recipes/app/router.dart';
+import 'package:abis_recipes/app/services.dart';
 import 'package:abis_recipes/features/books/models/ingredient.dart';
 import 'package:abis_recipes/features/books/models/note.dart';
 import 'package:abis_recipes/features/books/models/recipe.dart';
@@ -82,6 +83,7 @@ class IngredientList extends StatelessWidget  {
                             ),
                             items: [
                                PopupMenuItem(value: 'note', child: Text(ingredient?.note != null ?'Edit Note' : 'Add Note')),
+                              PopupMenuItem(value: 'edit', child: Text('Edit')),
                             ],
                           );
                           if (value != null) {
@@ -92,27 +94,30 @@ class IngredientList extends StatelessWidget  {
                                 context: context,
                                 builder: (BuildContext context) {
                                   TextEditingController noteController = TextEditingController();
-                                  return AlertDialog.adaptive(
-                                    backgroundColor: Colors.white,
-                                    surfaceTintColor: Colors.transparent,
-                                    title: Text('New Note'),
-                                    content: TextField(
-                                      controller: noteController,
-                                      autofocus: true,
-                                      decoration: InputDecoration(hintText: 'Enter your note here'),
-                                      maxLines: 5,
-                                      minLines: 4,
+                                  return Material(
+                                    color: Colors.transparent,
+                                    child: AlertDialog.adaptive(
+                                      backgroundColor: Colors.white,
+                                      surfaceTintColor: Colors.transparent,
+                                      title: Text('New Note'),
+                                      content: TextField(
+                                        controller: noteController,
+                                        autofocus: true,
+                                        decoration: InputDecoration(hintText: 'Enter your note here'),
+                                        maxLines: 5,
+                                        minLines: 4,
+                                      ),
+                                      actions: [
+                                        TextButton(
+                                          child: Text('Cancel'),
+                                          onPressed: () => router.pop(),
+                                        ),
+                                        TextButton(
+                                          child: Text('Save'),
+                                          onPressed: () => router.pop(noteController.text),
+                                        ),
+                                      ],
                                     ),
-                                    actions: [
-                                      TextButton(
-                                        child: Text('Cancel'),
-                                        onPressed: () => router.pop(),
-                                      ),
-                                      TextButton(
-                                        child: Text('Save'),
-                                        onPressed: () => router.pop(noteController.text),
-                                      ),
-                                    ],
                                   );
                                 },
                               );
@@ -125,6 +130,45 @@ class IngredientList extends StatelessWidget  {
                                 );
 
                                 await model.updateIngredient(ingredient!.copyWith(note: note), recipe);
+                              }
+                            } else if(value == 'edit'){
+
+                              if(!subscriptionService.premium.value){
+                                subscriptionService.showPremiumPopup();
+                              } else {
+                                final ingredientName = await showDialog<String>(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    TextEditingController ingredientController = TextEditingController(text: ingredient?.name);
+                                    return AlertDialog.adaptive(
+                                      backgroundColor: Colors.white,
+                                      surfaceTintColor: Colors.transparent,
+                                      title: Text('Edit Ingredient'),
+                                      content: TextField(
+                                        controller: ingredientController,
+                                        autofocus: true,
+                                        decoration: InputDecoration(hintText: 'Enter your ingredient here'),
+                                        maxLines: 5,
+                                        minLines: 4,
+                                      ),
+                                      actions: [
+                                        TextButton(
+                                          child: Text('Cancel'),
+                                          onPressed: () => router.pop(),
+                                        ),
+                                        TextButton(
+                                          child: Text('Save'),
+                                          onPressed: () => router.pop(ingredientController.text),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+
+                                debugPrint('ingredientName: ' + ingredientName.toString());
+                                if (ingredientName != null && ingredientName.isNotEmpty) {
+                                  await model.updateIngredient(ingredient!, recipe, newText: ingredientName);
+                                }
                               }
                             }
                           }

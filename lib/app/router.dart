@@ -39,6 +39,19 @@ final router = GoRouter(
         path: '/sign-in',
         builder: (context, state) => SignInScreen(
               providers: providers,
+              sideBuilder: (context, constraints) {
+                return Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    PastryIcon(
+                      pastry: Pastry.eclair,
+                      asset: 'assets/cheesecake.png',
+                      sideLength: 300,
+                    ),
+                    AppName(),
+                  ],
+                );
+              },
               headerBuilder: (context, constraints, shrinkOffset) {
                 return Column(
                   children: [
@@ -68,6 +81,19 @@ final router = GoRouter(
         path: '/register',
         builder: (context, state) => RegisterScreen(
           providers: providers,
+          sideBuilder:(context, constraints) {
+            return Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                PastryIcon(
+                  pastry: Pastry.eclair,
+                  asset: 'assets/cheesecake.png',
+                  sideLength: 300,
+                ),
+                AppName(),
+              ],
+            );
+          },
           headerBuilder: (context, constraints, shrinkOffset) {
             return Column(
               children: [

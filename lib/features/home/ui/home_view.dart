@@ -4,7 +4,6 @@ import 'package:abis_recipes/app/services.dart';
 import 'package:abis_recipes/features/home/ui/widgets/bake_mode_button.dart';
 import 'package:abis_recipes/features/home/ui/widgets/baker_chat.dart';
 import 'package:abis_recipes/features/home/ui/widgets/recent_recipes.dart';
-import 'package:abis_recipes/features/home/ui/widgets/recent_searches.dart';
 import 'package:abis_recipes/features/shared/ui/app_name.dart';
 import 'package:abis_recipes/features/shared/ui/pastry_icon.dart';
 import 'package:abis_recipes/main.dart';
@@ -68,8 +67,10 @@ class HomeView extends StatelessWidget {
                     context.pop();
                     context.push('/recipes');
                   },
-                  title: Text('All Recipes',
-                    style: Theme.of(context).textTheme.headlineSmall,),
+                  title: Text(
+                    'All Recipes',
+                    style: Theme.of(context).textTheme.headlineSmall,
+                  ),
                 ),
                 ListTile(
                   leading: PastryIcon(pastry: Pastry.eclair, asset: 'assets/book.png'),
@@ -77,8 +78,10 @@ class HomeView extends StatelessWidget {
                     context.pop();
                     context.push('/books');
                   },
-                  title: Text('Recipe Books',
-                    style: Theme.of(context).textTheme.headlineSmall,),
+                  title: Text(
+                    'Recipe Books',
+                    style: Theme.of(context).textTheme.headlineSmall,
+                  ),
                 ),
                 ListTile(
                   leading: PastryIcon(pastry: Pastry.eclair, asset: 'assets/chef.png'),
@@ -86,8 +89,10 @@ class HomeView extends StatelessWidget {
                     context.pop();
                     context.push('/profile');
                   },
-                  title: Text('Account',
-                    style: Theme.of(context).textTheme.headlineSmall,),
+                  title: Text(
+                    'Account',
+                    style: Theme.of(context).textTheme.headlineSmall,
+                  ),
                 ),
                 ListTile(
                   leading: PastryIcon(pastry: Pastry.eclair, asset: 'assets/oven.png'),
@@ -95,8 +100,10 @@ class HomeView extends StatelessWidget {
                     context.pop();
                     context.push('/subscriptions');
                   },
-                  title: Text('Premium',
-                  style: Theme.of(context).textTheme.headlineSmall,),
+                  title: Text(
+                    'Premium',
+                    style: Theme.of(context).textTheme.headlineSmall,
+                  ),
                 ),
               ],
             ),
@@ -144,8 +151,7 @@ class HomeView extends StatelessWidget {
                                 labelText: 'Recipe Url',
                                 hintText: 'https://sallysbakingaddiction.com/homemade-eclairs/',
                                 contentPadding: EdgeInsets.all(4),
-                                border: OutlineInputBorder(
-                                ),
+                                border: OutlineInputBorder(),
                                 fillColor: Colors.white,
                                 filled: true,
                                 prefixIcon: IconButton(
@@ -188,7 +194,7 @@ class HomeView extends StatelessWidget {
 
                                     //String url = 'https://www.brit.co/pescatarian-vegetable-recipes/';
 
-                                    if(!subscriptionService.premium.value && (sharedPreferences.getInt('free_recipes') ?? 0) >= 3){
+                                    if (!subscriptionService.premium.value && (sharedPreferences.getInt('free_recipes') ?? 0) >= 3) {
                                       FocusScope.of(context).unfocus();
                                       subscriptionService.showPremiumPopup();
                                       return;
@@ -209,41 +215,61 @@ class HomeView extends StatelessWidget {
                             builder: (context, parsing, _) {
                               return RawMaterialButton(
                                 constraints: BoxConstraints.tight(Size.square(50)),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                                 fillColor: Theme.of(context).colorScheme.primaryContainer,
                                 onPressed: () async {
                                   String? imageName = await model.capturePhoto(ImageSource.camera);
 
-                                  if(imageName == null) {
+                                  if (imageName == null) {
                                     return;
                                   }
 
                                   router.push('/image-recipe/$imageName');
                                 },
-                                child: parsing ?  SizedBox(
-                                    height: 36, width: 36,child: CircularProgressIndicator(color: Colors.white)):Icon(
-                                  Icons.camera_alt_outlined,
-                                  color: Colors.white,
-                                  size: 30,
-                                ),
+                                child: parsing
+                                    ? SizedBox(height: 36, width: 36, child: CircularProgressIndicator(color: Colors.white))
+                                    : Icon(
+                                        Icons.camera_alt_outlined,
+                                        color: Colors.white,
+                                        size: 30,
+                                      ),
                               );
-                            }
-                        ),
+                            }),
                       ],
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Row(
-                      children: [
-                        Text('Free Recipes: ${3 - (sharedPreferences.getInt('free_recipes') ?? 0)}',
-                          style: Theme.of(context).textTheme.bodySmall,),
-                      ],
-                    ),
+                  ValueListenableBuilder(
+                      valueListenable: subscriptionService.premium,
+                      builder: (context, premium, child) {
+                        if (premium) {
+                          return SizedBox.shrink();
+                        }
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
+                          child: Row(
+                            children: [
+                              Text(
+                                'Free Recipes: ${3 - (sharedPreferences.getInt('free_recipes') ?? 0)}',
+                                style: Theme.of(context).textTheme.bodySmall,
+                              ),
+                              gap8,
+                              SizedBox.square(
+                                dimension: 12,
+                                child: CircularProgressIndicator(
+
+                                  value: (3 - (sharedPreferences.getInt('free_recipes') ?? 0)) / 3,
+                                  backgroundColor: Colors.grey.shade300,
+                                ),
+                              )
+                            ],
+                          ),
+                        );
+                      }),
+                  gap8,
+                  Divider(
+                    height: 2,
+                    color: Colors.grey.shade300,
                   ),
-                  gap16,
-                  Divider(height: 2,
-                  color: Colors.grey.shade300,),
                   Expanded(child: RecentRecipes()),
                 ],
               ),

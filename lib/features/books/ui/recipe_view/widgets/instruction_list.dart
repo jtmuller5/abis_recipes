@@ -11,17 +11,17 @@ import 'package:flutter_animate/flutter_animate.dart';
 
 class InstructionList extends StatelessWidget {
   InstructionList({
-    Key? key, required this.recipe,
+    Key? key,
+    required this.recipe,
   }) : super(key: key);
 
   final Recipe recipe;
 
   @override
   Widget build(BuildContext context) {
-
     return SliverList(
       delegate: SliverChildBuilderDelegate(
-            (BuildContext context, int index) {
+        (BuildContext context, int index) {
           Instruction instruction = (recipe.instructions ?? [])[index];
 
           return InstructionTile(
@@ -38,10 +38,11 @@ class InstructionList extends StatelessWidget {
 
 class InstructionTile extends StatefulWidget {
   const InstructionTile(
-      this.instruction,
-      this.index, {
-        Key? key, required this.recipe,
-      }) : super(key: key);
+    this.instruction,
+    this.index, {
+    Key? key,
+    required this.recipe,
+  }) : super(key: key);
 
   final Recipe recipe;
   final Instruction instruction;
@@ -57,7 +58,6 @@ class _InstructionTileState extends State<InstructionTile> {
 
   @override
   Widget build(BuildContext context) {
-
     RecipeViewModel model = getModel<RecipeViewModel>(context);
 
     return Animate(
@@ -87,16 +87,16 @@ class _InstructionTileState extends State<InstructionTile> {
                     context: context,
                     position: RelativeRect.fromRect(
                       rect.translate(rect.width, 0),
-                      Offset.zero & overlay.size ,
+                      Offset.zero & overlay.size,
                     ),
                     items: [
                       const PopupMenuItem(value: 'note', child: Text('Add Note')),
+                      const PopupMenuItem(value: 'edit', child: Text('Edit')),
                       const PopupMenuItem(value: 'shorten', child: Text('Shorten')),
                     ],
                   );
                   if (value != null) {
                     if (value == 'shorten') {
-
                       if (!(widget.instruction.shortened ?? false) && (widget.instruction.text ?? '').length > 80) {
                         setState(() {
                           shortening = true;
@@ -123,7 +123,6 @@ class _InstructionTileState extends State<InstructionTile> {
                       final noteText = await showDialog<String>(
                         context: context,
                         builder: (BuildContext context) {
-
                           TextEditingController noteController = TextEditingController();
                           return AlertDialog(
                             backgroundColor: Colors.white,
@@ -149,7 +148,6 @@ class _InstructionTileState extends State<InstructionTile> {
                       );
 
                       if (noteText != null && noteText.isNotEmpty) {
-
                         Note note = Note(
                           text: noteText,
                           recipeId: widget.recipe.recipeId,
@@ -158,13 +156,48 @@ class _InstructionTileState extends State<InstructionTile> {
 
                         await model.updateInstruction(widget.instruction.copyWith(note: note), widget.recipe);
                       }
+                    } else if (value == 'edit') {
+                      final instructionText = await showDialog<String>(
+                        context: context,
+                        builder: (BuildContext context) {
+                          TextEditingController instructionController = TextEditingController(text: widget.instruction.text);
+                          return AlertDialog(
+                            backgroundColor: Colors.white,
+                            surfaceTintColor: Colors.transparent,
+                            title: Text('Edit Instruction'),
+                            content: TextField(
+                              controller: instructionController,
+                              autofocus: true,
+                              decoration: InputDecoration(hintText: 'Enter your instruction here'),
+                              maxLines: 5,
+                              minLines: 4,
+                            ),
+                            actions: [
+                              TextButton(
+                                child: Text('Cancel'),
+                                onPressed: () => router.pop(),
+                              ),
+                              TextButton(
+                                child: Text('Save'),
+                                onPressed: () => router.pop(instructionController.text),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+
+                      if (instructionText != null && instructionText.isNotEmpty) {
+                        await model.updateInstruction(widget.instruction, widget.recipe, updatedInstruction: instructionText);
+                      } else if (instructionText == '') {
+                        model.deleteInstruction(widget.instruction, widget.recipe);
+                      }
                     }
                   }
                 }
               }
             },
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16,vertical: 8.0),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8.0),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -176,10 +209,13 @@ class _InstructionTileState extends State<InstructionTile> {
                         children: [
                           CircleAvatar(
                             backgroundColor: Theme.of(context).colorScheme.primary,
-                            child: shortening ? CircularProgressIndicator(color: Colors.white,):Center(
-                              child: Text('${widget.index + 1}',
-                                  style: Theme.of(context).textTheme.titleMedium!.copyWith(color: Theme.of(context).colorScheme.onPrimary)),
-                            ),
+                            child: shortening
+                                ? CircularProgressIndicator(
+                                    color: Colors.white,
+                                  )
+                                : Center(
+                                    child: Text('${widget.index + 1}', style: Theme.of(context).textTheme.titleMedium!.copyWith(color: Theme.of(context).colorScheme.onPrimary)),
+                                  ),
                           ),
                           if (widget.instruction.note != null)
                             IconButton(
@@ -187,9 +223,8 @@ class _InstructionTileState extends State<InstructionTile> {
                               icon: Icon(
                                 Icons.sticky_note_2_outlined,
                                 color: Theme.of(context).colorScheme.primary,
-
                               ),
-                              onPressed: (){
+                              onPressed: () {
                                 // Display note
                                 showDialog(
                                   context: context,
@@ -200,7 +235,7 @@ class _InstructionTileState extends State<InstructionTile> {
                                     content: Text(widget.instruction.note!.text ?? ''),
                                     actions: [
                                       TextButton(
-                                        onPressed: (){
+                                        onPressed: () {
                                           router.pop();
                                         },
                                         child: Text('Close'),
@@ -210,26 +245,24 @@ class _InstructionTileState extends State<InstructionTile> {
                                 );
                               },
                             ),
-                          if(widget.instruction.shortened ?? false)
+                          if (widget.instruction.shortened ?? false)
                             IconButton(
-                              constraints: BoxConstraints.tightFor(width: 40, height: 40),
-                              icon: Icon(
-                                showShort ? Icons.expand: Icons.compress,
-                                color: Theme.of(context).colorScheme.primary,
-
-                              ),
-                              onPressed: (){
-                                setState(() {
-                                  showShort = !showShort;
-                                });
-                              }),
+                                constraints: BoxConstraints.tightFor(width: 40, height: 40),
+                                icon: Icon(
+                                  showShort ? Icons.expand : Icons.compress,
+                                  color: Theme.of(context).colorScheme.primary,
+                                ),
+                                onPressed: () {
+                                  setState(() {
+                                    showShort = !showShort;
+                                  });
+                                }),
                         ],
                       ),
                     ),
                   ),
                   Expanded(
-                    child: Text(showShort ? widget.instruction.shortText ?? '' : widget.instruction.text ?? '',
-                        style: Theme.of(context).textTheme.bodyLarge!.copyWith(fontSize: 18)),
+                    child: Text(showShort ? widget.instruction.shortText ?? '' : widget.instruction.text ?? '', style: Theme.of(context).textTheme.bodyLarge!.copyWith(fontSize: 18)),
                   ),
                 ],
               ),
@@ -258,4 +291,3 @@ class _InstructionTileState extends State<InstructionTile> {
                   ]);
             },
           ),*/
-
