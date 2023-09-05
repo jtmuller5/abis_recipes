@@ -52,4 +52,4 @@ app.*.map.json
 /assets/config.json
 
 **/**report.xml
-**/**/fastlane/report.xml
+**/**/android/fastlane/report.xml

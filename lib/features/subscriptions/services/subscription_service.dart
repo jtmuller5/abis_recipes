@@ -162,7 +162,7 @@ class SubscriptionService {
       'jmcn1492@gmail.com',
       'jnobis13@hotmail.com',
       'abigail.naidoo.03@gmail.com',
-      //'jtmuller5@gmail.com',
+      'jtmuller5@gmail.com',
     ];
 
     return vipEmails.contains(FirebaseAuth.instance.currentUser?.email);
